@@ -50,6 +50,49 @@ public class WorkerManager {
 			{
 				continue;
 			}
+			
+			//워커의 공격 능력 추가 - 170808 노승호
+			Unit target = getClosestEnemyUnitFromWorker(worker);
+			
+			/* 테스트 용으로 잠시 가린 주석
+			for (Unit CombatUnits : MyBotModule.Broodwar.self().getUnits())
+			{
+				if (CombatUnits.getType() != UnitType.Terran_SCV) {
+					CombatUnitsCounter++;
+				}	
+				
+			}
+			
+			if (CombatUnitsCounter<=5 && target!= null) {
+				setCombatWorker(worker);
+			}
+			*/
+			
+			if(workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Build && workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Scout) {
+				
+				if (target!= null) {
+					
+					if (target.getType()!=UnitType.Terran_SCV || target.getType()!=UnitType.Protoss_Probe || target.getType()!=UnitType.Zerg_Drone ) {
+						
+					
+					setCombatWorker(worker);
+					System.out.println("드론도 공격함");
+										}
+				} 
+				if (target==null  ) {
+					stopCombat();
+					
+				//	System.out.println("SCV 공격 중지");
+	
+				}
+			}
+			
+			//SCV의 공격성 테스트 용으로 사용하는 코드
+			
+			
+			
+			
+			
 
 			// 게임상에서 worker가 isIdle 상태가 되었으면 (새로 탄생했거나, 그전 임무가 끝난 경우), WorkerData 도 Idle 로 맞춘 후, handleGasWorkers, handleIdleWorkers 등에서 새 임무를 지정한다 
 			if ( worker.isIdle() )

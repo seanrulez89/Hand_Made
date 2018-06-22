@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -23,7 +24,10 @@ import bwta.Chokepoint;
 
 public class StrategyManager {
 
-	boolean isEXP;
+	boolean isEXP = true;
+	BaseLocation nextEXP;
+	
+	boolean Mutal_flag;
 
 	// 아군
 	Player myPlayer;
@@ -99,6 +103,7 @@ public class StrategyManager {
 	BuildOrderItem.SeedPositionStrategy seedPositionStrategyOfMyCombatUnitTrainingBuildingType;
 	BuildOrderItem.SeedPositionStrategy buildAtFirstChokePoint;
 
+	
 	// 아군 방어 건물 목록 
 	ArrayList<Unit> myDefenseBuildingType1List = new ArrayList<Unit>();  // 파일런 벙커 크립
 	ArrayList<Unit> myDefenseBuildingType2List = new ArrayList<Unit>();  // 캐논   터렛 성큰
@@ -176,7 +181,12 @@ public class StrategyManager {
 		/// 변수 초기값을 설정합니다
 		setVariables();
 		/// 게임 초기에 사용할 빌드오더를 세팅합니다
-		setInitialBuildOrder();		
+		setInitialBuildOrder();	
+		
+//		System.out.println(enemyRace);
+		
+//		expansion ();
+		
 	}
 
 
@@ -186,6 +196,7 @@ public class StrategyManager {
 		// 참가자께서 자유롭게 초기값을 수정하셔도 됩니다 
 
 		isEXP = true;
+		Mutal_flag = false;
 
 		myPlayer = MyBotModule.Broodwar.self();
 		myRace = MyBotModule.Broodwar.self().getRace();
@@ -269,80 +280,136 @@ public class StrategyManager {
 			;
 		} 
 		else if (MyBotModule.Broodwar.self().getRace() == Race.Zerg) {
+
+/*			
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
+					nextEXP.getTilePosition(),true);
+			
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
+					nextEXP.getTilePosition(),true);			
+*/			
+
+			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);			
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Spawning_Pool,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
 					BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Lair);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Spire,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord,
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);	
+			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 					BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord,
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);	
+
+	
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);	
+			
+
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord,
+
+
+
+
+
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Mutalisk,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Mutalisk,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Mutalisk,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Mutalisk,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Mutalisk,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Mutalisk,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Mutalisk,
+			
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			
+			
+
 
 			// 저글링 이동속도 업
 			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Metabolic_Boost);
@@ -562,7 +629,7 @@ public class StrategyManager {
 
 		//		wraith();
 
-		//		expansion ();
+				expansion ();
 
 		//		enemyProtossTurret();
 
@@ -610,9 +677,56 @@ public class StrategyManager {
 	{
 		if(isEXP)
 		{
-			List<BaseLocation> startLocation = BWTA.getStartLocations();
-			int cnt = 0;
+			List<BaseLocation> myBaseLocations = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
+			
+			List<BaseLocation> enemyBaseLocations= InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer);
+			
+			List<BaseLocation> EXPLocations = BWTA.getBaseLocations();
+			
 
+			double minDistance = 1000000000;
+			double tempDistance = 0;
+
+
+			for (BaseLocation myBaseLocation : myBaseLocations)
+			{
+				if(EXPLocations.contains(myBaseLocation))
+				{
+					EXPLocations.remove(myBaseLocation);
+				}
+				
+			}
+
+			for (BaseLocation enemyBaseLocation : enemyBaseLocations)
+			{
+				if(EXPLocations.contains(enemyBaseLocation))
+				{
+					EXPLocations.remove(enemyBaseLocation);
+				}
+			}
+				
+			for (BaseLocation EXPLocation : EXPLocations)
+			{
+				for (BaseLocation myBaseLocation : myBaseLocations)
+				{
+					tempDistance = EXPLocation.getGroundDistance(myBaseLocation);//(myBaseLocation.getPosition());
+					if (minDistance > tempDistance)
+					{
+						minDistance = tempDistance;
+						nextEXP = EXPLocation;
+//						System.out.println(nextEXP);
+					}
+				}
+				
+					
+			}			
+			
+			
+			
+			
+			
+			
+			/*
 			for (Unit CC : MyBotModule.Broodwar.self().getUnits())
 			{
 				if(CC.getType() == UnitType.Terran_Command_Center)
@@ -643,7 +757,7 @@ public class StrategyManager {
 						}
 					}
 				}
-			}	
+			}*/	
 		}
 	}
  
@@ -689,7 +803,15 @@ public class StrategyManager {
 
 			/// 아군 공격유닛 들에게 방어를 지시합니다
 			MyBotModule.Broodwar.drawTextScreen(100, y, "Defense Mode");	
+			
+			
+
 			commandMyCombatUnitToDefense();
+
+			
+//			commandMyCombatUnitToDefense();
+//			MUTAL();
+			
 
 			/// 공격 모드로 전환할 때인지 여부를 판단합니다			
 			if (isTimeToStartAttack() ) {
@@ -709,6 +831,7 @@ public class StrategyManager {
 			if (isTimeToStartDefense() ) {
 				MyBotModule.Broodwar.drawTextScreen(100, y, "Defense Mode");	
 				combatState = CombatState.defenseMode;
+
 			}	
 
 			/// 적군을 Eliminate 시키는 모드로 전환할지 여부를 판단합니다 
@@ -724,6 +847,249 @@ public class StrategyManager {
 			commandMyCombatUnitToEliminate();	
 		}
 	}
+	
+	
+	
+	public void MUTAL ()
+	{
+/*		
+		if (MyBotModule.Broodwar.getFrameCount() % (24*3) != 0) {
+			return;
+		}
+*/		
+		
+		
+		if (combatState == CombatState.defenseMode)
+		{
+			if(myCombatUnitType2List.size() > 5)
+			{
+				for(Unit mutal : myCombatUnitType2List)
+				{
+					
+					//						ArrayList <Unit> units = (ArrayList<Unit>) MyBotModule.Broodwar.getUnitsInRadius(mutal_position, 2 * Config.TILE_SIZE);
+					//List <Unit> nearbyunits = mutal.getUnitsInRadius(1000);
+					
+					ArrayList <Unit> nearbyunits;
+					
+					
+					
+					
+					if(enemyMainBaseLocation != null)
+					{
+						System.out.println("done");
+						nearbyunits = (ArrayList<Unit>) MyBotModule.Broodwar.getUnitsInRadius(enemyMainBaseLocation.getPosition(), 4 * Config.TILE_SIZE);
+						
+					}
+					else 
+					{
+						nearbyunits = (ArrayList<Unit>) MyBotModule.Broodwar.getUnitsInRadius(new Position(63 * Config.TILE_SIZE ,63 * Config.TILE_SIZE), 4 * Config.TILE_SIZE);
+						
+					}
+//					ArrayList <Unit> nearbyunits = (ArrayList<Unit>) MyBotModule.Broodwar.getUnitsInRadius(enemyMainBaseLocation.getPosition(), 5 * Config.TILE_SIZE);
+					
+					
+					ArrayList <Unit> nearbyenemy = new ArrayList <Unit>(); // 0622 여기서 초기화 안하면 에러남
+					ArrayList <Unit> nearbyenemyworker = new ArrayList <Unit>();
+
+					for(Unit unit222 : nearbyunits)
+					{
+						if(unit222.getType() == InformationManager.Instance().getWorkerType(enemyRace))
+						{
+							nearbyenemyworker.add(unit222);
+							System.out.println(unit222.getType());
+						}
+						
+						
+						if(unit222.getPlayer() == enemyPlayer && unit222 != null && unit222.exists() && unit222.isAttacking())
+						{
+							nearbyenemy.add(unit222);
+							System.out.println("attackable : " + unit222.getType());
+						}	
+					}
+					
+					
+					double minDistance = 1000000000;
+					double tempDistance = 0;
+					Unit myAttackTarget = null;
+					
+					
+					if(nearbyenemy.size() == 0)
+					{
+						for(Unit targetENEMY : nearbyenemyworker) 
+						{			
+							if(targetENEMY == null || targetENEMY.exists() == false)
+							{
+								continue;
+							}
+							
+							tempDistance = mutal.getDistance(targetENEMY.getPosition());
+							if (minDistance > tempDistance) 
+							{
+								minDistance = tempDistance;
+								myAttackTarget = targetENEMY;
+							}	
+						}	
+					}
+					else
+					{
+						for(Unit targetENEMY : nearbyenemy) 
+						{			
+							if(targetENEMY == null || targetENEMY.exists() == false)
+							{
+								continue;
+							}
+							
+							tempDistance = mutal.getDistance(targetENEMY.getPosition());
+							if (minDistance > tempDistance) 
+							{
+								minDistance = tempDistance;
+								myAttackTarget = targetENEMY;
+							}
+						
+						}
+					}
+					
+					
+
+					
+					if (mutal.canAttack() && myAttackTarget != null)
+					{
+						
+						if(myAttackTarget.getType() == UnitType.Zerg_Spore_Colony || myAttackTarget.getType() == UnitType.Terran_Missile_Turret || myAttackTarget.getType() == UnitType.Protoss_Photon_Cannon)
+						{
+							if(enemyMainBaseLocation != null)
+							{
+								
+								int x, y;
+								
+								x = enemyMainBaseLocation.getX();
+								y = enemyMainBaseLocation.getY();
+								
+								if(x<63) {
+									x=0;
+								}
+								else {
+									x=127;
+								}
+								
+								if(y<63) {
+									y=0;
+								}
+								else {
+									y=127;
+								}
+								
+								
+								mutal.move(new Position(x* Config.TILE_SIZE,y* Config.TILE_SIZE));	 // 0622 이렇게 무시하고 강제이동하면 되긴하는데 그 위치에 있으면 어떡할까
+								// 이럴거면 이러지말고 아예 누
+								
+							}
+						}
+						else 
+						{
+							mutal.attack(myAttackTarget); // 0622  이거 포문 감싸기전에는 이거 한줄
+						}
+						
+						
+						
+						
+						
+					}
+					else 
+					{
+//						mutal.move(enemyMainBaseLocation.getPosition());
+
+
+						
+						
+						int mutal_x = 63 * Config.TILE_SIZE;
+						int mutal_y = 63 * Config.TILE_SIZE;
+						
+						if(enemyMainBaseLocation != null)
+						{
+							mutal_x = (enemyMainBaseLocation.getX() + myMainBaseLocation.getX())/2;
+							mutal_y = (enemyMainBaseLocation.getY() + myMainBaseLocation.getY())/2;
+							
+							
+							if(mutal_x>50 && mutal_x<70)
+							{
+								mutal_x = enemyMainBaseLocation.getX();	
+							}
+							
+							
+						}
+						
+						
+						Position mutal_position = new Position(mutal_x, mutal_y);
+						
+						
+						
+						
+						
+						
+
+						ArrayList <Unit> units = (ArrayList<Unit>) MyBotModule.Broodwar.getUnitsInRadius(mutal_position, 1 * Config.TILE_SIZE);
+						
+						
+/*						
+						if(units.isEmpty() == false) 
+						{
+							Iterator <Unit> itr = units.iterator();
+							
+							
+							while(itr.hasNext())
+							{
+								Unit unit = itr.next();
+								
+								if(unit.getPlayer() == enemyPlayer)
+								{
+									units.remove(unit);
+									continue;
+								}
+								
+								if(unit.getType() != UnitType.Zerg_Mutalisk)
+								{
+									units.remove(unit);
+									continue;
+								}o
+							}
+						}
+*/
+						
+						if(units.size()>5 && Mutal_flag == false)
+						{
+							Mutal_flag = true;
+						}
+						
+						
+							
+						if(enemyMainBaseLocation != null && Mutal_flag == true )
+						{
+							
+							commandUtil.attackMove(mutal, enemyMainBaseLocation.getPosition());
+							
+							//mutal.attackm(enemyMainBaseLocation.getPosition());
+						}
+						else
+						{
+							
+							mutal.move(mutal_position); // 0622 어택무브해야돼 말아야돼
+						}	
+					
+						
+
+					
+						
+						
+						
+						
+					}
+				}
+			}
+		}
+	}
+	
+	
 
 	/// 공격 모드로 전환할 때인지 여부를 리턴합니다
 	int attack_cnt=0;
@@ -785,8 +1151,9 @@ public class StrategyManager {
 		// 공격 유닛 숫자가 10 미만으로 떨어지면 후퇴
 		//if (myCombatUnitType1List.size() + myCombatUnitType2List.size() + myCombatUnitType3List.size() < 10) 
 
-		if(myCombatUnitType1List.size() < 4)
+		if(myCombatUnitType1List.size() < 2)
 		{
+			Mutal_flag = false;
 			return true;
 		}
 
@@ -810,6 +1177,7 @@ public class StrategyManager {
 
 		if (enemyUnitCountAroundMyMainBaseLocation > 3) 
 		{
+			Mutal_flag = false;
 			return true;
 		}
 		
@@ -881,15 +1249,62 @@ public class StrategyManager {
 				if ((building.getType().isBuilding() && building.isUnderAttack()) || (building.getType() == UnitType.Zerg_Drone && building.isUnderAttack())) // buliding.getHitPoints() < buliding.getType().maxHitPoints())
 				{
 					myAttackedBuildingPosition = building.getPosition();
-					myAttackedBuildingPosition = setTargetPositionOne(myAttackedBuildingPosition,40);
+					myAttackedBuildingPosition = setTargetPositionOne(myAttackedBuildingPosition,80);
 
-					if (unit.canAttack()) {
-						commandUtil.attackMove(unit, myAttackedBuildingPosition);
+					List <Unit> nearbyunits = building.getUnitsInRadius(1000);
+					
+					ArrayList <Unit> nearbyenemy = new ArrayList <Unit>(); // 0622 여기서 초기화 안하면 에러남
+					
+
+					
+					
+					for(Unit unit222 : nearbyunits)
+					{
+						if(unit222.getPlayer() == enemyPlayer && unit222 != null && unit222.exists())
+						{
+							nearbyenemy.add(unit222);
+						}	
+					}
+					
+					
+					double minDistance = 1000000000;
+					double tempDistance = 0;
+					Unit myAttackTarget = null;
+					for(Unit targetENEMY : nearbyenemy) 
+					{
+						
+						if(targetENEMY == null || targetENEMY.exists() == false)
+						{
+							continue;
+						}
+						
+						
+						
+						
+						tempDistance = unit.getDistance(targetENEMY.getPosition());
+						if (minDistance > tempDistance) 
+						{
+							minDistance = tempDistance;
+							myAttackTarget = targetENEMY;
+						}
+					
+					}
+
+					
+					if (unit.canAttack() && myAttackTarget != null)
+					{
+//						commandUtil.attackMove(unit, myAttackedBuildingPosition);
+//						commandUtil.attackUnit(unit, building);
+						unit.attack(myAttackTarget);
 					}
 					else {
-						commandUtil.move(unit, myAttackedBuildingPosition);
+						commandUtil.attackMove(unit, myAttackedBuildingPosition);	
 					}
 
+					
+					
+					
+					
 					System.out.println("건물님 지키러 갑니다");
 					hasCommanded =true;
 				}
@@ -919,6 +1334,17 @@ public class StrategyManager {
 				}
 			}
 		}   
+
+	
+	
+	
+		if (!isTimeToStartDefense() ) {
+//			Mutal_flag=false;
+			MUTAL();
+		}
+		
+	
+	
 	}
 
 	/// 러커 유닛에 대해 컨트롤 명령을 내립니다
@@ -1267,7 +1693,7 @@ public class StrategyManager {
 		{
 			if(unit.canAttack())
 			{
-				if(unit.getType() != UnitType.Terran_SCV)
+				if(unit.getType().isBuilding() == false && unit.getType() != UnitType.Zerg_Drone && unit.getType() != UnitType.Zerg_Larva && unit.getType() != UnitType.Zerg_Overlord )
 				{
 					myNum = myNum + 1;
 				}
@@ -1390,20 +1816,22 @@ public class StrategyManager {
 			//				Position position07 = setTargetPositionTwo(mySecondChokePoint.getPoint(), enemySecondChokePoint.getPoint(), 30);
 
 			
+			//for (Unit unit : myAllCombatUnitList)
+			
 				targetPosition = position01;
-				if(countMyAttackUnitAround(targetPosition,48) > 0.5 * countMyAttackUnitAll ())
+				if(myAllCombatUnitList.size() > 0.5 * myAllCombatUnitList.size())
 				{
 					targetPosition = position02;
-					if(countMyAttackUnitAround(targetPosition,48) > 0.5 * countMyAttackUnitAll ())
+					if(myAllCombatUnitList.size() > 0.5 * myAllCombatUnitList.size())
 					{
 						targetPosition = position03;
-						if(countMyAttackUnitAround(targetPosition,48) > 0.5 * countMyAttackUnitAll ())
+						if(myAllCombatUnitList.size() > 0.5 * myAllCombatUnitList.size())
 						{
 							targetPosition = position04;
-							if(countMyAttackUnitAround(targetPosition,48) > 0.5 * countMyAttackUnitAll ())
+							if(myAllCombatUnitList.size() > 0.5 * myAllCombatUnitList.size())
 							{
 								targetPosition = position05;
-								if(countMyAttackUnitAround(targetPosition,48) > 0.5 * countMyAttackUnitAll ())
+								if(myAllCombatUnitList.size() > 0.5 * myAllCombatUnitList.size())
 								{
 									targetPosition = position06;
 								}
@@ -1649,9 +2077,11 @@ public class StrategyManager {
 							// 전략이나 업그레이드 등 전략적인 사유로 공격을 나가서는 안된다면
 							// 이 부분에서 그런것을 체크해야 한다
 							// 가령 아래 레이스는 은신이 개발 안되면 모두 공격나가도 공격 안따라가는 것이다.
-							if (unit.getType() == UnitType.Terran_Wraith )// && myCombatUnitType5List.size()<6 && !myPlayer.hasResearched(TechType.Cloaking_Field)) 
+							if (unit.getType() == UnitType.Zerg_Mutalisk )// && myCombatUnitType5List.size()<6 && !myPlayer.hasResearched(TechType.Cloaking_Field)) 
 							{
-								unit.patrol(myMainBaseLocation.getPosition(),true);
+								//unit.patrol(myMainBaseLocation.getPosition(),true);
+								//unit.move(enemyMainBaseLocation.getPosition());
+								commandUtil.attackMove(unit, targetPosition); // 0622 일단은 이렇게 하는데 뮤탈이 먼저 들어가서 일꾼 잡고 있었으면 상황이 살짝 달라진다 굳이 나올 필요 없는데 나오는 형국
 								hasCommanded = true;
 							}
 							else
@@ -2230,7 +2660,7 @@ public class StrategyManager {
 								// std.cout + "worker enqueue" + std.endl;
 
 								// 권순우 0617 다음의 코드를 highest로 하면 긴급으로 유닛 생산을 명령하는데 추가하는데 쓰일 수 있을 듯 하다. 가령 최초 빌드가 끝나기도 전에 일꾼이 죽어버리는 등의 상황에서
-								BuildManager.Instance().buildQueue.queueAsHighestPriority(
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(
 										new MetaType(InformationManager.Instance().getWorkerType()), false);
 							}
 						}
@@ -2459,14 +2889,26 @@ public class StrategyManager {
 
 		// 공격 유닛 생산 건물 증설 : 돈이 남아돌면 실시. 최대 6개 까지만
 		if (isPossibleToConstructCombatUnitTrainingBuildingType == true
-				&& BuildManager.Instance().getAvailableMinerals() > 300 
-				&& numberOfMyCombatUnitTrainingBuilding < 3) {
+				&& BuildManager.Instance().getAvailableMinerals() > 400 
+				&& numberOfMyCombatUnitTrainingBuilding < 8) {
 
 			// 게이트웨이 / 배럭 / 해처리 증설
 			if (BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getBasicCombatBuildingType()) == 0 ) 
 			{
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(InformationManager.Instance().getBasicCombatBuildingType(), 
-						seedPositionStrategyOfMyCombatUnitTrainingBuildingType, false);
+						nextEXP.getTilePosition(), true); /// 해처리 추가 확장 0622
+				
+				if(nextEXP.gas() > 0)
+				{
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor, 
+							nextEXP.getTilePosition(), true); /// 해처리 추가 확장 0622
+				}
+				
+				// 이거 되면 내 베이스 포문 돌면서 근처에 해처리 갯수보고 근처에 더 짓기 일단 몇 해처리 이상 먹었다 치고
+				
+				
+				
+				
 			}
 		}
 	}
@@ -2671,12 +3113,19 @@ public class StrategyManager {
 		UnitType nextUnitTypeToTrain = null;
 
 		if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 1) {
-			nextUnitTypeToTrain = myCombatUnitType1;
+			if(myCombatUnitType1List.size() < 0.7 * myCombatUnitType2List.size())
+			{
+				nextUnitTypeToTrain = myCombatUnitType1;
+			}
+			else
+			{
+				nextUnitTypeToTrain = myCombatUnitType2;
+			}
 		}
 
 		else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 2) {
 
-			if(myCombatUnitType1List.size() < 2 * myCombatUnitType2List.size())
+			if(myCombatUnitType1List.size() < 0.7 * myCombatUnitType2List.size())
 			{
 				nextUnitTypeToTrain = myCombatUnitType1;
 			}
@@ -2687,10 +3136,18 @@ public class StrategyManager {
 		}
 		else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 3) {
 
-			nextUnitTypeToTrain = myCombatUnitType1;		
+			if(myCombatUnitType1List.size() < 0.7 * myCombatUnitType2List.size())
+			{
+				nextUnitTypeToTrain = myCombatUnitType1;
+			}
+			else
+			{
+				nextUnitTypeToTrain = myCombatUnitType2;
+			}	
 		}
 		else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 4)     //myCombatUnitType4List.size() <= MaxNumberOfCombatUnitType4 )
 		{
+			/*
 			int cnt = 0;
 
 			for (Unit unit : myAllCombatUnitList) 
@@ -2700,10 +3157,10 @@ public class StrategyManager {
 					cnt = cnt +1;
 				}
 			}
-
-			if(cnt<4)
+*/
+			if(myCombatUnitType1List.size() < 0.7 * myCombatUnitType2List.size())
 			{
-				nextUnitTypeToTrain = myCombatUnitType2;
+				nextUnitTypeToTrain = myCombatUnitType1;
 			}
 			else
 			{
@@ -2715,7 +3172,14 @@ public class StrategyManager {
 
 		else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 5) {
 
-			nextUnitTypeToTrain = myCombatUnitType1;		
+			if(myCombatUnitType1List.size() < 0.7 * myCombatUnitType2List.size())
+			{
+				nextUnitTypeToTrain = myCombatUnitType1;
+			}
+			else
+			{
+				nextUnitTypeToTrain = myCombatUnitType2;
+			}		
 		}
 		else
 		{
