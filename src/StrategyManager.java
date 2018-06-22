@@ -848,7 +848,7 @@ public class StrategyManager {
 		}
 	}
 	
-	
+///////	
 	
 	public void MUTAL ()
 	{
