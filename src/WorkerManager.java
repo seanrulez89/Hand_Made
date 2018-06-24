@@ -76,7 +76,7 @@ public class WorkerManager {
 						
 					
 					setCombatWorker(worker);
-					System.out.println("드론도 공격함");
+				//	System.out.println("드론도 공격함");
 										}
 				} 
 				if (target==null  ) {
