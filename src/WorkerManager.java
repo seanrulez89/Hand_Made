@@ -255,7 +255,7 @@ public class WorkerManager {
 					}
 				}
 				
-				//System.out.println(numAssigned);
+				
 			}
 		}
 	}
