@@ -1,10 +1,5 @@
-import bwapi.Color;
-import bwapi.Position;
-import bwapi.Race;
-import bwapi.TilePosition;
-import bwapi.Unit;
-import bwapi.UnitType;
-import bwta.BWTA;
+import bwapi.*;
+import bwta.*;
 
 /// 일꾼 유닛들의 상태를 관리하고 컨트롤하는 class
 public class WorkerManager {
@@ -28,7 +23,7 @@ public class WorkerManager {
 	public void update() {
 
 		// 1초에 1번만 실행한다
-		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
+//		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
 
 		updateWorkerStatus();
 		handleGasWorkers();
@@ -37,6 +32,10 @@ public class WorkerManager {
 		handleCombatWorkers();
 		handleRepairWorkers();
 	}
+	
+	
+
+	
 	
 	public void updateWorkerStatus() 
 	{
@@ -68,7 +67,7 @@ public class WorkerManager {
 			}
 			*/
 			
-			if(workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Build && workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Scout) {
+			if(workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Build && workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Scout && workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Gas) {
 				
 				if (target!= null) {
 					
@@ -82,12 +81,112 @@ public class WorkerManager {
 				if (target==null  ) {
 					stopCombat();
 					
-				//	System.out.println("SCV 공격 중지");
-	
+				//	
+				// 
 				}
 			}
 			
-			//SCV의 공격성 테스트 용으로 사용하는 코드
+		
+			if (MyBotModule.Broodwar.getFrameCount() < 5000)
+			{
+				for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+				{
+					if ((unit.getType().isBuilding() && unit.isUnderAttack()) || (unit.getType() == UnitType.Zerg_Drone && unit.isUnderAttack())) // buliding.getHitPoints() < buliding.getType().maxHitPoints())
+					{
+						boolean	isPossibleToConstructDefenseBuildingType1 = false;
+						boolean	isPossibleToConstructDefenseBuildingType2 = false;	
+
+						int numberOfUnitType_Zerg_Creep_Colony = 0; 
+						int numberOfUnitType_Zerg_Sunken_Colony = 0;
+						
+						Player myPlayer = MyBotModule.Broodwar.self();;
+									// 저그의 경우 크립 콜로니 갯수를 셀 때 성큰 콜로니 갯수까지 포함해서 세어야, 크립 콜로니를 지정한 숫자까지만 만든다
+						numberOfUnitType_Zerg_Creep_Colony += myPlayer.allUnitCount(UnitType.Zerg_Creep_Colony);
+						numberOfUnitType_Zerg_Creep_Colony += BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony);
+						numberOfUnitType_Zerg_Creep_Colony += ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Creep_Colony, null);
+						numberOfUnitType_Zerg_Creep_Colony += myPlayer.allUnitCount(UnitType.Zerg_Sunken_Colony);
+						numberOfUnitType_Zerg_Creep_Colony += BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony);
+						numberOfUnitType_Zerg_Sunken_Colony += myPlayer.allUnitCount(UnitType.Zerg_Sunken_Colony);
+						numberOfUnitType_Zerg_Sunken_Colony += BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony);
+
+						if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0) 
+						{
+							isPossibleToConstructDefenseBuildingType1 = true;	
+						}
+
+						if (myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) > 0) 
+						{
+							isPossibleToConstructDefenseBuildingType2 = true;	
+						}
+
+						//System.out.println("numberOfUnitType_Zerg_Creep_Colony : " + numberOfUnitType_Zerg_Creep_Colony);
+						//System.out.println("+++++");
+						//System.out.println("numberOfUnitType_Zerg_Sunken_Colony : " + numberOfUnitType_Zerg_Sunken_Colony);
+
+						if (isPossibleToConstructDefenseBuildingType1 == true 
+								&& numberOfUnitType_Zerg_Creep_Colony < 5) 
+						{
+
+							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) < 5 ) {
+
+								if (BuildManager.Instance().getAvailableMinerals() >= UnitType.Zerg_Creep_Colony.mineralPrice()) {
+									
+									//System.out.println("----------------------------");
+									
+									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony, 
+											BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
+								}			
+							}
+						}
+						
+						
+						if (isPossibleToConstructDefenseBuildingType2 == true
+								&&  numberOfUnitType_Zerg_Sunken_Colony < 3) {
+
+							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) < 3 ) {
+
+								if (BuildManager.Instance().getAvailableMinerals() >= UnitType.Zerg_Sunken_Colony.mineralPrice()) {
+
+									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Sunken_Colony, 
+											BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
+									BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+											BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+									
+								}			
+							}
+						}
+						
+
+					}
+				}
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			
 			
 			
@@ -152,8 +251,11 @@ public class WorkerManager {
 					if (gasWorker != null)
 					{
 						workerData.setWorkerJob(gasWorker, WorkerData.WorkerJob.Gas, unit);
+						//System.out.println("New gasworker set");
 					}
 				}
+				
+				//System.out.println(numAssigned);
 			}
 		}
 	}
