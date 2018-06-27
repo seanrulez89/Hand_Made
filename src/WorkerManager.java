@@ -23,7 +23,7 @@ public class WorkerManager {
 	public void update() {
 
 		// 1초에 1번만 실행한다
-//		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
+		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
 
 		updateWorkerStatus();
 		handleGasWorkers();
@@ -31,6 +31,8 @@ public class WorkerManager {
 		handleMoveWorkers();
 		handleCombatWorkers();
 		handleRepairWorkers();
+	//	rebalanceWorkers(); 0628 이걸 하는건 좋은데 이걸 하니까 우왕좌왕 미네랄 못캐는 애들이 생기는듯 계속 새로 할당되서
+		
 	}
 	
 	
@@ -161,35 +163,7 @@ public class WorkerManager {
 				}
 			}
 			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
+				
 			
 			
 
@@ -250,8 +224,11 @@ public class WorkerManager {
 					Unit gasWorker = chooseGasWorkerFromMineralWorkers(unit);
 					if (gasWorker != null)
 					{
+						if(!gasWorker.isCarryingMinerals()) // 0626 미네랄을 들지 않은 일꾼만 가스를 캐라!
+						{
 						workerData.setWorkerJob(gasWorker, WorkerData.WorkerJob.Gas, unit);
 						//System.out.println("New gasworker set");
+						}
 					}
 				}
 				
