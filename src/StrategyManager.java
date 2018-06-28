@@ -27,6 +27,7 @@ public class StrategyManager {
 	boolean isEXP = true;
 	BaseLocation nextEXP;
 	Expansion myExpansion;
+	Position attackTargetPosition;
 
 	
 	Mutalisk mutalisk;
@@ -195,8 +196,9 @@ public class StrategyManager {
 		isEXP = true;
 		Mutal_flag = false;
 		
-		//mutalisk = Mutalisk.Instance();
+		mutalisk = new Mutalisk();
 		mutalisk_start = false;
+		attackTargetPosition = null;
 		
 
 		myPlayer = MyBotModule.Broodwar.self();
@@ -315,17 +317,33 @@ public class StrategyManager {
 		
 		if(enemyMainBaseLocation!=null && mutalisk_start == false)
 		{
+			attackTargetPosition = enemyFirstExpansionLocation.getPosition();
 			mutalisk = new Mutalisk();
 			mutalisk_start = true;
 		}
 		
-		
+/*		
 		if (MyBotModule.Broodwar.getFrameCount() % 24 == 0 && mutalisk_start == true) { // 0627 일단 이렇게 했는데 공격시점에서는 조건을 어떻게 해줄까?
 			
 			//mutalisk = new Mutalisk();
 			mutalisk.myMutal();
-			System.out.println(mutalisk.moveToEndPoint);
+			//System.out.println(mutalisk.moveToEndPoint);
 		}
+*/	
+		
+		mutalisk.myMutal();
+		
+/*		if (MyBotModule.Broodwar.getFrameCount() % 24 == 0) { // 0627 일단 이렇게 했는데 공격시점에서는 조건을 어떻게 해줄까?
+			
+			//mutalisk = new Mutalisk();
+			mutalisk.myMutal();
+			//System.out.println(mutalisk.moveToEndPoint);
+		}
+*/		
+		
+		
+		
+		
 		// enemyProtossTurret();
 
 	}
@@ -445,6 +463,8 @@ public class StrategyManager {
 					List<BaseLocation> startLocation = BWTA.getStartLocations();
 					int size = startLocation.size();
 
+					
+					/*
 					for (int i = 1; i < size; i++) // 0이면 우리 기지에 짓더라 이게 무슨 순서가 있는건지... 0623 이거 좀 손봐라 기지만 계속 지어
 					{
 						if (MyBotModule.Broodwar.isExplored(startLocation.get(i).getTilePosition())) {
@@ -462,7 +482,7 @@ public class StrategyManager {
 							}
 						}
 
-					}
+					}*/
 				}
 				return true;
 			}
@@ -1005,7 +1025,7 @@ public class StrategyManager {
 	}
 
 	/// 아군 공격 유닛들에게 공격을 지시합니다
-	void commandMyCombatUnitToAttack() {
+	public void commandMyCombatUnitToAttack() {
 
 		// 최종 타겟은 적군의 Main BaseLocation
 
@@ -1013,7 +1033,7 @@ public class StrategyManager {
 
 		BaseLocation targetEnemyBaseLocation = enemyMainBaseLocation;
 		Chokepoint targetPoint = enemySecondChokePoint;
-		Position targetPosition = null;
+		
 
 		// int myDeadUnits = myKilledCombatUnitCount1 + myKilledCombatUnitCount2 +
 		// myKilledCombatUnitCount3;
@@ -1083,17 +1103,17 @@ public class StrategyManager {
 
 			// for (Unit unit : myAllCombatUnitList)
 
-			targetPosition = position01;
+			attackTargetPosition = position01;
 			if (myAllCombatUnitList.size() > 0.5 * myAllCombatUnitList.size()) {
-				targetPosition = position02;
+				attackTargetPosition = position02;
 				if (myAllCombatUnitList.size() > 0.5 * myAllCombatUnitList.size()) {
-					targetPosition = position03;
+					attackTargetPosition = position03;
 					if (myAllCombatUnitList.size() > 0.5 * myAllCombatUnitList.size()) {
-						targetPosition = position04;
+						attackTargetPosition = position04;
 						if (myAllCombatUnitList.size() > 0.5 * myAllCombatUnitList.size()) {
-							targetPosition = position05;
+							attackTargetPosition = position05;
 							if (myAllCombatUnitList.size() > 0.5 * myAllCombatUnitList.size()) {
-								targetPosition = position06;
+								attackTargetPosition = position06;
 							}
 						}
 					}
@@ -1277,13 +1297,18 @@ public class StrategyManager {
 								
 								//mu.MUTAL_MOVEMENT(unit, null, new Position(x, y));
 								//mutalisk = new Mutalisk();
+								
+								/* 0628 이유는 모르지만 이 부분이 프레임 아웃을 유발하는듯 하다
 								if(enemyMainBaseLocation!=null && mutalisk_start == true)
 								{
 								mutalisk.myMutal();
 								}
+								*/ 
+								
+								
 								hasCommanded = true;
 							} else {
-								commandUtil.attackMove(unit, targetPosition);
+								commandUtil.attackMove(unit, attackTargetPosition);
 								hasCommanded = true;
 							}
 						}
@@ -1361,7 +1386,7 @@ public class StrategyManager {
 
 							// canAttack 기능이 없는 유닛타입 중 러커는 일반 공격유닛처럼 targetPosition 을 향해 이동시킵니다
 							else if (unit.getType() == UnitType.Zerg_Lurker) {
-								commandUtil.move(unit, targetPosition);
+								commandUtil.move(unit, attackTargetPosition);
 								hasCommanded = true;
 							} else if (unit.getType() == UnitType.Terran_Science_Vessel) {
 
@@ -1409,7 +1434,7 @@ public class StrategyManager {
 							// canAttack 기능이 없는 다른 유닛타입 (하이템플러, 옵저버, 사이언스베슬, 오버로드) 는
 							// 따로 명령을 내린 적이 없으면 다른 공격유닛들과 동일하게 이동하도록 되어있습니다.
 							else {
-								commandUtil.move(unit, targetPosition);
+								commandUtil.move(unit, attackTargetPosition);
 								hasCommanded = true;
 							}
 						}
@@ -1693,7 +1718,7 @@ public class StrategyManager {
 			// 서플라이가 다 꽉찼을때 새 서플라이를 지으면 지연이 많이 일어나므로, supplyMargin (게임에서의 서플라이 마진 값의 2배)만큼
 			// 부족해지면 새 서플라이를 짓도록 한다
 			// 이렇게 값을 정해놓으면, 게임 초반부에는 서플라이를 너무 일찍 짓고, 게임 후반부에는 서플라이를 너무 늦게 짓게 된다
-			int supplyMargin = 12;
+			int supplyMargin = 24;
 
 			// currentSupplyShortage 를 계산한다
 			int currentSupplyShortage = MyBotModule.Broodwar.self().supplyUsed() + supplyMargin
@@ -1820,7 +1845,7 @@ public class StrategyManager {
 				if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType1.mineralPrice()) {
 
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType1,
-							seedPositionStrategyOfMyDefenseBuildingType, false);
+							BuildOrderItem.SeedPositionStrategy.FirstChokePoint, false);
 				}
 			}
 		}
@@ -1833,7 +1858,7 @@ public class StrategyManager {
 				if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType2.mineralPrice()) {
 
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType2,
-							seedPositionStrategyOfMyDefenseBuildingType, false);
+							BuildOrderItem.SeedPositionStrategy.FirstChokePoint, false);
 				}
 			}
 		}
@@ -1946,12 +1971,10 @@ public class StrategyManager {
 				isTimeToStartUpgradeType2 = true;
 			}
 			// 가스 좀 남으면 하라고 넣은건데 저기서 가스가 현재량인지 채굴총량인지???????
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 && myPlayer.gatheredGas() > 200
-					&& myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) > 12) {
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 && myPlayer.gas() > 300 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5) {
 				isTimeToStartUpgradeType3 = true;
 			}
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 && myPlayer.gatheredGas() > 200
-					&& myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) > 12) {
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 && myPlayer.gas() > 300 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5){
 				isTimeToStartUpgradeType4 = true;
 			}
 			// 러커는 최우선으로 리서치한다
