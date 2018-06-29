@@ -46,18 +46,35 @@ public class Mutalisk {
 			inRange = 10 * Config.TILE_SIZE;
 		}
 		
-		
-		
+		ArrayList <Unit> defenseBuilding = new ArrayList<Unit>();
+		ArrayList <Unit> normalBuilding = new ArrayList<Unit>();
 		 
 																					
 		for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(myUnit.getPosition(), inRange)) { // 저글링 같은 근접공격유닛은 10배 해봐야 무의미한가?
 
 			if (enemy.getPlayer() == enemyPlayer) {
 				
-				if(enemy.getType() == UnitType.Zerg_Egg || enemy.getType() == UnitType.Zerg_Larva)
+				if(enemy.getType() == UnitType.Zerg_Egg || enemy.getType() == UnitType.Zerg_Larva) // 0629 여기에 거를 유닛을 넣어두고 정 타겟이 없으면 그때서야 치기로 하자
 				{
 					continue;
 				}
+				
+				
+				if(enemy.getType().equals(UnitType.Terran_Missile_Turret)
+						|| enemy.getType().equals(UnitType.Zerg_Spore_Colony)
+						|| enemy.getType().equals(UnitType.Protoss_Photon_Cannon)
+						|| enemy.getType().equals(UnitType.Terran_Bunker))
+				{
+					defenseBuilding.add(enemy);
+					continue;
+				}
+				
+				if(enemy.getType().isBuilding() || enemy.getType().isAddon())
+				{
+					normalBuilding.add(enemy);
+					continue;
+				}
+				
 				
 				
 				
@@ -88,10 +105,44 @@ public class Mutalisk {
 					}
 
 				}
-
 			}
 
 		}
+		
+		if(nextTarget==null)
+		{
+			for (Unit enemy : defenseBuilding)
+			{
+				tempHP = enemy.getHitPoints();
+				if (targetHP > tempHP) {
+					targetHP = tempHP;
+					nextTarget = enemy;
+				}
+			}
+		}
+		
+		if(nextTarget==null)
+		{
+			for (Unit enemy : normalBuilding)
+			{
+				tempHP = enemy.getHitPoints();
+				if (targetHP > tempHP) {
+					targetHP = tempHP;
+					nextTarget = enemy;
+				}
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 
 		return nextTarget;
 	}

@@ -1,22 +1,41 @@
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
+import java.io.*;
 
-import bwapi.Color;
-import bwapi.Position;
-import bwapi.TilePosition;
-import bwapi.Unit;
-import bwapi.UnitType;
-import bwta.BWTA;
-import bwta.BaseLocation;
+import bwapi.*;
+import bwta.*;
 import bwta.Region;
 
 /// 게임 초반에 일꾼 유닛 중에서 정찰 유닛을 하나 지정하고, 정찰 유닛을 이동시켜 정찰을 수행하는 class<br>
 /// 적군의 BaseLocation 위치를 알아내는 것까지만 개발되어있습니다
 public class ScoutManager {
 
+	ArrayList <Integer> scoutUnits = new ArrayList <Integer> ();
+	
 	private Unit currentScoutUnit;
 	private int currentScoutStatus;
+	private Position currentScoutTargetPosition = Position.None;
+	private BaseLocation currentScoutTargetBaseLocation = null;
+	
+	private Unit firstScoutUnit;
+    private int firstScoutUnitStatus;
+    private Position firstScoutTargetPosition = Position.None;
+    private BaseLocation firstScoutTargetBaseLocation = null;
+    
+    private Unit secondScoutUnit = null;
+    private int secondScoutUnitStatus;	
+	private Position secondScoutTargetPosition = Position.None;
+    private BaseLocation secondScoutTargetBaseLocation = null;
+		
+	private Vector<Position> enemyBaseRegionVertices = new Vector<Position>();
+	private int currentScoutFreeToVertexIndex = -1;
+	
+	private CommandUtil commandUtil = new CommandUtil();
+	private static ScoutManager instance = new ScoutManager();
+	
+	/// static singleton 객체를 리턴합니다
+	public static ScoutManager Instance() {
+		return instance;
+	} 
 	
 	public enum ScoutStatus {
 		NoScout,						///< 정찰 유닛을 미지정한 상태
@@ -24,19 +43,24 @@ public class ScoutManager {
 		MoveAroundEnemyBaseLocation   	///< 적군의 BaseLocation 이 발견된 상태에서 정찰 유닛을 이동시키고 있는 상태
 	};
 	
-	private BaseLocation currentScoutTargetBaseLocation = null;
-	private Vector<Position> enemyBaseRegionVertices = new Vector<Position>();
-	private int currentScoutFreeToVertexIndex = -1;
-	private Position currentScoutTargetPosition = Position.None;
+	
+    public void onStart() {
 
-	private CommandUtil commandUtil = new CommandUtil();
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+		{
+			if (unit.getType() == UnitType.Zerg_Overlord)
+			{
+				firstScoutUnit = unit;
+				firstScoutUnitStatus = ScoutStatus.MovingToAnotherBaseLocation.ordinal();
+				firstScoutTargetBaseLocation = getClosestBaseLocation();
+			    commandUtil.move(firstScoutUnit, firstScoutTargetBaseLocation.getPosition());
+				scoutUnits.add(unit.getID());
+				//System.out.println(unit.getID());
+			}	
+		}
+    }
 	
-	private static ScoutManager instance = new ScoutManager();
 	
-	/// static singleton 객체를 리턴합니다
-	public static ScoutManager Instance() {
-		return instance;
-	} 
 
 	/// 정찰 유닛을 지정하고, 정찰 상태를 업데이트하고, 정찰 유닛을 이동시킵니다
 	public void update()
@@ -44,7 +68,7 @@ public class ScoutManager {
 		// 1초에 4번만 실행합니다
 		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) return;
 		
-		// scoutUnit 을 지정하고, scoutUnit 의 이동을 컨트롤함. 
+		// scoutUnit 을 지정하고, scoutUnit 의 이동을 컨트롤함.
 		assignScoutIfNeeded();
 		moveScoutUnit();
 
@@ -52,68 +76,24 @@ public class ScoutManager {
 	}
 
 	/// 정찰 유닛을 필요하면 새로 지정합니다
-	public void assignScoutIfNeeded()
-	{
-		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy());
+	public void assignScoutIfNeeded() {
+		BaseLocation enemyBaseLocation = InformationManager.Instance()
+				.getMainBaseLocation(MyBotModule.Broodwar.enemy());
 
-		if (enemyBaseLocation == null)
-		{
-			if (currentScoutUnit == null || currentScoutUnit.exists() == false || currentScoutUnit.getHitPoints() <= 0)
-			{
-				currentScoutUnit = null;
-				currentScoutStatus = ScoutStatus.NoScout.ordinal();
+		if (enemyBaseLocation == null && secondScoutUnit == null) {
 
-				
-				/*
-				// first building (Pylon / Supply Depot / Spawning Pool) 을 건설 시작한 후, 가장 가까이에 있는 Worker 를 정찰유닛으로 지정한다
-				Unit firstBuilding = null;
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+				if (unit.getType() == UnitType.Zerg_Overlord && !scoutUnits.contains(unit.getID())) {
 
-				for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-				{
-					if (unit.getType().isBuilding() == true && unit.getType().isResourceDepot() == false)
-					{
-						firstBuilding = unit;
-						break;
-					}
+					secondScoutUnit = unit;
+					scoutUnits.add(unit.getID());
+
 				}
 
-				if (firstBuilding != null)
-				{
-					// grab the closest worker to the first building to send to scout
-					Unit unit = WorkerManager.Instance().getClosestMineralWorkerTo(firstBuilding.getPosition());
-
-					// if we find a worker (which we should) add it to the scout units
-					// 정찰 나갈 일꾼이 없으면, 아무것도 하지 않는다
-					if (unit != null)
-					{
-						// set unit as scout unit
-						currentScoutUnit = unit;
-						WorkerManager.Instance().setScoutWorker(currentScoutUnit);
-
-						// 참고로, 일꾼의 정찰 임무를 해제하려면, 다음과 같이 하면 된다
-						//WorkerManager::Instance().setIdleWorker(currentScoutUnit);
-					}
-				}
-				*/
-				
-				for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-				{
-					if (unit.getType() == UnitType.Zerg_Overlord)
-					{
-
-						currentScoutUnit = unit;
-						System.out.println("here");
-						System.out.println("moving");
-						System.out.println("moving");
-
-					}
-						
-				}
-				
-				
-				
 			}
+
 		}
+
 	}
 
 	
@@ -123,135 +103,213 @@ public class ScoutManager {
 	/// 정찰 유닛을 이동시킵니다
 	// 상대방 MainBaseLocation 위치를 모르는 상황이면, StartLocation 들에 대해 아군의 MainBaseLocation에서 가까운 것부터 순서대로 정찰
 	// 상대방 MainBaseLocation 위치를 아는 상황이면, 해당 BaseLocation 이 있는 Region의 가장자리를 따라 계속 이동함 (정찰 유닛이 죽을때까지) 
-	public void moveScoutUnit()
-	{
-		if (currentScoutUnit == null || currentScoutUnit.exists() == false || currentScoutUnit.getHitPoints() <= 0 )
-		{
-			currentScoutUnit = null;
-			currentScoutStatus = ScoutStatus.NoScout.ordinal();
-			return;
-		}
-
-		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+	public void moveScoutUnit() {
+		BaseLocation enemyBaseLocation = InformationManager.Instance()
+				.getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 		BaseLocation myBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
 
-		if (enemyBaseLocation == null)
-		{
-			// currentScoutTargetBaseLocation 가 null 이거나 정찰 유닛이 currentScoutTargetBaseLocation 에 도착했으면 
-			// 아군 MainBaseLocation 으로부터 가장 가까운 미정찰 BaseLocation 을 새로운 정찰 대상 currentScoutTargetBaseLocation 으로 잡아서 이동
-			
-			if (currentScoutTargetBaseLocation == null || currentScoutUnit.getDistance(currentScoutTargetBaseLocation.getPosition()) < 5 * Config.TILE_SIZE) 
-			{
-				currentScoutStatus = ScoutStatus.MovingToAnotherBaseLocation.ordinal();
-				BaseLocation closestBaseLocation = null;
-				
-				double closestDistance = 1000000000;
-				double tempDistance = 0;
-				
-				for (BaseLocation startLocation : BWTA.getStartLocations())
-				{
-					// if we haven't explored it yet (방문했었던 곳은 다시 가볼 필요 없음)
-					if (MyBotModule.Broodwar.isExplored(startLocation.getTilePosition()) == false)
-					{
-						// GroundDistance 를 기준으로 가장 가까운 곳으로 선정
-						tempDistance = (double)(InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getGroundDistance(startLocation) + 0.5);
-
-						if (tempDistance > 0 && tempDistance < closestDistance) {
-							closestBaseLocation = startLocation;
-							closestDistance = tempDistance;
-						}
+		if (enemyBaseLocation == null) {
+			// assign a scout to go scout it
+			if (secondScoutUnit != null) {
+				if (secondScoutTargetBaseLocation == null) {
+					secondScoutTargetBaseLocation = getClosestBaseLocation();
+				} else {
+					if (MyBotModule.Broodwar.isExplored(secondScoutTargetBaseLocation.getTilePosition())) {
+						secondScoutTargetBaseLocation = getClosestBaseLocation();
+					} else {
+						commandUtil.move(secondScoutUnit, secondScoutTargetBaseLocation.getPosition());
 					}
 				}
-
-				if (closestBaseLocation != null) 
-				{
-					// assign a scout to go scout it
-					commandUtil.move(currentScoutUnit, closestBaseLocation.getPosition());
-					currentScoutTargetBaseLocation = closestBaseLocation;
-				}
-				
-				
 			}
 			
-
-			else
-			{
-				commandUtil.move(currentScoutUnit, currentScoutTargetBaseLocation.getPosition());
+			if (firstScoutUnit != null) {
+				if (firstScoutTargetBaseLocation == null) {
+					firstScoutTargetBaseLocation = getClosestBaseLocation();
+				} else {
+					if (MyBotModule.Broodwar.isExplored(firstScoutTargetBaseLocation.getTilePosition())) {
+						firstScoutTargetBaseLocation = getClosestBaseLocation();
+					} else {
+						commandUtil.move(firstScoutUnit, firstScoutTargetBaseLocation.getPosition());
+					}
+				}
 			}
+			
+			
+
+			
+			
+			/*
+			if (MyBotModule.Broodwar.isExplored(firstScoutTargetBaseLocation.getTilePosition())) {
+				// assign a scout to go scout it
+				firstScoutTargetBaseLocation = getClosestBaseLocation();
+				commandUtil.move(firstScoutUnit, firstScoutTargetBaseLocation.getPosition());
+				System.out.println("------------------------------");
+			}
+*/
+			
+			
+			
+			
+			
+			
 			
 		}
 		// if we know where the enemy region is
-		else 
-		{
-			// if scout is exist, move scout into enemy region
-			if (currentScoutUnit != null) {
-				
-				currentScoutTargetBaseLocation = enemyBaseLocation;
-				
-				if (MyBotModule.Broodwar.isExplored(currentScoutTargetBaseLocation.getTilePosition()) == false) {
-					
-					currentScoutStatus = ScoutStatus.MovingToAnotherBaseLocation.ordinal();
-					currentScoutTargetPosition = currentScoutTargetBaseLocation.getPosition();
-					commandUtil.move(currentScoutUnit, currentScoutTargetPosition);
-					
+		else {
+			boolean isDangerousBuilding = false;
+			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+				// morphing hydralisk_den
+				if (unit.getBuildType().equals(UnitType.Zerg_Hydralisk_Den) 
+						|| unit.getBuildType().equals(UnitType.Protoss_Photon_Cannon)
+						|| unit.getBuildType().equals(UnitType.Protoss_Cybernetics_Core)
+						|| unit.getBuildType().equals(UnitType.Zerg_Spore_Colony)
+						|| unit.getBuildType().equals(UnitType.Zerg_Spire)
+						) {
+					isDangerousBuilding = true;
+					break;
 				}
-				else { 
 
-					/* Refinary 짓기
-					TilePosition seedPosition = enemyBaseLocation.getTilePosition();
-					TilePosition desiredPosition = TilePosition.None;
-					
-					int maxRange = 100;
-					boolean constructionPlaceFound = false;
-
-					for (int range = 4; range <= maxRange; range *= 2) {
-						for (int i = seedPosition.getX() - range; i < seedPosition.getX() + range; i++) {
-							for (int j = seedPosition.getY() - range; j < seedPosition.getY() + range; j++) {
-								desiredPosition = new TilePosition(i,j);
-								if (MyBotModule.Broodwar.canBuildHere(desiredPosition, UnitType.Terran_Refinery, currentScoutUnit, true))	{
-									constructionPlaceFound = true;
-									break;
-								}
-							}
-							if (constructionPlaceFound) break;
-						}
-						if (constructionPlaceFound) break;
-					}
-
-					if (constructionPlaceFound == true && desiredPosition != TilePosition.None) {
-						
-						Position p = Position(desiredPosition); //error
-						currentScoutUnit.move(p);//error
-
-						currentScoutUnit.build(UnitType.Terran_Refinery, desiredPosition);
-			
-						Refinary 짓기 - 첫번쨰로 찾지 못하는 경우 타이밍에서 에러가생김..
-						
-						 */
-						
-						currentScoutStatus = ScoutStatus.MoveAroundEnemyBaseLocation.ordinal();
-						currentScoutTargetPosition = getScoutFleePositionFromEnemyRegionVertices();
-						commandUtil.move(currentScoutUnit, currentScoutTargetPosition);		
-						//적 기지 도는 코드	 - 노승호 0810
-					}
-					
-					
-	
-							
-					
-					
-					
-					
-				//	WorkerManager.Instance().setIdleWorker(currentScoutUnit);
-				//  currentScoutUnit = null;
-				//	currentScoutStatus = ScoutStatus.NoScout.ordinal();
-				//	currentScoutTargetPosition = myBaseLocation.getPosition();
-					//베이스로 돌아오는 코드
+				// complete hydralisk_den
+				if (unit.getType().equals(UnitType.Zerg_Hydralisk_Den)
+						|| unit.getType().equals(UnitType.Protoss_Photon_Cannon)
+						|| unit.getType().equals(UnitType.Protoss_Cybernetics_Core)
+						|| unit.getType().equals(UnitType.Zerg_Spore_Colony)
+						|| unit.getType().equals(UnitType.Zerg_Spire)
+						) {
+					isDangerousBuilding = true;
+					break;
 				}
 			}
+
+			if (MyBotModule.Broodwar.enemy().getRace().equals(Race.Terran) || isDangerousBuilding) {
+				moveScoutUnitToMyBaseLocation();
+				return;
+			}
+
+			if (firstScoutUnit.isUnderAttack()) {
+				moveScoutUnitToMyBaseLocation();
+				return;
+			}
+
+			if (secondScoutUnit != null && secondScoutUnit.isUnderAttack()) {
+				BaseLocation myMainBaseLocation = InformationManager.Instance()
+						.getMainBaseLocation(MyBotModule.Broodwar.self());
+				commandUtil.move(secondScoutUnit, myMainBaseLocation.getPosition());
+				return;
+			}
+
+
+
+
+			// 적 기지 도는 코드 - 노승호 0810
+			
+			
+			
+			// if scout is exist, move scout into enemy region
+			if (firstScoutUnit != null) {
+
+				firstScoutTargetBaseLocation = enemyBaseLocation;
+
+				if (MyBotModule.Broodwar.isExplored(firstScoutTargetBaseLocation.getTilePosition()) == false) {
+
+					firstScoutUnitStatus = ScoutStatus.MovingToAnotherBaseLocation.ordinal();
+					firstScoutTargetPosition = firstScoutTargetBaseLocation.getPosition();
+					commandUtil.move(firstScoutUnit, firstScoutTargetPosition);
+
+				} else {
+
+					firstScoutUnitStatus = ScoutStatus.MoveAroundEnemyBaseLocation.ordinal();
+					firstScoutTargetPosition = getScoutFleePositionFromEnemyRegionVertices(firstScoutUnit);
+					commandUtil.move(firstScoutUnit, firstScoutTargetPosition);
+					// 적 기지 도는 코드 - 노승호 0810
+				}
+			}
+				
+			// if scout is exist, move scout into enemy region
+			if (secondScoutUnit != null) {
+
+				secondScoutTargetBaseLocation = enemyBaseLocation;
+
+				if (MyBotModule.Broodwar.isExplored(secondScoutTargetBaseLocation.getTilePosition()) == false) {
+
+					secondScoutUnitStatus = ScoutStatus.MovingToAnotherBaseLocation.ordinal();
+					secondScoutTargetPosition = secondScoutTargetBaseLocation.getPosition();
+					commandUtil.move(secondScoutUnit, secondScoutTargetPosition);
+
+				} else {
+
+					secondScoutUnitStatus = ScoutStatus.MoveAroundEnemyBaseLocation.ordinal();
+					secondScoutTargetPosition = getScoutFleePositionFromEnemyRegionVertices(secondScoutUnit);
+					commandUtil.move(secondScoutUnit, secondScoutTargetPosition);
+					// 적 기지 도는 코드 - 노승호 0810
+				}
+			}
+			
+			
+			
+			
+			
+			
+	
+			
+			
+			
+			
+			
+			
+			
 		}
-		
-		//System.out.println("dddd");
+
+
+
+	}
+	
+	
+	
+    private void moveScoutUnitToMyBaseLocation() {
+        BaseLocation myFirstExpansionLocation = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.self());
+        commandUtil.move(firstScoutUnit, myFirstExpansionLocation.getPoint());
+        if (secondScoutUnit != null) {
+            BaseLocation myMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+            commandUtil.move(secondScoutUnit, myMainBaseLocation.getPosition());
+        }
+    }
+
+    private BaseLocation getClosestBaseLocation() {
+        double closestDistance = 1000000000;
+        double tempDistance;
+        BaseLocation closestBaseLocation = null;
+        // 아군 MainBaseLocation 으로부터 가장 가까운 미정찰 BaseLocation 을 새로운 정찰 대상 currentScoutTargetBaseLocation 으로 잡아서 이동
+        for (BaseLocation startLocation : BWTA.getStartLocations()) {
+            if (MyBotModule.Broodwar.isExplored(startLocation.getTilePosition())) {
+                continue;
+            }
+
+            if (startLocation == firstScoutTargetBaseLocation) {
+                continue;
+            }
+
+            if (startLocation == secondScoutTargetBaseLocation) {
+                continue;
+            }
+
+            tempDistance = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getGroundDistance(startLocation) + 0.5;
+            if (tempDistance > 0 && tempDistance < closestDistance) {
+                closestBaseLocation = startLocation;
+                closestDistance = tempDistance;
+            }
+        }
+
+        return closestBaseLocation;
+    }
+	
+	
+	
+	
+	
+	
+	
+	
 		
 	
 
@@ -260,7 +318,7 @@ public class ScoutManager {
 		return null;
 	}
 
-	public Position getScoutFleePositionFromEnemyRegionVertices()
+	public Position getScoutFleePositionFromEnemyRegionVertices(Unit currentScoutUnit)
 	{
 		// calculate enemy region vertices if we haven't yet
 		if (enemyBaseRegionVertices.isEmpty()) {
@@ -467,19 +525,19 @@ public class ScoutManager {
 	/// 정찰 유닛을 리턴합니다
 	public Unit getScoutUnit()
 	{
-		return currentScoutUnit;
+		return firstScoutUnit;
 	}
 
 	// 정찰 상태를 리턴합니다
 	public int getScoutStatus()
 	{
-		return currentScoutStatus;
+		return firstScoutUnitStatus;
 	}
 
 	/// 정찰 유닛의 이동 목표 BaseLocation 을 리턴합니다
 	public BaseLocation getScoutTargetBaseLocation()
 	{
-		return currentScoutTargetBaseLocation;
+		return firstScoutTargetBaseLocation;
 	}
 
 	/// 적군의 Main Base Location 이 있는 Region 의 경계선에 해당하는 Vertex 들의 목록을 리턴합니다

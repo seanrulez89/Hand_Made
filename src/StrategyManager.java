@@ -1655,7 +1655,7 @@ public class StrategyManager {
 			int optimalWorkerCount = 0;
 			for (BaseLocation baseLocation : InformationManager.Instance()
 					.getOccupiedBaseLocations(InformationManager.Instance().selfPlayer)) {
-				optimalWorkerCount += baseLocation.getMinerals().size() * 1.5;
+				optimalWorkerCount += baseLocation.getMinerals().size() * 2.0;
 				optimalWorkerCount += baseLocation.getGeysers().size() * 3;
 			}
 
@@ -1845,7 +1845,7 @@ public class StrategyManager {
 				if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType1.mineralPrice()) {
 
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType1,
-							BuildOrderItem.SeedPositionStrategy.FirstChokePoint, false);
+							BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
 				}
 			}
 		}
@@ -1858,7 +1858,7 @@ public class StrategyManager {
 				if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType2.mineralPrice()) {
 
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType2,
-							BuildOrderItem.SeedPositionStrategy.FirstChokePoint, false);
+							BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
 				}
 			}
 		}
@@ -1888,7 +1888,7 @@ public class StrategyManager {
 			// 게이트웨이 / 배럭 / 해처리 증설
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0) {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
-						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true); /// 해처리 추가 확장 0622
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true); /// 해처리 추가 확장 0622
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor,
 						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true); /// 해처리 추가 확장 0622
 			

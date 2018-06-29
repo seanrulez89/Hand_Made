@@ -63,7 +63,7 @@ public class InitialBuildOrder {
 
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
 
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Lair);
 
@@ -158,32 +158,22 @@ public class InitialBuildOrder {
 
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling,
 
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling,
+
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling,
+
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling,
 
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 
 
 		// 저글링 이동속도 업
