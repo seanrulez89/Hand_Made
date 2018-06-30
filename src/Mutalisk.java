@@ -39,7 +39,7 @@ public class Mutalisk {
 		
 		if(myUnit.getType() == UnitType.Zerg_Mutalisk)
 		{
-			inRange = myUnit.getType().seekRange() * 3;
+			inRange = myUnit.getType().seekRange() * 4;
 		}
 		else
 		{
@@ -79,22 +79,16 @@ public class Mutalisk {
 				
 				
 				
-				if (myUnit.canAttack(enemy)) {
-					if (enemy.canAttack(myUnit)) // 적군이면서 서로 공격가능하다면 가장 우선순위로 싸우고
+				if (myUnit.canTargetUnit(enemy)) {
+					if (enemy.canTargetUnit(myUnit)) // 적군이면서 서로 공격가능하다면 가장 우선순위로 싸우고
 					{
 						tempHP = enemy.getHitPoints();
 						if (targetHP > tempHP) {
 							targetHP = tempHP;
 							nextTarget = enemy;
 						}
-					} else if (enemy.canAttack()) // 나만 일방적으로 칠 수 있다면 2순위로 싸우고
-					{
-						tempHP = enemy.getHitPoints();
-						if (targetHP > tempHP) {
-							targetHP = tempHP;
-							nextTarget = enemy;
-						}
-					} else // 마지막 3순위 이것은 아마도 건물일 것이다. 나는 공격할 수 있지만, 적군은 아무것도 공격이 안되는 유닛이므로
+					
+					} else
 					{
 						tempHP = enemy.getHitPoints();
 						if (targetHP > tempHP) {
@@ -109,15 +103,12 @@ public class Mutalisk {
 
 		}
 		
-		if(nextTarget==null)
-		{
-			for (Unit enemy : defenseBuilding)
-			{
-				tempHP = enemy.getHitPoints();
-				if (targetHP > tempHP) {
-					targetHP = tempHP;
-					nextTarget = enemy;
-				}
+
+		for (Unit enemy : defenseBuilding) {
+			tempHP = enemy.getHitPoints();
+			if (targetHP > tempHP) {
+				targetHP = tempHP;
+				nextTarget = enemy;
 			}
 		}
 		
@@ -133,16 +124,7 @@ public class Mutalisk {
 			}
 		}
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+	
 
 		return nextTarget;
 	}
@@ -193,7 +175,7 @@ public class Mutalisk {
 						if (positionDistance > tempDistance) {
 							positionDistance = tempDistance;
 							invader = unit;
-							System.out.println("건물 주변 악당을 찾았다");
+							//System.out.println("건물 주변 악당을 찾았다");
 						}
 					}
 				}
@@ -221,7 +203,7 @@ public class Mutalisk {
 				if (positionDistance > tempDistance) {
 					positionDistance = tempDistance;
 					invader = unit;
-					System.out.println("길목2 주변 악당을 찾았다");
+					//System.out.println("길목2 주변 악당을 찾았다");
 				}
 			}
 		}
@@ -245,7 +227,7 @@ public class Mutalisk {
 				if (positionDistance > tempDistance) {
 					positionDistance = tempDistance;
 					invader = unit;
-					System.out.println("길목1 주변 악당을 찾았다");
+					//System.out.println("길목1 주변 악당을 찾았다");
 				}
 			}
 		}
@@ -344,8 +326,8 @@ public class Mutalisk {
 			gathered = true; // 0627 이것도 의미를 뒤집던가
 			moveToEndPoint = true;
 			
-			System.out.println("numberOfGathered" + numberOfGathered);
-			System.out.println("numberOfTotal" + numberOfTotal);
+			//System.out.println("numberOfGathered" + numberOfGathered);
+			//System.out.println("numberOfTotal" + numberOfTotal);
 		}
 
 
@@ -456,6 +438,15 @@ public class Mutalisk {
 	{
 		for(Unit mutal : SM.myCombatUnitType2List)
 		{
+			if(mutal.getAirWeaponCooldown()/2 >0)
+			{	
+			mutal.move(SM.myMainBaseLocation.getPosition());
+			continue;
+			}
+			
+			
+			
+			
 			Unit invader = weAreUnderAttack(mutal);
 			Position nextPlace = getNextPlaceToGo(mutal, SM.combatState);
 			Unit nextTarget = null;
@@ -479,7 +470,25 @@ public class Mutalisk {
 
 			if(invader != null)
 			{
-				mutal.attack(invader);
+				
+				
+				if(mutal.getAirWeaponCooldown()/2 >0)
+				{	
+				mutal.move(SM.myMainBaseLocation.getPosition());
+				}
+				else
+				{
+					mutal.attack(invader);
+				}
+
+//				System.out.println("11111");
+				
+				
+				
+				
+				
+				
+				
 //				System.out.println("집지키러 가즈아");
 
 			}
@@ -488,6 +497,9 @@ public class Mutalisk {
 //				System.out.println("아직 기지 못찾아서 앞마당으로 가라");
 				commandUtil.attackMove(mutal, SM.mySecondChokePoint.getPoint());
 				moveToEndPoint = false;
+				
+//				System.out.println("22222");
+				
 //				return;
 				continue;
 			}
@@ -495,21 +507,46 @@ public class Mutalisk {
 			else if(SM.combatState == StrategyManager.CombatState.attackStarted)
 			{
 //				commandUtil.attackMove(mutal, SM.attackTargetPosition);
-				commandUtil.attackMove(mutal, SM.enemyMainBaseLocation.getPosition());
+				
 				
 				if(nextTarget!=null)
 				{
-					mutal.attack(nextTarget);
-				}
+					if(mutal.getAirWeaponCooldown()/2 >0)
+					{	
+					mutal.move(SM.myMainBaseLocation.getPosition());
+					}
+					else
+					{
+						mutal.attack(nextTarget);
+					}
+					
 				
+				}
+				else
+				{
+					commandUtil.attackMove(mutal, SM.enemyMainBaseLocation.getPosition());
+				}
+//				System.out.println("33333");
 			}
 			
 			
 			
 			else if(nextTarget!=null && invader == null && mutalsAroundNextPlace.size()>3)
 			{
-				mutal.attack(nextTarget);
+				if(nextTarget!=null)
+				{
+					if(mutal.getAirWeaponCooldown()/2 >0)
+					{	
+					mutal.move(SM.myMainBaseLocation.getPosition());
+					}
+					else
+					{
+						mutal.attack(nextTarget);
+					}
+					
 				
+				}
+//				System.out.println("44444");
 //				System.out.println("잡아먹기");
 				
 			}
@@ -519,24 +556,65 @@ public class Mutalisk {
 				
 				mutal.move(SM.mySecondChokePoint.getPoint());
 				moveToEndPoint = false;
+//				System.out.println("55555");
 			}
 			
 			
 			else if(SM.myCombatUnitType2List.size()<6)
 			{
+				if(nextTarget!=null)
+				{
+					if(mutal.getAirWeaponCooldown()/2 >0)
+					{	
+					mutal.move(SM.myMainBaseLocation.getPosition());
+					}
+					else
+					{
+						
+						mutal.attack(nextTarget);
+					}
+					
+				
+				}
+				else
+				{
+					commandUtil.attackMove(mutal, SM.mySecondChokePoint.getPoint());
+				}
 				
 				
-				commandUtil.attackMove(mutal, SM.mySecondChokePoint.getPoint());
+				
+				
+				
 				moveToEndPoint = false;
+//				System.out.println("66666");
 //				return;
 				continue;
 			}
 			
 			else
 			{
-				commandUtil.attackMove(mutal, nextPlace);
+				if(nextTarget!=null)
+				{
+					if(mutal.getAirWeaponCooldown()/2 >0)
+					{	
+					mutal.move(SM.myMainBaseLocation.getPosition());
+					}
+					else
+					{
+						mutal.attack(nextTarget);
+					}
+					
+				
+				}
+				else
+				{
+					commandUtil.attackMove(mutal, nextPlace);
+				}
+				
+				
 //				System.out.println("어택땅으로 이동");
 
+//				System.out.println("7777");
 			}
 			
 			

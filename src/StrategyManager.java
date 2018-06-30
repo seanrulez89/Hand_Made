@@ -2,10 +2,12 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 //import StrategyManager.CombatState;
@@ -225,7 +227,7 @@ public class StrategyManager {
 			// 공격 유닛 종류 설정
 			myCombatUnitType1 = UnitType.Zerg_Zergling;
 			myCombatUnitType2 = UnitType.Zerg_Mutalisk;
-			// myCombatUnitType3 = UnitType.Terran_Siege_Tank_Tank_Mode;
+			myCombatUnitType3 = UnitType.Zerg_Ultralisk;
 			// myCombatUnitType4 = UnitType.Terran_Science_Vessel;
 			// myCombatUnitType5 = UnitType.Terran_Wraith;
 
@@ -243,7 +245,7 @@ public class StrategyManager {
 			// MaxNumberOfCombatUnitType4 = 4 ;
 
 			// 공격 유닛 생산 순서 설정
-			buildOrderArrayOfMyCombatUnitType = new int[] { 2, 2, 1 }; // 마린 마린 마린 메딕 시즈 베슬
+			buildOrderArrayOfMyCombatUnitType = new int[] { 1, 2, 3 }; // 마린 마린 마린 메딕 시즈 베슬
 			nextTargetIndexOfBuildOrderArray = 0; // 다음 생산 순서 index
 
 			// 방어 건물 종류 및 건설 갯수 설정
@@ -294,6 +296,9 @@ public class StrategyManager {
 		/// 전반적인 전투 로직 을 갖고 전투를 수행합니다
 		executeCombat();
 
+		
+		LastBuildOrder.Instance().lastBuildOrder();
+		
 		/// StrategyManager 의 수행상황을 표시합니다
 		/// drawStrategyManagerStatus();
 
@@ -307,7 +312,7 @@ public class StrategyManager {
 
 		// wraith();
 
-		if (MyBotModule.Broodwar.getFrameCount() % 24 == 0)
+		if (MyBotModule.Broodwar.getFrameCount() % 24 * 10 == 0)
 		{
 			myExpansion = Expansion.Instance(); // 0627 지속적인 정찰에 따라 업데이트 되는 내용을 반영하기 위해서 인스턴스를 계속 호출한다. 하지마 싱글톤이므로 결국 같은 인스턴스를 새로고침하는 셈이다.
 			myExpansion.expansion();
@@ -330,8 +335,9 @@ public class StrategyManager {
 			//System.out.println(mutalisk.moveToEndPoint);
 		}
 */	
-		
-		mutalisk.myMutal();
+		if (combatState != CombatState.eliminateEnemy && MyBotModule.Broodwar.getFrameCount() % 30 == 0) {
+			mutalisk.myMutal();
+		}
 		
 /*		if (MyBotModule.Broodwar.getFrameCount() % 24 == 0) { // 0627 일단 이렇게 했는데 공격시점에서는 조건을 어떻게 해줄까?
 			
@@ -529,21 +535,40 @@ public class StrategyManager {
 	/// 적군을 Eliminate 시키는 모드로 전환할지 여부를 리턴합니다
 	boolean isTimeToStartElimination() {
 
-		// 적군 유닛을 많이 죽였고, 아군 서플라이가 120 을 넘었으면
-		if (enemyKilledCombatUnitCount >= 15 && enemyKilledWorkerUnitCount >= 5 && myPlayer.supplyUsed() > 60 * 2) {
-
-			// 적군 본진에 아군 유닛이 30 이상 도착했으면 거의 게임 끝난 것
-			int myUnitCountAroundEnemyMainBaseLocation = 0;
-			for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(enemyMainBaseLocation.getPosition(),
-					10 * Config.TILE_SIZE)) {
-				if (unit.getPlayer() == myPlayer) {
-					myUnitCountAroundEnemyMainBaseLocation++;
-				}
+		int myScore =0;
+		int enemyScore =0;
+		
+		myScore = myPlayer.getBuildingScore() + myPlayer.getKillScore() + myPlayer.getRazingScore() + myPlayer.getUnitScore();
+		enemyScore = enemyPlayer.getBuildingScore() + enemyPlayer.getKillScore() + enemyPlayer.getRazingScore() + enemyPlayer.getUnitScore();
+/*		
+		System.out.println("myPlayer.getBuildingScore() : " + myPlayer.getBuildingScore() + "/ enemyPlayer.getBuildingScore() : " + enemyPlayer.getBuildingScore());
+		System.out.println("myPlayer.getKillScore() : " + myPlayer.getKillScore() + "/ enemyPlayer.getKillScore() : " + enemyPlayer.getKillScore());
+		System.out.println("myPlayer.getRazingScore() : " + myPlayer.getRazingScore() + "/ enemyPlayer.getRazingScore() : " + enemyPlayer.getRazingScore());
+		System.out.println("myPlayer.getUnitScore() : " + myPlayer.getUnitScore() + "/ enemyPlayer.getUnitScore() : " + enemyPlayer.getUnitScore());
+		System.out.println("myPlayer.deadUnitCount() : " + myPlayer.deadUnitCount() + "/ enemyPlayer.deadUnitCount() : " + enemyPlayer.deadUnitCount());
+스코어도 안되고 사망자도 안된다. 0701
+	*/
+		
+		
+		
+		if(enemyPlayer.deadUnitCount() > 2 * myPlayer.deadUnitCount())
+		{
+			System.out.println("eli case 3");
+			return true;
+		}
+	
+		// 적군 본진에 아군 유닛이 30 이상 도착했으면 거의 게임 끝난 것
+		int myUnitCountAroundEnemyMainBaseLocation = 0;
+		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(enemyMainBaseLocation.getPosition(), 10 * Config.TILE_SIZE)) 
+		{
+			if (unit.getPlayer() == myPlayer) {
+				myUnitCountAroundEnemyMainBaseLocation++;
 			}
-			if (myUnitCountAroundEnemyMainBaseLocation > 20) {
-				System.out.println("eli case 1");
-				return true;
-			}
+		}
+		
+		if (myUnitCountAroundEnemyMainBaseLocation > 30) {
+			System.out.println("eli case 1");
+			return true;
 		}
 
 		if (MyBotModule.Broodwar.getFrameCount() > 40000 && myPlayer.supplyUsed() > 80 * 2) {
@@ -551,13 +576,6 @@ public class StrategyManager {
 			return true;
 		}
 
-		/*
-		 * InformationManager instance = new InformationManager();
-		 * 
-		 * if (myInstance.hasBuildingAroundBaseLocation(enemyMainBaseLocation,
-		 * enemyPlayer, 200) == false && enemyKilledWorkerUnitCount >= 10) { return
-		 * true; }
-		 */
 		return false;
 	}
 
@@ -1652,11 +1670,45 @@ public class StrategyManager {
 				}
 			}
 
+			int numberOfMyCombatUnitTrainingBuilding = 0;
+			numberOfMyCombatUnitTrainingBuilding += myPlayer.allUnitCount(UnitType.Zerg_Hatchery);
+			numberOfMyCombatUnitTrainingBuilding += myPlayer.allUnitCount(UnitType.Zerg_Lair);
+			numberOfMyCombatUnitTrainingBuilding += myPlayer.allUnitCount(UnitType.Zerg_Hive);
+
+			numberOfMyCombatUnitTrainingBuilding += BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery);
+			numberOfMyCombatUnitTrainingBuilding += BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Lair);
+			numberOfMyCombatUnitTrainingBuilding += BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hive);
+
+			numberOfMyCombatUnitTrainingBuilding += ConstructionManager.Instance()
+					.getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null);
+			numberOfMyCombatUnitTrainingBuilding += ConstructionManager.Instance()
+					.getConstructionQueueItemCount(UnitType.Zerg_Lair, null);
+			numberOfMyCombatUnitTrainingBuilding += ConstructionManager.Instance()
+					.getConstructionQueueItemCount(UnitType.Zerg_Hive, null);
+			
+			
+			
+			
 			// 0630 최대치 설정
-			if(workerCount > 40) // 0630 해처리가 일정 숫자 이상이 되면 라바소모하느라 자원이 더 안모이는데 그때 맥스를 올려주자 
+			if(numberOfMyCombatUnitTrainingBuilding>=8)
+			{
+				if(workerCount > 70)
+				{
+					return;
+				}
+			}
+			if(numberOfMyCombatUnitTrainingBuilding>=6)
+			{
+				if(workerCount > 50)
+				{
+					return;
+				}
+			}
+			else if(workerCount > 40) // 0630 해처리가 일정 숫자 이상이 되면 라바소모하느라 자원이 더 안모이는데 그때 맥스를 올려주자 
 			{
 				return;
 			}
+			
 			
 			
 			int optimalWorkerCount = 0;
@@ -1896,8 +1948,7 @@ public class StrategyManager {
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0) {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true); /// 해처리 추가 확장 0622
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor,
-						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true); /// 해처리 추가 확장 0622
+				
 			
 			System.out.println("AA");
 			
@@ -1907,6 +1958,8 @@ public class StrategyManager {
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0) {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 						BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true); /// 해처리 추가 확장 0622
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor,
+						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true); /// 해처리 추가 확장 0622
 				
 				System.out.println("BB");
 			}
@@ -1914,7 +1967,7 @@ public class StrategyManager {
 				&& BuildManager.Instance().getAvailableMinerals() > 500 && numberOfMyCombatUnitTrainingBuilding < 13) {
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0) {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
-						nextEXP.getTilePosition(), true); /// 해처리 추가 확장 0622
+						nextEXP.getTilePosition(), false); /// 해처리 추가 확장 0622
 				
 				System.out.println("CC");
 
@@ -1978,7 +2031,7 @@ public class StrategyManager {
 				isTimeToStartUpgradeType2 = true;
 			}
 			// 가스 좀 남으면 하라고 넣은건데 저기서 가스가 현재량인지 채굴총량인지???????
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 && myPlayer.gas() > 300 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5) {
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 && myPlayer.gas() > 100 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5) {
 				isTimeToStartUpgradeType3 = true;
 			}
 			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 && myPlayer.gas() > 300 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5){
@@ -2043,7 +2096,7 @@ public class StrategyManager {
 		}
 
 		if (isTimeToStartUpgradeType3) {
-			if (myPlayer.getUpgradeLevel(necessaryUpgradeType3) == 0
+			if (myPlayer.getUpgradeLevel(necessaryUpgradeType3) < 4
 					&& myPlayer.isUpgrading(necessaryUpgradeType3) == false
 					&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType3) == 0) {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType3, false);
@@ -2051,7 +2104,7 @@ public class StrategyManager {
 		}
 
 		if (isTimeToStartUpgradeType4) {
-			if (myPlayer.getUpgradeLevel(necessaryUpgradeType4) == 0
+			if (myPlayer.getUpgradeLevel(necessaryUpgradeType4) < 4
 					&& myPlayer.isUpgrading(necessaryUpgradeType4) == false
 					&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType4) == 0) {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType4, false);
@@ -2094,7 +2147,23 @@ public class StrategyManager {
 
 						if (BuildManager.Instance().buildQueue.getItemCount(nextUnitTypeToTrain) == 0) {
 
-							BuildManager.Instance().buildQueue.queueAsLowestPriority(nextUnitTypeToTrain, false);
+							
+							if(nextUnitTypeToTrain == myCombatUnitType3)
+							{
+								
+								System.out.println("울트라리스크");
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(nextUnitTypeToTrain, true);
+							}
+							else
+							{
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(nextUnitTypeToTrain, false);
+							}
+							
+							
+							
+							
+							
+							
 							nextTargetIndexOfBuildOrderArray++;
 
 							if (nextTargetIndexOfBuildOrderArray >= buildOrderArrayOfMyCombatUnitType.length) {
@@ -2129,39 +2198,52 @@ public class StrategyManager {
 			}
 		} else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 3) {
 
-			if (myCombatUnitType1List.size() < 2.0 * myCombatUnitType2List.size()) {
+			
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern)>0) {
+				nextUnitTypeToTrain = myCombatUnitType3;
+			}
+			else if (myCombatUnitType1List.size() < 2.0 * myCombatUnitType2List.size()) 
+			{
 				nextUnitTypeToTrain = myCombatUnitType1;
-			} else {
+			} 
+			else 
+			{
 				nextUnitTypeToTrain = myCombatUnitType2;
 			}
-		} else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 4) // myCombatUnitType4List.size()
-																								// <=
-																								// MaxNumberOfCombatUnitType4
-																								// )
+			
+			
+			
+		} else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 4) 																					// )
 		{
-			/*
-			 * int cnt = 0;
-			 * 
-			 * for (Unit unit : myAllCombatUnitList) { if(unit.getType() ==
-			 * UnitType.Terran_Science_Vessel) { cnt = cnt +1; } }
-			 */
-			if (myCombatUnitType1List.size() < 2.0 * myCombatUnitType2List.size()) {
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern)>0) {
+				nextUnitTypeToTrain = myCombatUnitType3;
+			}
+			else if (myCombatUnitType1List.size() < 2.0 * myCombatUnitType2List.size()) 
+			{
 				nextUnitTypeToTrain = myCombatUnitType1;
-			} else {
+			} 
+			else 
+			{
 				nextUnitTypeToTrain = myCombatUnitType2;
 			}
-
-			// maxnumber 수정. 노승호 170808
 		}
 
-		else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 5) {
-
-			if (myCombatUnitType1List.size() < 2.0 * myCombatUnitType2List.size()) {
+		else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 5) 
+		{
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern)>0) {
+				nextUnitTypeToTrain = myCombatUnitType3;
+			}
+			else if (myCombatUnitType1List.size() < 2.0 * myCombatUnitType2List.size()) 
+			{
 				nextUnitTypeToTrain = myCombatUnitType1;
-			} else {
+			} 
+			else 
+			{
 				nextUnitTypeToTrain = myCombatUnitType2;
 			}
-		} else {
+		} 
+		else 
+		{
 			;
 		}
 
@@ -2452,7 +2534,6 @@ public class StrategyManager {
 
 		myAllCombatUnitList.clear();
 		myCombatUnitType1List.clear();
-
 		myCombatUnitType2List.clear();
 		myCombatUnitType3List.clear();
 
@@ -2466,14 +2547,14 @@ public class StrategyManager {
 			} else if (unit.getType() == myCombatUnitType2) {
 				myCombatUnitType2List.add(unit);
 				myAllCombatUnitList.add(unit);
-			} else if (unit.getType() == myCombatUnitType3 || unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
+			} else if (unit.getType() == myCombatUnitType3) {
 				myCombatUnitType3List.add(unit);
 				myAllCombatUnitList.add(unit);
-			} else if (unit.getType() == myCombatUnitType4 || unit.getType() == UnitType.Terran_Science_Vessel) {
+			} else if (unit.getType() == myCombatUnitType4) {
 				myCombatUnitType4List.add(unit);
 				myAllCombatUnitList.add(unit);
-			} //////////////////////////// 20170806 권순우 베슬을 리스트에 추가
-			else if (unit.getType() == myCombatUnitType5 || unit.getType() == UnitType.Terran_Wraith) {
+			}
+			else if (unit.getType() == myCombatUnitType5) {
 				myCombatUnitType5List.add(unit);
 				myAllCombatUnitList.add(unit);
 			} else if (unit.getType() == myDefenseBuildingType1) {
