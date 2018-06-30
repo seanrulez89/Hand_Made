@@ -1652,6 +1652,13 @@ public class StrategyManager {
 				}
 			}
 
+			// 0630 최대치 설정
+			if(workerCount > 40) // 0630 해처리가 일정 숫자 이상이 되면 라바소모하느라 자원이 더 안모이는데 그때 맥스를 올려주자 
+			{
+				return;
+			}
+			
+			
 			int optimalWorkerCount = 0;
 			for (BaseLocation baseLocation : InformationManager.Instance()
 					.getOccupiedBaseLocations(InformationManager.Instance().selfPlayer)) {
@@ -1670,7 +1677,7 @@ public class StrategyManager {
 
 								// 권순우 0617 다음의 코드를 highest로 하면 긴급으로 유닛 생산을 명령하는데 추가하는데 쓰일 수 있을 듯 하다. 가령 최초 빌드가
 								// 끝나기도 전에 일꾼이 죽어버리는 등의 상황에서
-								BuildManager.Instance().buildQueue.queueAsHighestPriority(
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(
 										new MetaType(InformationManager.Instance().getWorkerType()), false);
 							}
 						}
@@ -1896,7 +1903,7 @@ public class StrategyManager {
 			
 			}
 		} else if (isPossibleToConstructCombatUnitTrainingBuildingType == true
-				&& BuildManager.Instance().getAvailableMinerals() > 700 && numberOfMyCombatUnitTrainingBuilding == 3) {
+				&& BuildManager.Instance().getAvailableMinerals() > 400 && numberOfMyCombatUnitTrainingBuilding == 3) {
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0) {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 						BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true); /// 해처리 추가 확장 0622
@@ -1904,7 +1911,7 @@ public class StrategyManager {
 				System.out.println("BB");
 			}
 		} else if (isPossibleToConstructCombatUnitTrainingBuildingType == true
-				&& BuildManager.Instance().getAvailableMinerals() > 700 && numberOfMyCombatUnitTrainingBuilding < 6) {
+				&& BuildManager.Instance().getAvailableMinerals() > 500 && numberOfMyCombatUnitTrainingBuilding < 13) {
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0) {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 						nextEXP.getTilePosition(), true); /// 해처리 추가 확장 0622

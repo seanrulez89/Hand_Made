@@ -29,6 +29,8 @@ public class ScoutManager {
 	private Vector<Position> enemyBaseRegionVertices = new Vector<Position>();
 	private int currentScoutFreeToVertexIndex = -1;
 	
+	public static boolean isDangerousBuilding = false;
+	
 	private CommandUtil commandUtil = new CommandUtil();
 	private static ScoutManager instance = new ScoutManager();
 	
@@ -156,97 +158,100 @@ public class ScoutManager {
 		}
 		// if we know where the enemy region is
 		else {
-			boolean isDangerousBuilding = false;
-			for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-				// morphing hydralisk_den
-				if (unit.getBuildType().equals(UnitType.Zerg_Hydralisk_Den) 
-						|| unit.getBuildType().equals(UnitType.Protoss_Photon_Cannon)
-						|| unit.getBuildType().equals(UnitType.Protoss_Cybernetics_Core)
-						|| unit.getBuildType().equals(UnitType.Zerg_Spore_Colony)
-						|| unit.getBuildType().equals(UnitType.Zerg_Spire)
-						) {
-					isDangerousBuilding = true;
-					break;
+			
+			
+		
+			if (isDangerousBuilding == false) {
+
+				for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+					// morphing hydralisk_den
+					if (unit.getBuildType().equals(UnitType.Zerg_Hydralisk_Den)
+							|| unit.getBuildType().equals(UnitType.Protoss_Photon_Cannon)
+							|| unit.getBuildType().equals(UnitType.Protoss_Cybernetics_Core)
+							|| unit.getBuildType().equals(UnitType.Zerg_Spore_Colony)
+							|| unit.getBuildType().equals(UnitType.Zerg_Spire)) {
+						isDangerousBuilding = true;
+						break;
+					}
+
+					// complete hydralisk_den
+					if (unit.getType().equals(UnitType.Zerg_Hydralisk_Den)
+							|| unit.getType().equals(UnitType.Protoss_Photon_Cannon)
+							|| unit.getType().equals(UnitType.Protoss_Cybernetics_Core)
+							|| unit.getType().equals(UnitType.Zerg_Spore_Colony)
+							|| unit.getType().equals(UnitType.Zerg_Spire)) {
+						isDangerousBuilding = true;
+						break;
+					}
+				}
+			}
+				
+
+				if (MyBotModule.Broodwar.enemy().getRace().equals(Race.Terran) || isDangerousBuilding) {
+					moveScoutUnitToMyBaseLocation();
+					return;
 				}
 
-				// complete hydralisk_den
-				if (unit.getType().equals(UnitType.Zerg_Hydralisk_Den)
-						|| unit.getType().equals(UnitType.Protoss_Photon_Cannon)
-						|| unit.getType().equals(UnitType.Protoss_Cybernetics_Core)
-						|| unit.getType().equals(UnitType.Zerg_Spore_Colony)
-						|| unit.getType().equals(UnitType.Zerg_Spire)
-						) {
-					isDangerousBuilding = true;
-					break;
+				if (firstScoutUnit.isUnderAttack()) {
+					moveScoutUnitToMyBaseLocation();
+					return;
 				}
-			}
 
-			if (MyBotModule.Broodwar.enemy().getRace().equals(Race.Terran) || isDangerousBuilding) {
-				moveScoutUnitToMyBaseLocation();
-				return;
-			}
+				if (secondScoutUnit != null && secondScoutUnit.isUnderAttack()) {
+					BaseLocation myMainBaseLocation = InformationManager.Instance()
+							.getMainBaseLocation(MyBotModule.Broodwar.self());
+					commandUtil.move(secondScoutUnit, myMainBaseLocation.getPosition());
+					return;
+				}
 
-			if (firstScoutUnit.isUnderAttack()) {
-				moveScoutUnitToMyBaseLocation();
-				return;
-			}
-
-			if (secondScoutUnit != null && secondScoutUnit.isUnderAttack()) {
-				BaseLocation myMainBaseLocation = InformationManager.Instance()
-						.getMainBaseLocation(MyBotModule.Broodwar.self());
-				commandUtil.move(secondScoutUnit, myMainBaseLocation.getPosition());
-				return;
-			}
-
-
+			
 
 
 			// 적 기지 도는 코드 - 노승호 0810
 			
 			
-			
-			// if scout is exist, move scout into enemy region
-			if (firstScoutUnit != null) {
+			if (isDangerousBuilding == false) {
+				// if scout is exist, move scout into enemy region
+				if (firstScoutUnit != null) {
 
-				firstScoutTargetBaseLocation = enemyBaseLocation;
+					firstScoutTargetBaseLocation = enemyBaseLocation;
 
-				if (MyBotModule.Broodwar.isExplored(firstScoutTargetBaseLocation.getTilePosition()) == false) {
+					if (MyBotModule.Broodwar.isExplored(firstScoutTargetBaseLocation.getTilePosition()) == false) {
 
-					firstScoutUnitStatus = ScoutStatus.MovingToAnotherBaseLocation.ordinal();
-					firstScoutTargetPosition = firstScoutTargetBaseLocation.getPosition();
-					commandUtil.move(firstScoutUnit, firstScoutTargetPosition);
+						firstScoutUnitStatus = ScoutStatus.MovingToAnotherBaseLocation.ordinal();
+						firstScoutTargetPosition = firstScoutTargetBaseLocation.getPosition();
+						commandUtil.move(firstScoutUnit, firstScoutTargetPosition);
 
-				} else {
+					} else {
 
-					firstScoutUnitStatus = ScoutStatus.MoveAroundEnemyBaseLocation.ordinal();
-					firstScoutTargetPosition = getScoutFleePositionFromEnemyRegionVertices(firstScoutUnit);
-					commandUtil.move(firstScoutUnit, firstScoutTargetPosition);
-					// 적 기지 도는 코드 - 노승호 0810
+						firstScoutUnitStatus = ScoutStatus.MoveAroundEnemyBaseLocation.ordinal();
+						firstScoutTargetPosition = getScoutFleePositionFromEnemyRegionVertices(firstScoutUnit);
+						commandUtil.move(firstScoutUnit, firstScoutTargetPosition);
+						// 적 기지 도는 코드 - 노승호 0810
+					}
 				}
-			}
-				
-			// if scout is exist, move scout into enemy region
-			if (secondScoutUnit != null) {
 
-				secondScoutTargetBaseLocation = enemyBaseLocation;
+				// if scout is exist, move scout into enemy region
+				if (secondScoutUnit != null) {
 
-				if (MyBotModule.Broodwar.isExplored(secondScoutTargetBaseLocation.getTilePosition()) == false) {
+					secondScoutTargetBaseLocation = enemyBaseLocation;
 
-					secondScoutUnitStatus = ScoutStatus.MovingToAnotherBaseLocation.ordinal();
-					secondScoutTargetPosition = secondScoutTargetBaseLocation.getPosition();
-					commandUtil.move(secondScoutUnit, secondScoutTargetPosition);
+					if (MyBotModule.Broodwar.isExplored(secondScoutTargetBaseLocation.getTilePosition()) == false) {
 
-				} else {
+						secondScoutUnitStatus = ScoutStatus.MovingToAnotherBaseLocation.ordinal();
+						secondScoutTargetPosition = secondScoutTargetBaseLocation.getPosition();
+						commandUtil.move(secondScoutUnit, secondScoutTargetPosition);
 
-					secondScoutUnitStatus = ScoutStatus.MoveAroundEnemyBaseLocation.ordinal();
-					secondScoutTargetPosition = getScoutFleePositionFromEnemyRegionVertices(secondScoutUnit);
-					commandUtil.move(secondScoutUnit, secondScoutTargetPosition);
-					// 적 기지 도는 코드 - 노승호 0810
+					} else {
+
+						secondScoutUnitStatus = ScoutStatus.MoveAroundEnemyBaseLocation.ordinal();
+						secondScoutTargetPosition = getScoutFleePositionFromEnemyRegionVertices(secondScoutUnit);
+						commandUtil.move(secondScoutUnit, secondScoutTargetPosition);
+						// 적 기지 도는 코드 - 노승호 0810
+					}
 				}
+
 			}
-			
-			
-			
 			
 			
 			
