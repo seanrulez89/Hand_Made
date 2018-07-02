@@ -89,7 +89,7 @@ public class StrategyManager {
 	ArrayList<Unit> myAllCombatUnitList = new ArrayList<Unit>();
 	ArrayList<Unit> myCombatUnitType1List = new ArrayList<Unit>(); // 저글링
 	ArrayList<Unit> myCombatUnitType2List = new ArrayList<Unit>(); // 뮤탈리스크
-	ArrayList<Unit> myCombatUnitType3List = new ArrayList<Unit>(); // #미정
+	ArrayList<Unit> myCombatUnitType3List = new ArrayList<Unit>(); // 울트라리스크
 	ArrayList<Unit> myCombatUnitType4List = new ArrayList<Unit>(); // #미정
 	ArrayList<Unit> myCombatUnitType5List = new ArrayList<Unit>(); // #미정
 
@@ -108,6 +108,7 @@ public class StrategyManager {
 																						// 판단하는것으로 공격 방어와 연계되어야 함
 	BuildOrderItem.SeedPositionStrategy seedPositionStrategyOfMyCombatUnitTrainingBuildingType;
 	BuildOrderItem.SeedPositionStrategy buildAtFirstChokePoint;
+	BuildOrderItem.SeedPositionStrategy SeedPositionSpecified;
 
 	// 아군 방어 건물 목록
 	ArrayList<Unit> myDefenseBuildingType1List = new ArrayList<Unit>(); // 파일런 벙커 크립
@@ -237,27 +238,28 @@ public class StrategyManager {
 
 			// 공격 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
 			necessaryNumberOfCombatUnitType1 = 12; // 공격을 시작하기위해 필요한 최소한의 마린 유닛 숫자
-			necessaryNumberOfCombatUnitType2 = 8; // 공격을 시작하기위해 필요한 최소한의 메딕 유닛 숫자
-			// necessaryNumberOfCombatUnitType3 = 2; // 공격을 시작하기위해 필요한 최소한의 메딕 유닛 숫자
+			necessaryNumberOfCombatUnitType2 = 5; // 공격을 시작하기위해 필요한 최소한의 메딕 유닛 숫자
+			necessaryNumberOfCombatUnitType3 = 6; // 공격을 시작하기위해 필요한 최소한의 메딕 유닛 숫자
 			// necessaryNumberOfCombatUnitType4 = 1; // 공격을 시작하기위해 필요한 최소한의 메딕 유닛 숫자
 			// necessaryNumberOfCombatUnitType5 = 2;
 
 			// MaxNumberOfCombatUnitType4 = 4 ;
 
 			// 공격 유닛 생산 순서 설정
-			buildOrderArrayOfMyCombatUnitType = new int[] { 1, 2, 3 }; // 마린 마린 마린 메딕 시즈 베슬
+			buildOrderArrayOfMyCombatUnitType = new int[] {1,1, 2,1,1, 2,1,1, 2, 3}; // 마린 마린 마린 메딕 시즈 베슬
 			nextTargetIndexOfBuildOrderArray = 0; // 다음 생산 순서 index
 
 			// 방어 건물 종류 및 건설 갯수 설정
 			myDefenseBuildingType1 = UnitType.Zerg_Creep_Colony;
-			necessaryNumberOfDefenseBuilding1 = 3;
+			necessaryNumberOfDefenseBuilding1 = 1;
 			myDefenseBuildingType2 = UnitType.Zerg_Sunken_Colony;
-			necessaryNumberOfDefenseBuilding2 = 3;
+			necessaryNumberOfDefenseBuilding2 = 1;
 
 			// 방어 건물 건설 위치 설정
 			seedPositionStrategyOfMyDefenseBuildingType = BuildOrderItem.SeedPositionStrategy.SecondChokePoint; // 앞마당
 			seedPositionStrategyOfMyCombatUnitTrainingBuildingType = BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation; // 앞마당
 			buildAtFirstChokePoint = BuildOrderItem.SeedPositionStrategy.FirstChokePoint;
+			SeedPositionSpecified = BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified;
 
 			// 업그레이드 및 리서치 대상 설정
 			necessaryUpgradeType1 = UpgradeType.Metabolic_Boost;
@@ -277,16 +279,34 @@ public class StrategyManager {
 		/// 변수 값을 업데이트 합니다
 		updateVariables();
 
+		
 		/// 일꾼을 계속 추가 생산합니다
 		executeWorkerTraining();
+		
+		
+		
+		
 
 		/// Supply DeadLock 예방 및 SupplyProvider 가 부족해질 상황 에 대한 선제적 대응으로서 SupplyProvider를
 		/// 추가 건설/생산합니다
 		executeSupplyManagement();
 
 		/// 방어건물 및 공격유닛 생산 건물을 건설합니다
-		executeBuildingConstruction();
-
+		if (MyBotModule.Broodwar.getFrameCount() % 24 * 30 == 0)
+		{
+			myExpansion = Expansion.Instance(); // 0627 지속적인 정찰에 따라 업데이트 되는 내용을 반영하기 위해서 인스턴스를 계속 호출한다. 하지마 싱글톤이므로 결국 같은 인스턴스를 새로고침하는 셈이다.
+			myExpansion.expansion();
+			nextEXP = myExpansion.nextEXP;
+			
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)>3)
+			seedPositionStrategyOfMyDefenseBuildingType = BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified;
+			
+			executeBuildingConstruction();
+		}
+		
+		
+		
+		
 		/// 업그레이드 및 테크 리서치를 실행합니다
 		executeUpgradeAndTechResearch();
 
@@ -312,12 +332,9 @@ public class StrategyManager {
 
 		// wraith();
 
-		if (MyBotModule.Broodwar.getFrameCount() % 24 * 10 == 0)
-		{
-			myExpansion = Expansion.Instance(); // 0627 지속적인 정찰에 따라 업데이트 되는 내용을 반영하기 위해서 인스턴스를 계속 호출한다. 하지마 싱글톤이므로 결국 같은 인스턴스를 새로고침하는 셈이다.
-			myExpansion.expansion();
-			nextEXP = myExpansion.nextEXP;
-		}
+
+
+		
 		
 		
 		if(enemyMainBaseLocation!=null && mutalisk_start == false)
@@ -335,9 +352,9 @@ public class StrategyManager {
 			//System.out.println(mutalisk.moveToEndPoint);
 		}
 */	
-		if (combatState != CombatState.eliminateEnemy && MyBotModule.Broodwar.getFrameCount() % 30 == 0) {
+//		if (combatState != CombatState.eliminateEnemy && MyBotModule.Broodwar.getFrameCount() % 30 == 0) {
 			mutalisk.myMutal();
-		}
+//		}
 		
 /*		if (MyBotModule.Broodwar.getFrameCount() % 24 == 0) { // 0627 일단 이렇게 했는데 공격시점에서는 조건을 어떻게 해줄까?
 			
@@ -457,41 +474,16 @@ public class StrategyManager {
 				attack_cnt = attack_cnt + 1;
 				return true; // first wave
 			}
-		} else if (myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1
-				&& myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2)
-		// && myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3)
+		}
+		else if(myCombatUnitType1List.size() > 18)
 		{
-			// 공격 유닛이 30 이상 있으면
-			if (myCombatUnitType1List.size() + myCombatUnitType2List.size() > 30) {
-				attack_cnt = attack_cnt + 1;
-				if (attack_cnt >= 2 && isInitialBuildOrderFinished == true) {
-					// 커맨드 짓자
-					List<BaseLocation> startLocation = BWTA.getStartLocations();
-					int size = startLocation.size();
+			attack_cnt = attack_cnt + 1;
+			return true;
+		}
+		else if (myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3) {
+			attack_cnt = attack_cnt + 1;
+			return true;
 
-					
-					/*
-					for (int i = 1; i < size; i++) // 0이면 우리 기지에 짓더라 이게 무슨 순서가 있는건지... 0623 이거 좀 손봐라 기지만 계속 지어
-					{
-						if (MyBotModule.Broodwar.isExplored(startLocation.get(i).getTilePosition())) {
-							InformationManager instance = new InformationManager();
-							if (instance.hasBuildingAroundBaseLocation(startLocation.get(i), myPlayer, 200) == false) {
-								if (!startLocation.get(i).equals(enemyMainBaseLocation)
-										&& !startLocation.get(i).equals(myMainBaseLocation)) {
-									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
-											startLocation.get(i).getTilePosition(), false);
-									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor,
-											startLocation.get(i).getTilePosition(), false);
-									// System.out.println(size);
-									break;
-								}
-							}
-						}
-
-					}*/
-				}
-				return true;
-			}
 		}
 		return false;
 	}
@@ -503,7 +495,7 @@ public class StrategyManager {
 		// if (myCombatUnitType1List.size() + myCombatUnitType2List.size() +
 		// myCombatUnitType3List.size() < 10)
 
-		if (myCombatUnitType1List.size() < 2) {
+		if (myCombatUnitType1List.size() < 10) {
 			Mutal_flag = false;
 			return true;
 		}
@@ -601,6 +593,12 @@ public class StrategyManager {
 		case SecondChokePoint:
 			myDefenseBuildingPosition = mySecondChokePoint.getCenter();
 			break;
+
+		case SeedPositionSpecified:
+			myDefenseBuildingPosition = bwta.BWTA.getNearestChokepoint(nextEXP.getPosition()).getCenter();
+			break;
+			
+			
 		default:
 			myDefenseBuildingPosition = myMainBaseLocation.getPosition();
 			break;
@@ -1644,31 +1642,28 @@ public class StrategyManager {
 
 		if (MyBotModule.Broodwar.self().minerals() >= 50) {
 			// workerCount = 현재 일꾼 수 + 생산중인 일꾼 수
-			int workerCount = MyBotModule.Broodwar.self().allUnitCount(InformationManager.Instance().getWorkerType());
+			//int workerCount = MyBotModule.Broodwar.self().allUnitCount(UnitType.Zerg_Drone);
 
-			if (MyBotModule.Broodwar.self().getRace() == Race.Zerg) {
-				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-					if (unit.getType() == UnitType.Zerg_Egg) {
-						// Zerg_Egg 에게 morph 명령을 내리면 isMorphing = true,
-						// isBeingConstructed = true, isConstructing = true 가 된다
-						// Zerg_Egg 가 다른 유닛으로 바뀌면서 새로 만들어진 유닛은 잠시
-						// isBeingConstructed = true, isConstructing = true 가
-						// 되었다가,
-						if (unit.isMorphing() && unit.getBuildType() == UnitType.Zerg_Drone) {
-							workerCount++;
-						}
+			int workerCount = 0;
+			
+			
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+				
+				if (unit.getType() == UnitType.Zerg_Drone)
+				{
+					workerCount++;
+				}
+				else if (unit.getType() == UnitType.Zerg_Egg) {
+					// Zerg_Egg 에게 morph 명령을 내리면 isMorphing = true,
+					// isBeingConstructed = true, isConstructing = true 가 된다
+					// Zerg_Egg 가 다른 유닛으로 바뀌면서 새로 만들어진 유닛은 잠시
+					// isBeingConstructed = true, isConstructing = true 가
+					// 되었다가,
+					if (unit.isMorphing() && unit.getBuildType() == UnitType.Zerg_Drone) {
+						workerCount++;
 					}
 				}
-			} else {
-				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-					if (unit.getType().isResourceDepot()) // 권순우 0617 기지건물 : 넥서스, 커맨드센터, 해처리, 레어, 하이브
-					{
-						if (unit.isTraining()) {
-							workerCount += unit.getTrainingQueue().size();
-						}
-					}
-				}
-			}
+			}	
 
 			int numberOfMyCombatUnitTrainingBuilding = 0;
 			numberOfMyCombatUnitTrainingBuilding += myPlayer.allUnitCount(UnitType.Zerg_Hatchery);
@@ -1688,26 +1683,25 @@ public class StrategyManager {
 			
 			
 			
-			
-			// 0630 최대치 설정
-			if(numberOfMyCombatUnitTrainingBuilding>=8)
-			{
-				if(workerCount > 70)
-				{
-					return;
-				}
-			}
-			if(numberOfMyCombatUnitTrainingBuilding>=6)
-			{
-				if(workerCount > 50)
-				{
-					return;
-				}
-			}
-			else if(workerCount > 40) // 0630 해처리가 일정 숫자 이상이 되면 라바소모하느라 자원이 더 안모이는데 그때 맥스를 올려주자 
+			if(workerCount>60)
 			{
 				return;
 			}
+			
+			/* 0630 최대치 설정
+			if(numberOfMyCombatUnitTrainingBuilding>=8 && workerCount > 60)
+			{
+					return;
+			}
+			else if(numberOfMyCombatUnitTrainingBuilding>=6 && workerCount > 50)
+			{
+					return;
+			}
+			else if(numberOfMyCombatUnitTrainingBuilding>=4 && workerCount > 40)
+			{
+				return;
+			}
+			*/
 			
 			
 			
@@ -1718,17 +1712,22 @@ public class StrategyManager {
 				optimalWorkerCount += baseLocation.getGeysers().size() * 3;
 			}
 
+			System.out.println("현재 : " + workerCount + " / 최적 : " + optimalWorkerCount);
+			
+			
+			
 			if (workerCount < optimalWorkerCount) {
 				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-					if (unit.getType().isResourceDepot()) {
-						if (unit.isTraining() == false || unit.getLarva().size() > 0) {
+					if (unit.getType().equals(UnitType.Zerg_Hatchery) 
+							|| unit.getType().equals(UnitType.Zerg_Lair) 
+							|| unit.getType().equals(UnitType.Zerg_Hive)) 
+					{
+					//	if (unit.isTraining() == false || unit.getLarva().size() > 0) {
+						if (unit.getTrainingQueue().contains(UnitType.Zerg_Drone) == false || unit.getLarva().size() > 0) {
 							// 빌드큐에 일꾼 생산이 1개는 있도록 한다
-							if (BuildManager.Instance().buildQueue
-									.getItemCount(InformationManager.Instance().getWorkerType(), null) == 0) {
-								// std.cout + "worker enqueue" + std.endl;
+							if (BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getWorkerType(), null) == 0
+									&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Drone, null) == 0) {
 
-								// 권순우 0617 다음의 코드를 highest로 하면 긴급으로 유닛 생산을 명령하는데 추가하는데 쓰일 수 있을 듯 하다. 가령 최초 빌드가
-								// 끝나기도 전에 일꾼이 죽어버리는 등의 상황에서
 								BuildManager.Instance().buildQueue.queueAsLowestPriority(
 										new MetaType(InformationManager.Instance().getWorkerType()), false);
 							}
@@ -1854,14 +1853,8 @@ public class StrategyManager {
 			return;
 		}
 
-		// 1초에 한번만 실행
-		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) {
-			return;
-		}
-
 		boolean isPossibleToConstructDefenseBuildingType1 = false;
 		boolean isPossibleToConstructDefenseBuildingType2 = false;
-		boolean isPossibleToConstructCombatUnitTrainingBuildingType = false;
 
 		// 권순우 0617 방어 건물을 짓는데 흥미로운 것은
 		// 이미 존재하거나, 짓고 있거나, 지을 예정인 것도 모두 "존재"한다고 해야만
@@ -1872,28 +1865,22 @@ public class StrategyManager {
 		int numberOfMyDefenseBuildingType1 = 0;
 		int numberOfMyDefenseBuildingType2 = 0;
 
-		if (myRace == Race.Protoss) {
-		} else if (myRace == Race.Terran) {
-		} else if (myRace == Race.Zerg) {
-			// 저그의 경우 크립 콜로니 갯수를 셀 때 성큰 콜로니 갯수까지 포함해서 세어야, 크립 콜로니를 지정한 숫자까지만 만든다
-			numberOfMyDefenseBuildingType1 += myPlayer.allUnitCount(myDefenseBuildingType1);
-			numberOfMyDefenseBuildingType1 += BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType1);
-			numberOfMyDefenseBuildingType1 += ConstructionManager.Instance()
-					.getConstructionQueueItemCount(myDefenseBuildingType1, null);
-			numberOfMyDefenseBuildingType1 += myPlayer.allUnitCount(myDefenseBuildingType2);
-			numberOfMyDefenseBuildingType1 += BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType2);
-			numberOfMyDefenseBuildingType2 += myPlayer.allUnitCount(myDefenseBuildingType2);
-			numberOfMyDefenseBuildingType2 += BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType2);
+		// 저그의 경우 크립 콜로니 갯수를 셀 때 성큰 콜로니 갯수까지 포함해서 세어야, 크립 콜로니를 지정한 숫자까지만 만든다
+		numberOfMyDefenseBuildingType1 += myPlayer.allUnitCount(myDefenseBuildingType1);
+		numberOfMyDefenseBuildingType1 += BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType1);
+		numberOfMyDefenseBuildingType1 += ConstructionManager.Instance()
+				.getConstructionQueueItemCount(myDefenseBuildingType1, null);
+		numberOfMyDefenseBuildingType1 += myPlayer.allUnitCount(myDefenseBuildingType2);
+		numberOfMyDefenseBuildingType1 += BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType2);
+		numberOfMyDefenseBuildingType2 += myPlayer.allUnitCount(myDefenseBuildingType2);
+		numberOfMyDefenseBuildingType2 += BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType2);
 
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0) {
-				isPossibleToConstructDefenseBuildingType1 = true;
-			}
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0) {
+			isPossibleToConstructDefenseBuildingType1 = true;
+		}
 
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) > 0) {
-				isPossibleToConstructDefenseBuildingType2 = true;
-			}
-
-			isPossibleToConstructCombatUnitTrainingBuildingType = true;
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) > 0) {
+			isPossibleToConstructDefenseBuildingType2 = true;
 		}
 
 		if (isPossibleToConstructDefenseBuildingType1 == true
@@ -1941,40 +1928,46 @@ public class StrategyManager {
 				.getConstructionQueueItemCount(UnitType.Zerg_Hive, null);
 
 		// 공격 유닛 생산 건물 증설 : 돈이 남아돌면 실시. 최대 6개 까지만
-		if (isPossibleToConstructCombatUnitTrainingBuildingType == true
-				&& BuildManager.Instance().getAvailableMinerals() > 400 && numberOfMyCombatUnitTrainingBuilding == 2) {
+		if (BuildManager.Instance().getAvailableMinerals() > 300 && numberOfMyCombatUnitTrainingBuilding == 2 || numberOfMyCombatUnitTrainingBuilding == 4 || numberOfMyCombatUnitTrainingBuilding == 5 ) {
 
 			// 게이트웨이 / 배럭 / 해처리 증설
-			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0) {
+			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 && ConstructionManager
+					.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0) {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true); /// 해처리 추가 확장 0622
-				
-			
-			System.out.println("AA");
-			
+
+				System.out.println("AA");
+
 			}
-		} else if (isPossibleToConstructCombatUnitTrainingBuildingType == true
-				&& BuildManager.Instance().getAvailableMinerals() > 400 && numberOfMyCombatUnitTrainingBuilding == 3) {
+		} 
+		
+		
+		/*
+		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding == 3) {
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0) {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
-						BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true); /// 해처리 추가 확장 0622
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor,
-						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true); /// 해처리 추가 확장 0622
-				
+						BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true); // 해처리 추가 확장 0622
+				//BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor,
+				//		BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+
 				System.out.println("BB");
 			}
-		} else if (isPossibleToConstructCombatUnitTrainingBuildingType == true
-				&& BuildManager.Instance().getAvailableMinerals() > 500 && numberOfMyCombatUnitTrainingBuilding < 13) {
-			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0) {
+		} 
+		*/
+		
+		
+		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding < 10) {
+			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 && ConstructionManager
+					.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0) {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 						nextEXP.getTilePosition(), false); /// 해처리 추가 확장 0622
-				
+
 				System.out.println("CC");
 
-				if (nextEXP.gas() > 3500) {
+				if (nextEXP.gas() > 0) {
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor,
 							nextEXP.getTilePosition(), false); /// 해처리 추가 확장 0622
-					
+
 					System.out.println("DD");
 				}
 
@@ -2027,7 +2020,7 @@ public class StrategyManager {
 				isTimeToStartUpgradeType1 = true;
 			}
 			// 레어 있으면 오버로드 이속 업
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0) {
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0) {
 				isTimeToStartUpgradeType2 = true;
 			}
 			// 가스 좀 남으면 하라고 넣은건데 저기서 가스가 현재량인지 채굴총량인지???????
@@ -2096,7 +2089,7 @@ public class StrategyManager {
 		}
 
 		if (isTimeToStartUpgradeType3) {
-			if (myPlayer.getUpgradeLevel(necessaryUpgradeType3) < 4
+			if (myPlayer.getUpgradeLevel(necessaryUpgradeType3) < 3
 					&& myPlayer.isUpgrading(necessaryUpgradeType3) == false
 					&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType3) == 0) {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType3, false);
@@ -2104,7 +2097,7 @@ public class StrategyManager {
 		}
 
 		if (isTimeToStartUpgradeType4) {
-			if (myPlayer.getUpgradeLevel(necessaryUpgradeType4) < 4
+			if (myPlayer.getUpgradeLevel(necessaryUpgradeType4) < 3
 					&& myPlayer.isUpgrading(necessaryUpgradeType4) == false
 					&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType4) == 0) {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType4, false);
@@ -2147,23 +2140,8 @@ public class StrategyManager {
 
 						if (BuildManager.Instance().buildQueue.getItemCount(nextUnitTypeToTrain) == 0) {
 
-							
-							if(nextUnitTypeToTrain == myCombatUnitType3)
-							{
-								
-								System.out.println("울트라리스크");
-								BuildManager.Instance().buildQueue.queueAsLowestPriority(nextUnitTypeToTrain, true);
-							}
-							else
-							{
-								BuildManager.Instance().buildQueue.queueAsLowestPriority(nextUnitTypeToTrain, false);
-							}
-							
-							
-							
-							
-							
-							
+							BuildManager.Instance().buildQueue.queueAsLowestPriority(nextUnitTypeToTrain, false);
+
 							nextTargetIndexOfBuildOrderArray++;
 
 							if (nextTargetIndexOfBuildOrderArray >= buildOrderArrayOfMyCombatUnitType.length) {
@@ -2182,24 +2160,21 @@ public class StrategyManager {
 		UnitType nextUnitTypeToTrain = null;
 
 		if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 1) {
-			if (myCombatUnitType1List.size() < 2.0 * myCombatUnitType2List.size()) {
+
 				nextUnitTypeToTrain = myCombatUnitType1;
-			} else {
-				nextUnitTypeToTrain = myCombatUnitType2;
-			}
+
 		}
 
 		else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 2) {
 
-			if (myCombatUnitType1List.size() < 2.0 * myCombatUnitType2List.size()) {
-				nextUnitTypeToTrain = myCombatUnitType1;
-			} else {
+
 				nextUnitTypeToTrain = myCombatUnitType2;
-			}
+			
+			
 		} else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 3) {
 
 			
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern)>0) {
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern)>0 ) {
 				nextUnitTypeToTrain = myCombatUnitType3;
 			}
 			else if (myCombatUnitType1List.size() < 2.0 * myCombatUnitType2List.size()) 
@@ -2213,34 +2188,6 @@ public class StrategyManager {
 			
 			
 			
-		} else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 4) 																					// )
-		{
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern)>0) {
-				nextUnitTypeToTrain = myCombatUnitType3;
-			}
-			else if (myCombatUnitType1List.size() < 2.0 * myCombatUnitType2List.size()) 
-			{
-				nextUnitTypeToTrain = myCombatUnitType1;
-			} 
-			else 
-			{
-				nextUnitTypeToTrain = myCombatUnitType2;
-			}
-		}
-
-		else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 5) 
-		{
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern)>0) {
-				nextUnitTypeToTrain = myCombatUnitType3;
-			}
-			else if (myCombatUnitType1List.size() < 2.0 * myCombatUnitType2List.size()) 
-			{
-				nextUnitTypeToTrain = myCombatUnitType1;
-			} 
-			else 
-			{
-				nextUnitTypeToTrain = myCombatUnitType2;
-			}
 		} 
 		else 
 		{

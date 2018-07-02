@@ -1,10 +1,29 @@
 import java.util.*;
+
+
+
 import java.io.*;
 
 import bwapi.*;
 import bwta.*;
 
 public class Mutalisk {
+	
+	
+	public class MTLSK
+	{
+		public Unitset ourUnits = null;
+
+	};
+	
+	public MTLSK mtlsk = new MTLSK();
+	
+	
+	
+	
+	
+	
+	
 	
 	private CommandUtil commandUtil = new CommandUtil();
 	StrategyManager SM = StrategyManager.Instance();
@@ -18,6 +37,9 @@ public class Mutalisk {
 
 	BaseLocation myMainBaseLocation = SM.myMainBaseLocation;
 	BaseLocation enemyMainBaseLocation = SM.enemyMainBaseLocation;
+	
+	Position gatherPoint = new Position(63 * 32, 63 * 32);;
+	Position endPoint = null;
 
 
 
@@ -26,85 +48,136 @@ public class Mutalisk {
 
 	boolean Mutal_flag;
 	public static boolean moveToEndPoint = false;
+	public static boolean underAttack = true;
 
-	public Unit getNextTargetOf(Unit myUnit) {
+	public Unit getNextTargetOf(UnitType myUnitType, Position averagePosition) {
 		Unit nextTarget = null;
 
 		enemyPlayer = SM.enemyPlayer;
 
+		double targetDistance = 100000000;
+		double tempDistance = 0;
+		
 		double targetHP = 10000;
 		double tempHP = 0;
 		
 		int inRange = 0;
 		
-		if(myUnit.getType() == UnitType.Zerg_Mutalisk)
+		if(myUnitType == UnitType.Zerg_Mutalisk)
 		{
-			inRange = myUnit.getType().seekRange() * 4;
+			inRange =myUnitType.seekRange() * 5;
 		}
 		else
 		{
-			inRange = 10 * Config.TILE_SIZE;
+			inRange = 4 * Config.TILE_SIZE;
 		}
 		
+		ArrayList <Unit> airToAir = new ArrayList<Unit>();
+		ArrayList <Unit> groundToAir = new ArrayList<Unit>();
+		ArrayList <Unit> airToGround = new ArrayList<Unit>();
+		ArrayList <Unit> groundToGround = new ArrayList<Unit>();
+		ArrayList <Unit> specialUnit = new ArrayList<Unit>();		
+		ArrayList <Unit> enemyWorker = new ArrayList<Unit>();
+		ArrayList <Unit> supply = new ArrayList<Unit>();
 		ArrayList <Unit> defenseBuilding = new ArrayList<Unit>();
 		ArrayList <Unit> normalBuilding = new ArrayList<Unit>();
+		ArrayList <Unit> elseUnit = new ArrayList<Unit>();
 		 
-																					
-		for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(myUnit.getPosition(), inRange)) { // 저글링 같은 근접공격유닛은 10배 해봐야 무의미한가?
+		// 																			
+		for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(averagePosition, inRange)) { // 저글링 같은 근접공격유닛은 10배 해봐야 무의미한가?
 
 			if (enemy.getPlayer() == enemyPlayer) {
 				
-				if(enemy.getType() == UnitType.Zerg_Egg || enemy.getType() == UnitType.Zerg_Larva) // 0629 여기에 거를 유닛을 넣어두고 정 타겟이 없으면 그때서야 치기로 하자
+
+				if(enemy.getType().equals(UnitType.Terran_Valkyrie)
+						|| enemy.getType().equals(UnitType.Terran_Wraith)
+						|| enemy.getType().equals(UnitType.Terran_Battlecruiser)
+						|| enemy.getType().equals(UnitType.Zerg_Mutalisk)
+						|| enemy.getType().equals(UnitType.Zerg_Devourer)
+						|| enemy.getType().equals(UnitType.Zerg_Scourge)
+						|| enemy.getType().equals(UnitType.Protoss_Scout)
+						|| enemy.getType().equals(UnitType.Protoss_Corsair)
+						|| enemy.getType().equals(UnitType.Protoss_Carrier)
+						|| enemy.getType().equals(UnitType.Protoss_Interceptor))
 				{
-					continue;
+					airToAir.add(enemy);					
 				}
-				
-				
-				if(enemy.getType().equals(UnitType.Terran_Missile_Turret)
+				else if(enemy.getType().equals(UnitType.Terran_Ghost)
+						|| enemy.getType().equals(UnitType.Terran_Goliath)
+						|| enemy.getType().equals(UnitType.Terran_Marine)
+						|| enemy.getType().equals(UnitType.Zerg_Hydralisk)
+						|| enemy.getType().equals(UnitType.Protoss_Dragoon)
+						|| enemy.getType().equals(UnitType.Protoss_Archon))
+				{
+					groundToAir.add(enemy);					
+				}
+				else if(enemy.getType().equals(UnitType.Zerg_Guardian)
+						|| enemy.getType().equals(UnitType.Protoss_Arbiter))
+				{
+					airToGround.add(enemy);					
+				}
+				else if(enemy.getType().equals(UnitType.Terran_Firebat)
+						|| enemy.getType().equals(UnitType.Terran_Vulture)
+						|| enemy.getType().equals(UnitType.Terran_Vulture_Spider_Mine)
+						|| enemy.getType().equals(UnitType.Terran_Siege_Tank_Siege_Mode)
+						|| enemy.getType().equals(UnitType.Terran_Siege_Tank_Tank_Mode)
+						|| enemy.getType().equals(UnitType.Zerg_Zergling)
+						|| enemy.getType().equals(UnitType.Zerg_Lurker)
+						|| enemy.getType().equals(UnitType.Zerg_Ultralisk)
+						|| enemy.getType().equals(UnitType.Protoss_Zealot)
+						|| enemy.getType().equals(UnitType.Protoss_Reaver))
+				{
+					groundToGround.add(enemy);					
+				}
+				else if(enemy.getType().equals(UnitType.Terran_Science_Vessel)
+						|| enemy.getType().equals(UnitType.Zerg_Queen)
+						|| enemy.getType().equals(UnitType.Zerg_Defiler)
+						|| enemy.getType().equals(UnitType.Protoss_High_Templar))
+				{
+					specialUnit.add(enemy);					
+				}
+				else if(enemy.getType().equals(UnitType.Terran_SCV)
+						|| enemy.getType().equals(UnitType.Zerg_Drone)
+						|| enemy.getType().equals(UnitType.Protoss_Probe))
+				{
+					enemyWorker.add(enemy);					
+				}
+				else if(enemy.getType().equals(UnitType.Terran_Supply_Depot)
+						|| enemy.getType().equals(UnitType.Terran_Command_Center)
+						|| enemy.getType().equals(UnitType.Zerg_Overlord)
+						|| enemy.getType().equals(UnitType.Zerg_Hatchery)
+						|| enemy.getType().equals(UnitType.Zerg_Lair)
+						|| enemy.getType().equals(UnitType.Zerg_Hive)
+						|| enemy.getType().equals(UnitType.Protoss_Nexus)
+						|| enemy.getType().equals(UnitType.Protoss_Pylon))
+				{
+					supply.add(enemy);					
+				}
+				else if(enemy.getType().equals(UnitType.Terran_Missile_Turret)
 						|| enemy.getType().equals(UnitType.Zerg_Spore_Colony)
 						|| enemy.getType().equals(UnitType.Protoss_Photon_Cannon)
 						|| enemy.getType().equals(UnitType.Terran_Bunker))
 				{
 					defenseBuilding.add(enemy);
-					continue;
-				}
-				
-				if(enemy.getType().isBuilding() || enemy.getType().isAddon())
-				{
-					normalBuilding.add(enemy);
-					continue;
-				}
-				
-				
-				
-				
-				
-				if (myUnit.canTargetUnit(enemy)) {
-					if (enemy.canTargetUnit(myUnit)) // 적군이면서 서로 공격가능하다면 가장 우선순위로 싸우고
-					{
-						tempHP = enemy.getHitPoints();
-						if (targetHP > tempHP) {
-							targetHP = tempHP;
-							nextTarget = enemy;
-						}
 					
-					} else
-					{
-						tempHP = enemy.getHitPoints();
-						if (targetHP > tempHP) {
-							targetHP = tempHP;
-							nextTarget = enemy;
-						}
-
-					}
-
+				}			
+				else if(enemy.getType().isBuilding() || enemy.getType().isAddon())
+				{
+					normalBuilding.add(enemy);				
 				}
+				else
+				{
+					// 메딕, 드랍쉽 등등
+					elseUnit.add(enemy);
+				}
+
 			}
 
 		}
 		
-
-		for (Unit enemy : defenseBuilding) {
+		
+		for(Unit enemy : airToAir)
+		{
 			tempHP = enemy.getHitPoints();
 			if (targetHP > tempHP) {
 				targetHP = tempHP;
@@ -112,246 +185,310 @@ public class Mutalisk {
 			}
 		}
 		
-		if(nextTarget==null)
+		if(nextTarget!=null)
+		{return nextTarget;}
+		
+		for(Unit enemy : groundToAir)
 		{
-			for (Unit enemy : normalBuilding)
-			{
-				tempHP = enemy.getHitPoints();
-				if (targetHP > tempHP) {
-					targetHP = tempHP;
-					nextTarget = enemy;
-				}
+			tempHP = enemy.getHitPoints();
+			if (targetHP > tempHP) {
+				targetHP = tempHP;
+				nextTarget = enemy;
 			}
 		}
 		
-	
+		if(nextTarget!=null)
+		{return nextTarget;}
+		
+		
+		for(Unit enemy : enemyWorker)
+		{
+			tempHP = enemy.getHitPoints();
+			if (targetHP > tempHP) {
+				targetHP = tempHP;
+				nextTarget = enemy;
+			}
+		}
+		
+		if(nextTarget!=null)
+		{return nextTarget;}
+		
+		
+		for(Unit enemy : defenseBuilding)
+		{
+			tempHP = enemy.getHitPoints();
+			if (targetHP > tempHP) {
+				targetHP = tempHP;
+				nextTarget = enemy;
+			}
+		}
+		
+		if(nextTarget!=null)
+		{return nextTarget;}
+		
+		for(Unit enemy : airToGround)
+		{
+			tempHP = enemy.getHitPoints();
+			if (targetHP > tempHP) {
+				targetHP = tempHP;
+				nextTarget = enemy;
+			}
+		}
+		
+		if(nextTarget!=null)
+		{return nextTarget;}
+		
+		for(Unit enemy : groundToGround)
+		{
+			tempHP = enemy.getHitPoints();
+			if (targetHP > tempHP) {
+				targetHP = tempHP;
+				nextTarget = enemy;
+			}
+		}
+		
+		if(nextTarget!=null)
+		{return nextTarget;}
+		
+		for(Unit enemy : specialUnit)
+		{
+			tempHP = enemy.getHitPoints();
+			if (targetHP > tempHP) {
+				targetHP = tempHP;
+				nextTarget = enemy;
+			}
+		}
+		
+		if(nextTarget!=null)
+		{return nextTarget;}
+		
+
+		
+
+		
+		
+		
+		for(Unit enemy : supply)
+		{
+			tempHP = enemy.getHitPoints();
+			if (targetHP > tempHP) {
+				targetHP = tempHP;
+				nextTarget = enemy;
+			}
+		}
+		
+		if(nextTarget!=null)
+		{return nextTarget;}
+
+		
+
+		
+		
+		for(Unit enemy : normalBuilding)
+		{
+			tempHP = enemy.getHitPoints();
+			if (targetHP > tempHP) {
+				targetHP = tempHP;
+				nextTarget = enemy;
+			}
+		}
+		
+		if(nextTarget!=null)
+		{return nextTarget;}
+		
+		for(Unit enemy : elseUnit)
+		{
+			tempHP = enemy.getHitPoints();
+			if (targetHP > tempHP) {
+				targetHP = tempHP;
+				nextTarget = enemy;
+			}
+		}
+		
+		if(nextTarget!=null)
+		{return nextTarget;}
+		
 
 		return nextTarget;
 	}
 	
 	
-	public Unit weAreUnderAttack(Unit myUnit) {
+	public Unit weAreUnderAttack(Position myPosition) {
+		// 이것이 결국  SM의 isTimeToDefense를 대체하면서 별도의 클래스로 만들어지던가 해야한다
 		Unit invader = null;
 		enemyPlayer = SM.enemyPlayer;
 
 		double positionDistance = 100000000;
 		double tempDistance = 0;
 
+		
+	
+		// 건물이나 드론이 얻어맞는 경우
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 			if ((unit.getType().isBuilding() && unit.isUnderAttack())
-					|| (unit.getType() == UnitType.Zerg_Drone && unit.isUnderAttack())) {
-				Unit tempEnemy = null;
-				tempEnemy = getNextTargetOf(unit); // 길이 변수 만들어서 유닛에 따라 적용하고
+					|| (unit.getType().equals(UnitType.Zerg_Drone) && unit.isUnderAttack())) {
+				Unit tempEnemy = getNextTargetOf(unit.getType(), unit.getPosition()); // 반경 4개 타일안의 적을 찾을 것이다.
 
 				if (tempEnemy != null) {
-					tempDistance = tempEnemy.getPosition().getDistance(myUnit.getPosition());
+					tempDistance = tempEnemy.getPosition().getDistance(myPosition);
 					if (positionDistance > tempDistance) {
 						positionDistance = tempDistance;
 						invader = tempEnemy;
 					}
 				}
-
 			}
 		}
 
 		if (invader != null) {
+			underAttack = true;
 			moveToEndPoint = false;
-
-			// System.out.println("time to defense");
-
 			return invader;
 		}
 
-		for (Unit building : MyBotModule.Broodwar.self().getUnits()) {
-			if (building.getType().isBuilding()) {
+		// 기지 주변에 악당이 등장하는 경우
+		for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(myPlayer)) {
 
-				for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(building.getPosition(), 8 * Config.TILE_SIZE)) {
+			for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getPosition(), 8 * Config.TILE_SIZE)) {
 
-					// System.out.println("check point -----------------");
+				if (unit.getPlayer() == enemyPlayer) {
 
-					if (unit.getPlayer() == enemyPlayer) { // && unit.canAttack()
-
-						tempDistance = unit.getPosition().getDistance(myUnit.getPosition());
-						if (positionDistance > tempDistance) {
-							positionDistance = tempDistance;
-							invader = unit;
-							//System.out.println("건물 주변 악당을 찾았다");
-						}
+					tempDistance = unit.getPosition().getDistance(myPosition);
+					if (positionDistance > tempDistance) {
+						positionDistance = tempDistance;
+						invader = unit;
+						// System.out.println("기지 주변 악당을 찾았다");
 					}
 				}
-
 			}
-
 		}
 
 		if (invader != null) {
+			underAttack = true;
 			moveToEndPoint = false;
-
-			// System.out.println("time to defense");
-
 			return invader;
 		}
 
-		
+		// 길목 주변에 악당이 등장하는 경우
 		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(SM.mySecondChokePoint.getPoint(), 8 * Config.TILE_SIZE)) {
+			if (unit.getPlayer() == enemyPlayer) {
 
-			// System.out.println("check point -----------------");
-
-			if (unit.getPlayer() == enemyPlayer) { // && unit.canAttack()
-
-				tempDistance = unit.getPosition().getDistance(myUnit.getPosition());
+				tempDistance = unit.getPosition().getDistance(myPosition);
 				if (positionDistance > tempDistance) {
 					positionDistance = tempDistance;
 					invader = unit;
-					//System.out.println("길목2 주변 악당을 찾았다");
+					// System.out.println("길목2 주변 악당을 찾았다");
 				}
 			}
 		}
-		
+
 		if (invader != null) {
+			underAttack = true;
 			moveToEndPoint = false;
-
-			// System.out.println("time to defense");
-
 			return invader;
 		}
 		
-		
+		// 길목 주변에 악당이 등장하는 경우
 		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(SM.myFirstChokePoint.getPoint(), 8 * Config.TILE_SIZE)) {
+			if (unit.getPlayer() == enemyPlayer) {
 
-			// System.out.println("check point -----------------");
-
-			if (unit.getPlayer() == enemyPlayer) { // && unit.canAttack()
-
-				tempDistance = unit.getPosition().getDistance(myUnit.getPosition());
+				tempDistance = unit.getPosition().getDistance(myPosition);
 				if (positionDistance > tempDistance) {
 					positionDistance = tempDistance;
 					invader = unit;
-					//System.out.println("길목1 주변 악당을 찾았다");
+					// System.out.println("길목1 주변 악당을 찾았다");
 				}
 			}
 		}
-		
+
 		if (invader != null) {
+			underAttack = true;
 			moveToEndPoint = false;
-
-			// System.out.println("time to defense");
-
 			return invader;
 		}
 		
-		
-		
-		
-		
-		
-		
-		
-		
+		underAttack = false;
 		return invader;
-
-		/*
-		 * for(BaseLocation mybase : myBaseLocations) // 이게 안되면 그냥 빌딩타입을 찾아 {
-		 * //System.out.println("----------------------------------------"); for (Unit
-		 * unit : MyBotModule.Broodwar.getUnitsInRadius(mybase.getPosition(),20 *
-		 * Config.TILE_SIZE)) { //System.out.println(
-		 * "======================================================="); if
-		 * (unit.getPlayer() != myPlayer && unit.canAttack()) {
-		 * enemyUnitCountAroundMyMainBaseLocation++;
-		 * 
-		 * 
-		 * tempDistance = unit.getPosition().getDistance(myUnit.getPosition()); if
-		 * (positionDistance > tempDistance) { positionDistance = tempDistance; invader
-		 * = unit; } }
-		 * 
-		 * } }
-		 */
-
 	}
 	
 	
 
-	public boolean enoughGathered(Unit myUnit, Position targetPosition, double input_ratio) {
-		boolean gathered = false;
-		double ratio = input_ratio;
+	public boolean enoughGathered(UnitType myUnitType, Position targetPosition, int radius, double input_ratio) {
+
 		int numberOfGathered = 0;
 		int numberOfTotal = 0;
+		int numberOfMinimum = 5;
 
-		if(targetPosition == null)
-		{
+		if (targetPosition == null) {
 			System.out.println("아직 기지 못 찾음");
 			return false;
 		}
-		
-		
-		if (myUnit.getType() == SM.myCombatUnitType1) {
-			numberOfTotal = SM.myCombatUnitType1List.size();
 
-		} else if (myUnit.getType() == SM.myCombatUnitType2) {
+		if (moveToEndPoint == true) {
+			return moveToEndPoint;
+		}
+
+		if (myUnitType == SM.myCombatUnitType1) {
+			numberOfTotal = SM.myCombatUnitType1List.size();
+		} else if (myUnitType == SM.myCombatUnitType2) {
 			numberOfTotal = SM.myCombatUnitType2List.size();
 		} else {
 
 		}
 
-		List<Unit> unitsAround = MyBotModule.Broodwar.getUnitsInRadius(targetPosition, 3 * Config.TILE_SIZE);
+		List<Unit> unitsAround = MyBotModule.Broodwar.getUnitsInRadius(targetPosition, radius * Config.TILE_SIZE);
 
 		for (Unit unit : unitsAround) {
-			
-			if(unit.exists() && unit != null) {
-				
-				
-			
-			if (unit.getPlayer() == myPlayer) {
-				if (unit.getType() == myUnit.getType()) {
-					numberOfGathered++;
+
+			if (unit.exists() && unit != null) {
+
+				if (unit.getPlayer() == myPlayer) {
+					if (unit.getType() == myUnitType) {
+						numberOfGathered++;
+					}
 				}
 			}
-			}
 		}
 
-		
-		
-		if(moveToEndPoint==true)
-		{
-			gathered = true;
-			return gathered;
-		}
-		
-		
-		
-		
-		
-		if (numberOfGathered > 5  && numberOfGathered > numberOfTotal * ratio) {
-
-			gathered = true; // 0627 이것도 의미를 뒤집던가
+		if (numberOfGathered > numberOfMinimum && numberOfGathered > numberOfTotal * input_ratio) {
 			moveToEndPoint = true;
-			
-			//System.out.println("numberOfGathered" + numberOfGathered);
-			//System.out.println("numberOfTotal" + numberOfTotal);
 		}
 
-
-
-		return gathered;
+		return moveToEndPoint;
+	}
+	
+	
+	
+	public Position getAveragePosition(List <Unit> Units)
+	{
+		Position averagePosition = null;
+		
+		int x = 0;
+		int y = 0;
+		
+		for(Unit unit : Units)
+		{
+			x += unit.getX();
+			y += unit.getY();
+		}
+		
+		x = x/Units.size();
+		y = y/Units.size();
+		
+		averagePosition = new Position(x,y);
+		
+		return averagePosition;
 	}
 	
 	
 	
 	
 	
-	
-	
-	public Position getNextPlaceToGo(Unit myUnit, StrategyManager.CombatState CombatState) // 0627 공격이면 포지션 받는 유형으로 함수
-																							// 하나 더 짜면 되고, 컴뱃상태도 쓸모가 없네?
-	{
-		Unit invader = weAreUnderAttack(myUnit);
-		Position nextPlace = bwta.BWTA.getNearestChokepoint(SM.mySecondChokePoint.getCenter()).getCenter();
-		Position gatherPoint = null;
-		Position endPoint = null;
+	public Position getNextPlaceToGo() {
+		int a = 63 * 32;
+		int b = 63 * 32;
+		
+		Position nextPlace = new Position(a,b);
 
-		// if (enemyMainBaseLocation != null && CombatState ==
-		// StrategyManager.CombatState.defenseMode && underAttack == null) // 적위치를 알고
-		// 방어모드인데 평화상태라면
 		if (enemyMainBaseLocation != null) {
 			int x, y;
 
@@ -372,8 +509,7 @@ public class Mutalisk {
 
 			endPoint = new Position(x, y);
 
-			int a = 63 * 32;
-			int b = 63 * 32;
+
 
 			a = (enemyMainBaseLocation.getX() + myMainBaseLocation.getX()) / 2;
 			b = (enemyMainBaseLocation.getY() + myMainBaseLocation.getY()) / 2;
@@ -400,30 +536,21 @@ public class Mutalisk {
 			{
 				;
 			}
-
-
 			gatherPoint = new Position(a, b);
-
-//			System.out.println("A : " + a / 32);
-//			System.out.println("B : " + b / 32);
-//			System.out.println("enemyMainBaseLocation.getX() : " + enemyMainBaseLocation.getX());
-//			System.out.println("enemyMainBaseLocation.getY() : " + enemyMainBaseLocation.getY());
-
+		}
+		else
+		{
+			// 기지를 찾지 못 한 상태로 중앙으로 보낸다
+			return nextPlace;
 		}
 
-		// System.out.println("BBBB");
-
-		enoughGathered(myUnit, gatherPoint, 0.5);
-		
-
-
-		if (endPoint != null && moveToEndPoint == true && CombatState == StrategyManager.CombatState.defenseMode
-				&& invader == null) {
+		if (endPoint != null && moveToEndPoint == true && SM.combatState == StrategyManager.CombatState.defenseMode
+				&& underAttack == false) {
 			nextPlace = endPoint;
 		} else if (gatherPoint != null) {
 			nextPlace = gatherPoint;
-//			System.out.println("모이자");
-
+		} else {
+			
 		}
 
 		return nextPlace;
@@ -434,660 +561,140 @@ public class Mutalisk {
 	
 	
 	
-	public void myMutal()
-	{
-		for(Unit mutal : SM.myCombatUnitType2List)
+	public void myMutal() {
+		
+		if(SM.myCombatUnitType2List.size() == 0)
 		{
-			if(mutal.getAirWeaponCooldown()/2 >0)
-			{	
-			mutal.move(SM.myMainBaseLocation.getPosition());
-			continue;
-			}
-			
-			
-			
-			
-			Unit invader = weAreUnderAttack(mutal);
-			Position nextPlace = getNextPlaceToGo(mutal, SM.combatState);
-			Unit nextTarget = null;
-			nextTarget = getNextTargetOf(mutal);
-			
-			
-			ArrayList<Unit> mutalsAroundNextPlace = new ArrayList<Unit>();
-			if (SM.enemyMainBaseLocation != null) {
-				List<Unit> unitsAroundNextPlace = MyBotModule.Broodwar
-						.getUnitsInRadius(SM.enemyMainBaseLocation.getPosition(), 8 * Config.TILE_SIZE);
-
-				for (Unit unit : unitsAroundNextPlace) {
-					if (unit.getPlayer() == SM.myPlayer && unit.getType() == mutal.getType()) {
-						mutalsAroundNextPlace.add(unit);
-					}
-				}
-			}
-			
-
-			
-
-			if(invader != null)
-			{
-				
-				
-				if(mutal.getAirWeaponCooldown()/2 >0)
-				{	
-				mutal.move(SM.myMainBaseLocation.getPosition());
-				}
-				else
-				{
-					mutal.attack(invader);
-				}
-
-//				System.out.println("11111");
-				
-				
-				
-				
-				
-				
-				
-//				System.out.println("집지키러 가즈아");
-
-			}
-			else if(SM.enemyMainBaseLocation==null)
-			{
-//				System.out.println("아직 기지 못찾아서 앞마당으로 가라");
-				commandUtil.attackMove(mutal, SM.mySecondChokePoint.getPoint());
-				moveToEndPoint = false;
-				
-//				System.out.println("22222");
-				
-//				return;
-				continue;
-			}
-			
-			else if(SM.combatState == StrategyManager.CombatState.attackStarted)
-			{
-//				commandUtil.attackMove(mutal, SM.attackTargetPosition);
-				
-				
-				if(nextTarget!=null)
-				{
-					if(mutal.getAirWeaponCooldown()/2 >0)
-					{	
-					mutal.move(SM.myMainBaseLocation.getPosition());
-					}
-					else
-					{
-						mutal.attack(nextTarget);
-					}
-					
-				
-				}
-				else
-				{
-					commandUtil.attackMove(mutal, SM.enemyMainBaseLocation.getPosition());
-				}
-//				System.out.println("33333");
-			}
-			
-			
-			
-			else if(nextTarget!=null && invader == null && mutalsAroundNextPlace.size()>3)
-			{
-				if(nextTarget!=null)
-				{
-					if(mutal.getAirWeaponCooldown()/2 >0)
-					{	
-					mutal.move(SM.myMainBaseLocation.getPosition());
-					}
-					else
-					{
-						mutal.attack(nextTarget);
-					}
-					
-				
-				}
-//				System.out.println("44444");
-//				System.out.println("잡아먹기");
-				
-			}
-			else if(mutalsAroundNextPlace.size()<3 && SM.myCombatUnitType2List.size()<5)
-			{
-				
-				
-				mutal.move(SM.mySecondChokePoint.getPoint());
-				moveToEndPoint = false;
-//				System.out.println("55555");
-			}
-			
-			
-			else if(SM.myCombatUnitType2List.size()<6)
-			{
-				if(nextTarget!=null)
-				{
-					if(mutal.getAirWeaponCooldown()/2 >0)
-					{	
-					mutal.move(SM.myMainBaseLocation.getPosition());
-					}
-					else
-					{
-						
-						mutal.attack(nextTarget);
-					}
-					
-				
-				}
-				else
-				{
-					commandUtil.attackMove(mutal, SM.mySecondChokePoint.getPoint());
-				}
-				
-				
-				
-				
-				
-				moveToEndPoint = false;
-//				System.out.println("66666");
-//				return;
-				continue;
-			}
-			
-			else
-			{
-				if(nextTarget!=null)
-				{
-					if(mutal.getAirWeaponCooldown()/2 >0)
-					{	
-					mutal.move(SM.myMainBaseLocation.getPosition());
-					}
-					else
-					{
-						mutal.attack(nextTarget);
-					}
-					
-				
-				}
-				else
-				{
-					commandUtil.attackMove(mutal, nextPlace);
-				}
-				
-				
-//				System.out.println("어택땅으로 이동");
-
-//				System.out.println("7777");
-			}
-			
-			
-			
-			/*
-			if(mutal.isIdle())
-			{
-//				System.out.println("놀지말고 앞마당으로 가라");
-				commandUtil.attackMove(mutal, SM.myFirstExpansionLocation.getPosition());
-//				moveToEndPoint = false;
-//				return;
-				continue;
-			}*/
-			
-
-			
-			/*
-			if(SM.myCombatUnitType2List.size()<6)
-			{
-				commandUtil.attackMove(mutal, SM.myFirstExpansionLocation.getPosition());
-				moveToEndPoint = false;
-//				return;
-				continue;
-			}*/
-			
-
-			
-
-			
-			
-			
-		}
-		
-	}	
-
-	
-	
-	
-	
-	
-	
-	public void MUTAL() {
-		
-		//if (MyBotModule.Broodwar.getFrameCount() % (24*3) != 0) { return; }
-		
-		
-		
-		
-
-		if (CombatStateNow == StrategyManager.CombatState.defenseMode) {
-			if (mutalisks.size() > 5) {
-				for (Unit mutal : mutalisks) {
-
-					// ArrayList <Unit> units = (ArrayList<Unit>)
-					// MyBotModule.Broodwar.getUnitsInRadius(mutal_position, 2 * Config.TILE_SIZE);
-					// List <Unit> nearbyunits = mutal.getUnitsInRadius(1000);
-
-					ArrayList<Unit> nearbyunits;
-
-					if (enemyMainBaseLocation != null) {
-						//// system.out.println("done");
-
-						int x, y;
-
-						x = enemyMainBaseLocation.getX();
-						y = enemyMainBaseLocation.getY();
-
-						if (x < 63 * 32) {
-							x = 0;
-						} else {
-							x = 127 * 32;
-						}
-
-						if (y < 63 * 32) {
-							y = 0;
-						} else {
-							y = 127 * 32;
-						}
-
-						// 0623 nearbyunits = (ArrayList<Unit>)
-						// MyBotModule.Broodwar.getUnitsInRadius(enemyMainBaseLocation.getPosition(), 4
-						// * Config.TILE_SIZE);
-						nearbyunits = (ArrayList<Unit>) MyBotModule.Broodwar.getUnitsInRadius(new Position(x, y),
-								4 * Config.TILE_SIZE);
-
-					} else {
-						nearbyunits = (ArrayList<Unit>) MyBotModule.Broodwar.getUnitsInRadius(
-								new Position(63 * Config.TILE_SIZE, 63 * Config.TILE_SIZE), 4 * Config.TILE_SIZE);
-
-					}
-					// ArrayList <Unit> nearbyunits = (ArrayList<Unit>)
-					// MyBotModule.Broodwar.getUnitsInRadius(enemyMainBaseLocation.getPosition(), 5
-					// * Config.TILE_SIZE);
-
-					ArrayList<Unit> nearbyenemy = new ArrayList<Unit>(); // 0622 여기서 초기화 안하면 에러남
-					ArrayList<Unit> nearbyenemyworker = new ArrayList<Unit>();
-
-					for (Unit unit222 : nearbyunits) {
-						if (unit222.getType() == InformationManager.Instance().getWorkerType(enemyRace)) {
-							nearbyenemyworker.add(unit222);
-							//// system.out.println(unit222.getType());
-						}
-
-						if (unit222.getPlayer() == enemyPlayer && unit222 != null && unit222.exists()
-								&& unit222.isAttacking()) {
-							nearbyenemy.add(unit222);
-							// system.out.println("attackable : " + unit222.getType());
-						}
-					}
-
-					double minDistance = 1000000000;
-					double tempDistance = 0;
-					Unit myAttackTarget = null;
-
-					if (nearbyenemy.size() == 0) {
-						for (Unit targetENEMY : nearbyenemyworker) {
-							if (targetENEMY == null || targetENEMY.exists() == false) {
-								continue;
-							}
-
-							tempDistance = mutal.getDistance(targetENEMY.getPosition());
-							if (minDistance > tempDistance) {
-								minDistance = tempDistance;
-								myAttackTarget = targetENEMY;
-							}
-						}
-					} else {
-						for (Unit targetENEMY : nearbyenemy) {
-							if (targetENEMY == null || targetENEMY.exists() == false) {
-								continue;
-							}
-
-							tempDistance = mutal.getDistance(targetENEMY.getPosition());
-							if (minDistance > tempDistance) {
-								minDistance = tempDistance;
-								myAttackTarget = targetENEMY;
-							}
-
-						}
-					}
-
-					// 0623 타겟을 이렇게 잡으니 나중에 거의 승리했을때 주변에 딱히 칠 유닛이 없어서 건물도 안치고 노는 문제 발생
-
-					if (mutal.canAttack() && myAttackTarget != null) {
-
-						if (myAttackTarget.getType() == UnitType.Zerg_Spore_Colony
-								|| myAttackTarget.getType() == UnitType.Terran_Missile_Turret
-								|| myAttackTarget.getType() == UnitType.Protoss_Photon_Cannon) {
-							if (enemyMainBaseLocation != null) {
-
-								int x, y;
-
-								x = enemyMainBaseLocation.getX();
-								y = enemyMainBaseLocation.getY();
-
-								if (x < 63 * 32) {
-									x = 0;
-								} else {
-									x = 127 * 32;
-								}
-
-								if (y < 63 * 32) {
-									y = 0;
-								} else {
-									y = 127 * 32;
-								}
-
-								// 0623 mutal.move(new Position(x* Config.TILE_SIZE,y* Config.TILE_SIZE)); //
-								// 0622 이렇게 무시하고 강제이동하면 되긴하는데 그 위치에 있으면 어떡할까
-								// 이럴거면 이러지말고 아예 누
-								MUTAL_MOVEMENT(mutal, null, new Position(x, y));
-
-							}
-						} else {
-							// 0623 mutal.attack(myAttackTarget); // 0622 이거 포문 감싸기전에는 이거 한줄
-
-							///////////////////////////////////////////////// 0623 적 본진 알고, 방어건물이 있었지만 무시했는데
-							///////////////////////////////////////////////// 눈앞에 다른 적이 있는 경우, 이 경우 그대로 두면
-							///////////////////////////////////////////////// 계속 본진을 갖다박으므로 중간집결지를 지향하는 어택땅을
-							///////////////////////////////////////////////// 하는 것이다.
-							int mutal_x = 63 * Config.TILE_SIZE;
-							int mutal_y = 63 * Config.TILE_SIZE;
-
-							if (enemyMainBaseLocation != null) {
-								mutal_x = (enemyMainBaseLocation.getX() + myMainBaseLocation.getX()) / 2;
-								mutal_y = (enemyMainBaseLocation.getY() + myMainBaseLocation.getY()) / 2;
-
-								// system.out.println(enemyMainBaseLocation.getX());
-								// system.out.println("case 1 mutal_x : " + mutal_x);
-
-								if (mutal_x > 50 * 32 && mutal_x < 70 * 32) {
-									mutal_x = enemyMainBaseLocation.getX();
-									// system.out.println("case 1 mutal_x AFTER : " + mutal_x);
-									// system.out.println("case 1 mutal_y AFTER : " + mutal_y);
-								}
-							}
-							/////////////////////////////////////////////////////////////
-
-							MUTAL_MOVEMENT(mutal, myAttackTarget, new Position(mutal_x, mutal_y));
-						}
-
-					} else {
-						// mutal.move(enemyMainBaseLocation.getPosition());
-
-						int mutal_x = 63 * 32;
-						int mutal_y = 63 * 32;
-
-						if (enemyMainBaseLocation != null) {
-							mutal_x = (enemyMainBaseLocation.getX() + myMainBaseLocation.getX()) / 2;
-							mutal_y = (enemyMainBaseLocation.getY() + myMainBaseLocation.getY()) / 2;
-
-							// system.out.println(enemyMainBaseLocation.getX());
-							// system.out.println("case 2 mutal_x : " + mutal_x);
-
-							if (mutal_x > 50 * 32 && mutal_x < 70 * 32) {
-								mutal_x = enemyMainBaseLocation.getX();
-								// system.out.println("case 2 mutal_x AFTER : " + mutal_x);
-								// system.out.println("case 2 mutal_y AFTER : " + mutal_y);
-							}
-
-						}
-
-						Position mutal_position = new Position(mutal_x, mutal_y);
-
-						ArrayList<Unit> units = (ArrayList<Unit>) MyBotModule.Broodwar.getUnitsInRadius(mutal_position,
-								1 * Config.TILE_SIZE);
-
-						/*
-						 * if(units.isEmpty() == false) { Iterator <Unit> itr = units.iterator();
-						 * 
-						 * 
-						 * while(itr.hasNext()) { Unit unit = itr.next();
-						 * 
-						 * if(unit.getPlayer() == enemyPlayer) { units.remove(unit); continue; }
-						 * 
-						 * if(unit.getType() != UnitType.Zerg_Mutalisk) { units.remove(unit); continue;
-						 * }o } }
-						 */
-
-						if (units.size() > 5 && Mutal_flag == false) {
-							Mutal_flag = true;
-						}
-
-						if (enemyMainBaseLocation != null && Mutal_flag == true) {
-
-							// 0623 commandUtil.attackMove(mutal, enemyMainBaseLocation.getPosition());
-							// 0623 MUTAL_MOVEMENT(mutal, null, enemyMainBaseLocation.getPosition());
-
-							int x, y;
-
-							x = enemyMainBaseLocation.getX();
-							y = enemyMainBaseLocation.getY();
-
-							if (x < 63 * 32) {
-								x = 0;
-							} else {
-								x = 127 * 32;
-							}
-
-							if (y < 63 * 32) {
-								y = 0;
-							} else {
-								y = 127 * 32;
-							}
-
-							// 0623 mutal.move(new Position(x* Config.TILE_SIZE,y* Config.TILE_SIZE)); //
-							// 0622 이렇게 무시하고 강제이동하면 되긴하는데 그 위치에 있으면 어떡할까
-							// 이럴거면 이러지말고 아예 누
-							MUTAL_MOVEMENT(mutal, null, new Position(x, y));
-
-							// system.out.println(x + " , " + y);
-
-						} else {
-
-							// 0623 mutal.move(mutal_position); // 0622 어택무브해야돼 말아야돼
-							MUTAL_MOVEMENT(mutal, null, mutal_position);
-
-						}
-
-					}
-				}
-			}
-		}
-	}
-
-	void MUTAL_MOVEMENT(Unit mutal, Unit target, Position position) {
-
-		if (MyBotModule.Broodwar.getFrameCount() % (24 * 2.5) != 0) {
 			return;
 		}
-
-		if (enemyMainBaseLocation != null && Mutal_flag == true) // 일꾼이거나 방어건물이 아닌 공격중인 어떤 적군유닛
+		
+		
+		Position averagePosition = getAveragePosition(SM.myCombatUnitType2List);
+		enoughGathered(UnitType.Zerg_Mutalisk, gatherPoint, 3, 0.8);
+		Unit invader = weAreUnderAttack(averagePosition);
+		Position nextPlace = getNextPlaceToGo();
+		Unit nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, averagePosition);
+		int timer = 0;
+		
+		/*
+		for (Unit mutal : SM.myCombatUnitType2List)
 		{
+			mtlsk.ourUnits.getLoadedUnits().add(mutal);		
+		}
+*/
+		
+		
+		
+		
+		ArrayList<Unit> mutalsAroundNextPlace = new ArrayList<Unit>();
+		if (SM.enemyMainBaseLocation != null) {
+			List<Unit> unitsAroundNextPlace = MyBotModule.Broodwar
+					.getUnitsInRadius(SM.enemyMainBaseLocation.getPosition(), 8 * Config.TILE_SIZE);
 
-			List<Unit> arrived = MyBotModule.Broodwar.getUnitsInRadius(enemyMainBaseLocation.getPosition(),
-					8 * Config.TILE_SIZE);
-			// 0623 죽은 뮤탈 빼는 과정이 필요할듯?
-
-			int mutal_x = 63 * 32;
-			int mutal_y = 63 * 32;
-
-			if (enemyMainBaseLocation != null) {
-				mutal_x = (enemyMainBaseLocation.getX() + myMainBaseLocation.getX()) / 2;
-				mutal_y = (enemyMainBaseLocation.getY() + myMainBaseLocation.getY()) / 2;
-
-				// system.out.println(enemyMainBaseLocation.getX());
-				// system.out.println("case 3 mutal_x : " + mutal_x);
-
-				if (mutal_x > 50 * 32 && mutal_x < 70 * 32) {
-					mutal_x = enemyMainBaseLocation.getX();
-					// system.out.println("case 3 mutal_x AFTER : " + mutal_x);
-					// system.out.println("case 3 mutal_y AFTER : " + mutal_y);
+			for (Unit unit : unitsAroundNextPlace) {
+				if (unit.getPlayer() == SM.myPlayer && unit.getType() == UnitType.Zerg_Mutalisk) {
+					mutalsAroundNextPlace.add(unit);
 				}
 			}
+		}
 
-			Position mutal_position = new Position(mutal_x, mutal_y);
+		for (Unit mutal : SM.myCombatUnitType2List) {
+			
+			timer = (int) (mutal.getAirWeaponCooldown() / 1.5);
 
-			ArrayList<Unit> units = (ArrayList<Unit>) MyBotModule.Broodwar.getUnitsInRadius(mutal_position,
-					1 * Config.TILE_SIZE);
+			
 
-			ArrayList<Unit> survived_MUTAL = (ArrayList<Unit>) MyBotModule.Broodwar
-					.getUnitsInRadius(enemyMainBaseLocation.getPosition(), 8 * Config.TILE_SIZE);
+			
 
-			Iterator<Unit> itr = survived_MUTAL.iterator();
-			int survived_Mutal = 0;
+			if (invader != null) {
+				
+				mutal.attack(invader);
+				// System.out.println("11111");
+				// System.out.println("집지키러 가즈아");
+			} else if (SM.enemyMainBaseLocation == null) {
+				commandUtil.attackMove(mutal, SM.mySecondChokePoint.getPoint());
+				moveToEndPoint = false;
+				// System.out.println("22222");
+				// System.out.println("아직 기지 못찾아서 앞마당으로 가라");
 
-			while (itr.hasNext()) {
-				Unit unit = itr.next();
+			} else if (SM.combatState == StrategyManager.CombatState.attackStarted) {
+				if (nextTarget != null) {
+					if (timer == 0) {
+						mutal.attack(nextTarget);
+					} else {
+						mutal.move(SM.myMainBaseLocation.getPosition());
+					}
 
-				if (unit.getPlayer() == myPlayer && unit.getType() == UnitType.Zerg_Mutalisk) {
-					survived_Mutal++;
+				} else {
+					commandUtil.attackMove(mutal, SM.enemyMainBaseLocation.getPosition());
 				}
+				// System.out.println("33333");
 			}
 
-			/*
-			 * 
-			 * boolean temp_Mutal_flag = false;
-			 * 
-			 * 
-			 * if(units.size()>5) { temp_Mutal_flag = true; }
-			 */
+			else if (nextTarget != null && invader == null && mutalsAroundNextPlace.size() > 3) {
 
-			if (units.size() > 5 && Mutal_flag == false) {
-				Mutal_flag = true;
+				if (timer == 0) {
+					mutal.attack(nextTarget);
+				} else {
+					mutal.move(gatherPoint);
+				}
+
+				// System.out.println("44444");
+				// System.out.println("잡아먹기");
+
+			} else if (mutalsAroundNextPlace.size() < 3 && SM.myCombatUnitType2List.size() < 5) {
+
+				mutal.move(SM.mySecondChokePoint.getPoint());
+				moveToEndPoint = false;
+				// System.out.println("55555");
 			}
 
-			if (!Mutal_flag) {
-				mutal.move(mutal_position);
-				// system.out.println("정찰이 늦어서 나중에 본진 찾고 일단 중간집결지로 가는 중이다");
-			} else if (!arrived.contains(mutal)) {
-				mutal.move(position);
-				// system.out.println("아직 더 가야됨");
-			}
+			else if (SM.myCombatUnitType2List.size() < 4 + SM.myCombatUnitType1List.size() / 4) // 6에서 점점 늘려보자는 취지
+			{
+				if (nextTarget != null) {
+					if (timer == 0) {
+						mutal.attack(nextTarget);
+					} else {
+						mutal.move(SM.myMainBaseLocation.getPosition());
 
-			else if (survived_Mutal < 4) {
-				Mutal_flag = false;
-				mutal.move(mutal_position);
-				// system.out.println("후퇴하자");
+					}
+
+				} else {
+					commandUtil.attackMove(mutal, SM.mySecondChokePoint.getPoint());
+				}
+
+				moveToEndPoint = false;
+				// System.out.println("66666");
 
 			}
 
 			else {
-				commandUtil.attackMove(mutal, position);
-				// system.out.println("다 왔습니다."); // 여기서도 누굴 칠까 우선순위가 필요
-			}
-
-		} else if (target == null) {
-			// mutal.move(position); // 중간 집결이거나, 적본진으로 가는데 방어건물 등이 있어서 무시하고 쭉 들어가는 경우
-
-			if (enemyMainBaseLocation != null) {
-				List<Unit> arrived = MyBotModule.Broodwar.getUnitsInRadius(enemyMainBaseLocation.getPosition(),
-						8 * Config.TILE_SIZE);
-
-				int mutal_x = 63 * 32;
-				int mutal_y = 63 * 32;
-
-				if (enemyMainBaseLocation != null) {
-					mutal_x = (enemyMainBaseLocation.getX() + myMainBaseLocation.getX()) / 2;
-					mutal_y = (enemyMainBaseLocation.getY() + myMainBaseLocation.getY()) / 2;
-
-					// system.out.println(enemyMainBaseLocation.getX());
-					// system.out.println("case 4 mutal_x : " + mutal_x);
-
-					if (mutal_x > 50 * 32 && mutal_x < 70 * 32) {
-						mutal_x = enemyMainBaseLocation.getX();
-						// system.out.println("case 4 mutal_x AFTER : " + mutal_x);
-						// system.out.println("case 4 mutal_y AFTER : " + mutal_y);
+				if (nextTarget != null) {
+					if (timer == 0) {
+						mutal.attack(nextTarget);
+					} else {
+						mutal.move(SM.myMainBaseLocation.getPosition());
 					}
+
+				} else {
+					commandUtil.attackMove(mutal, nextPlace);
 				}
 
-				Position mutal_position = new Position(mutal_x, mutal_y);
-
-				ArrayList<Unit> units = (ArrayList<Unit>) MyBotModule.Broodwar.getUnitsInRadius(mutal_position,
-						1 * Config.TILE_SIZE);
-
-				ArrayList<Unit> survived_MUTAL = (ArrayList<Unit>) MyBotModule.Broodwar
-						.getUnitsInRadius(enemyMainBaseLocation.getPosition(), 8 * Config.TILE_SIZE);
-
-				Iterator<Unit> itr = survived_MUTAL.iterator();
-				int survived_Mutal = 0;
-
-				while (itr.hasNext()) {
-					Unit unit = itr.next();
-
-					if (unit.getPlayer() == myPlayer && unit.getType() == UnitType.Zerg_Mutalisk) {
-						survived_Mutal++;
-					}
-				}
-
-				if (units.size() > 5 && Mutal_flag == false) {
-					Mutal_flag = true;
-				}
-
-				if (!Mutal_flag) {
-					mutal.move(mutal_position);
-					// system.out.println("정찰이 빨리 된 편이라서 일단 모이러 갑니다일수도 있고 너무 늦은것일수도 잇다??");
-				}
-
-				else if (!arrived.contains(mutal)) {
-					mutal.move(position);
-					// system.out.println("아직 더 가야됨ㅠㅠ");
-				}
-
-				else if (survived_Mutal < 4) {
-					Mutal_flag = false;
-					mutal.move(mutal_position);
-					// system.out.println("후퇴하자");
-
-				}
-
-				else {
-					commandUtil.attackMove(mutal, position);
-					// system.out.println("다 왔습니다.ㅠㅠ");
-				}
-			} else {
-				// mutal.move(position);
-				commandUtil.attackMove(mutal, position);
-				// system.out.println("정찰이 덜 되서 일단 갑니다. 아마도 중앙. 그럼 이걸 어택땅으로 하는게 어떨까?");
-				// system.out.println("BBB");
+				// System.out.println("어택땅으로 이동");
+				// System.out.println("7777");
 			}
-
-		} else if (mutal.canAttack(target)) {
-			mutal.attack(target);
-			// system.out.println("CCC");
-		} else {
-			double angle = mutal.getAngle();
-			angle = (angle + 3.1416) % 6.2832;
-
-			int x1 = mutal.getPoint().getX();
-			int y1 = mutal.getPoint().getY();
-
-			int x2 = target.getPoint().getX();
-			int y2 = target.getPoint().getX();
-
-			double a = (y2 - y1) / (x2 - x1);
-			double b = a * x1 - y1;
-
-			int x3 = x1;
-
-			if (x1 < x2) {
-				x3 = x3 - 1000;
-			} else {
-				x3 = x3 + 1000;
-			}
-
-			int y3 = (int) (a * x3 + b);
-
-			mutal.move(new Position(x3, y3));
-			// system.out.println("DDD");
 
 		}
 
 	}
+
+	
+	
+	
+	
+	
+	
+
 	
 	/*
 	private static Mutalisk instance = new Mutalisk();

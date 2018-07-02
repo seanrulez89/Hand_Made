@@ -158,18 +158,9 @@ public class InitialBuildOrder {
 
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling,
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling,
-
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling,
-
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling,
-
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
 		
 		
 

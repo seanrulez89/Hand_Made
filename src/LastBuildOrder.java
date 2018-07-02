@@ -27,30 +27,13 @@ public class LastBuildOrder {
 	
 	public void lastBuildOrder() {
 
-		if (myPlayer.getUpgradeLevel(UpgradeType.Metabolic_Boost) == 1) {
+		if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Attacks) >= 1)
+		{
 
 			int chamberNumber = myPlayer.allUnitCount(UnitType.Zerg_Evolution_Chamber)
 					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Evolution_Chamber)
 					+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Evolution_Chamber,	null);
-
-			if (chamberNumber == 0) {
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Evolution_Chamber,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
-
-			}
-
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) == 1) {
-				if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) < 4
-						&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
-						&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Carapace, false);
-				}
-			}
-
-		}
-		
-		if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Attacks) >= 1)
-		{
+	
 			int queensNestNumber = myPlayer.allUnitCount(UnitType.Zerg_Queens_Nest)
 					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Queens_Nest)
 					+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Queens_Nest, null);
@@ -67,16 +50,30 @@ public class LastBuildOrder {
 					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Ultralisk_Cavern)
 					+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Ultralisk_Cavern, null);
 			
-			if (queensNestNumber == 0 && BuildManager.Instance().getAvailableMinerals() > 500) {
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Queens_Nest,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-				
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Spire,
+			if (chamberNumber == 0) {
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Evolution_Chamber,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 
 			}
+
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) >= 1) {
+				if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) < 3
+						&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
+						&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0) {
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Carapace, false);
+				}
+			}
 			
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Queens_Nest) == 1 && hiveNumber == 0 && BuildManager.Instance().getAvailableMinerals() > 500)
+			if (queensNestNumber == 0 && BuildManager.Instance().getAvailableMinerals() > UnitType.Zerg_Queens_Nest.mineralPrice()) {
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Queens_Nest,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				
+	//			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Spire,
+	//					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+
+			}
+			
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Queens_Nest) == 1 && hiveNumber == 0 && BuildManager.Instance().getAvailableMinerals() > UnitType.Zerg_Hive.mineralPrice())
 			{
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hive,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);	
@@ -98,10 +95,10 @@ public class LastBuildOrder {
 
 			
 			
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) == 1 && greaterSpireNumber < 2)
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) == 1 && greaterSpireNumber == 0)
 			{
-			//	BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Greater_Spire,
-			//			BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Greater_Spire,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				
 			}
 			

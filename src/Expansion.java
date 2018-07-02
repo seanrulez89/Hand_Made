@@ -36,6 +36,12 @@ public class Expansion {
 		}
 
 		for (BaseLocation EXPLocation : EXPLocations) {
+			
+			if(EXPLocation.getGeysers().size()==0)
+			{
+				continue;
+			}
+			
 
 			for (BaseLocation myBaseLocation : myBaseLocations) {
 				distanceFromMyLocation = EXPLocation.getGroundDistance(myBaseLocation);
