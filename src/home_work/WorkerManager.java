@@ -1,3 +1,6 @@
+package home_work;
+import java.util.List;
+
 import bwapi.*;
 import bwta.*;
 
@@ -39,171 +42,177 @@ public class WorkerManager {
 
 	
 	
-	public void updateWorkerStatus() 
-	{
-		// Drone 은 건설을 위해 isConstructing = true 상태로 건설장소까지 이동한 후, 
-		// 잠깐 getBuildType() == none 가 되었다가, isConstructing = true, isMorphing = true 가 된 후, 건설을 시작한다
+	public void updateWorkerStatus() {
+		// Drone 은 건설을 위해 isConstructing = true 상태로 건설장소까지 이동한 후,
+		// 잠깐 getBuildType() == none 가 되었다가, isConstructing = true, isMorphing = true 가
+		// 된 후, 건설을 시작한다
 
 		// for each of our Workers
-		for (Unit worker : workerData.getWorkers())
-		{
-			if (!worker.isCompleted())
-			{
+		for (Unit worker : workerData.getWorkers()) {
+			if (!worker.isCompleted() || worker == null) {
 				continue;
 			}
+
+			// 워커의 공격 능력 추가 - 170808 노승호
 			
-			//워커의 공격 능력 추가 - 170808 노승호
-			Unit target = getClosestEnemyUnitFromWorker(worker);
-			
-			/* 테스트 용으로 잠시 가린 주석
-			for (Unit CombatUnits : MyBotModule.Broodwar.self().getUnits())
-			{
-				if (CombatUnits.getType() != UnitType.Terran_SCV) {
-					CombatUnitsCounter++;
-				}	
+
+				Unit target = getClosestEnemyUnitFromWorker(worker);
 				
-			}
-			
-			if (CombatUnitsCounter<=5 && target!= null) {
-				setCombatWorker(worker);
-			}
-			*/
-			
-			if(workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Build && workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Scout && workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Gas) {
-				
-				if (target!= null) {
-					
-					if (target.getType()!=UnitType.Terran_SCV || target.getType()!=UnitType.Protoss_Probe || target.getType()!=UnitType.Zerg_Drone ) {
-						
-					
-					setCombatWorker(worker);
-				//	System.out.println("드론도 공격함");
-										}
-				} 
-				if (target==null  ) {
-					stopCombat();
-					
-				//	
-				// 
-				}
-			}
-			
-		
-			if (MyBotModule.Broodwar.getFrameCount() < 5000)
-			{
-				for (Unit unit : MyBotModule.Broodwar.self().getUnits())
+				if(target!=null && workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Build)
 				{
-					if ((unit.getType().isBuilding() && unit.isUnderAttack()) || (unit.getType() == UnitType.Zerg_Drone && unit.isUnderAttack())) // buliding.getHitPoints() < buliding.getType().maxHitPoints())
-					{
-						boolean	isPossibleToConstructDefenseBuildingType1 = false;
-						boolean	isPossibleToConstructDefenseBuildingType2 = false;	
+				commandUtil.attackUnit(worker, target);
+				}
+			
+			
+			
+		/*	
+			Unit target = getClosestEnemyUnitFromWorker(worker);
 
-						int numberOfUnitType_Zerg_Creep_Colony = 0; 
-						int numberOfUnitType_Zerg_Sunken_Colony = 0;
-						
-						Player myPlayer = MyBotModule.Broodwar.self();;
-									// 저그의 경우 크립 콜로니 갯수를 셀 때 성큰 콜로니 갯수까지 포함해서 세어야, 크립 콜로니를 지정한 숫자까지만 만든다
-						numberOfUnitType_Zerg_Creep_Colony += myPlayer.allUnitCount(UnitType.Zerg_Creep_Colony);
-						numberOfUnitType_Zerg_Creep_Colony += BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony);
-						numberOfUnitType_Zerg_Creep_Colony += ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Creep_Colony, null);
-						numberOfUnitType_Zerg_Creep_Colony += myPlayer.allUnitCount(UnitType.Zerg_Sunken_Colony);
-						numberOfUnitType_Zerg_Creep_Colony += BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony);
-						numberOfUnitType_Zerg_Sunken_Colony += myPlayer.allUnitCount(UnitType.Zerg_Sunken_Colony);
-						numberOfUnitType_Zerg_Sunken_Colony += BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony);
+			if (workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Build
+					&& workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Scout
+					&& workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Gas) {
 
-						if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0) 
-						{
-							isPossibleToConstructDefenseBuildingType1 = true;	
-						}
+				if (target != null) {
 
-						if (myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) > 0) 
-						{
-							isPossibleToConstructDefenseBuildingType2 = true;	
-						}
+					if (target.getType() != UnitType.Terran_SCV || target.getType() != UnitType.Protoss_Probe
+							|| target.getType() != UnitType.Zerg_Drone) {
 
-						//System.out.println("numberOfUnitType_Zerg_Creep_Colony : " + numberOfUnitType_Zerg_Creep_Colony);
-						//System.out.println("+++++");
-						//System.out.println("numberOfUnitType_Zerg_Sunken_Colony : " + numberOfUnitType_Zerg_Sunken_Colony);
-
-						if (isPossibleToConstructDefenseBuildingType1 == true 
-								&& numberOfUnitType_Zerg_Creep_Colony < 5) 
-						{
-
-							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) < 5 ) {
-
-								if (BuildManager.Instance().getAvailableMinerals() >= UnitType.Zerg_Creep_Colony.mineralPrice()) {
-									
-									//System.out.println("----------------------------");
-									
-									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony, 
-											BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
-								}			
-							}
-						}
-						
-						
-						if (isPossibleToConstructDefenseBuildingType2 == true
-								&&  numberOfUnitType_Zerg_Sunken_Colony < 3) {
-
-							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) < 3 ) {
-
-								if (BuildManager.Instance().getAvailableMinerals() >= UnitType.Zerg_Sunken_Colony.mineralPrice()) {
-
-									BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Sunken_Colony, 
-											BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
-									BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-											BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-									
-								}			
-							}
-						}
-						
-
+						setCombatWorker(worker);
+						// System.out.println("드론도 공격함");
 					}
 				}
-			}
-			
-				
-			
-			
+				if (target == null) {
+					stopCombat();
 
-			// 게임상에서 worker가 isIdle 상태가 되었으면 (새로 탄생했거나, 그전 임무가 끝난 경우), WorkerData 도 Idle 로 맞춘 후, handleGasWorkers, handleIdleWorkers 등에서 새 임무를 지정한다 
-			if ( worker.isIdle() )
-			{
-				// workerData 에서 Build / Move / Scout 로 임무지정한 경우, worker 는 즉 임무 수행 도중 (임무 완료 전) 에 일시적으로 isIdle 상태가 될 수 있다 
+					//
+					//
+				}
+			}
+*/
+			// 게임상에서 worker가 isIdle 상태가 되었으면 (새로 탄생했거나, 그전 임무가 끝난 경우), WorkerData 도 Idle 로
+			// 맞춘 후, handleGasWorkers, handleIdleWorkers 등에서 새 임무를 지정한다
+			if (worker.isIdle()) {
+				// workerData 에서 Build / Move / Scout 로 임무지정한 경우, worker 는 즉 임무 수행 도중 (임무 완료 전)
+				// 에 일시적으로 isIdle 상태가 될 수 있다
 				if ((workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Build)
-					&& (workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Move)
-					&& (workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Scout))  
-				{
-					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit)null);
+						&& (workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Move)
+						&& (workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Scout)) {
+					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit) null);
 				}
 			}
 
 			// if its job is gas
-			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Gas)
-			{
+			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Gas) {
 				Unit refinery = workerData.getWorkerResource(worker);
 
 				// if the refinery doesn't exist anymore (파괴되었을 경우)
-				if (refinery == null || !refinery.exists() ||	refinery.getHitPoints() <= 0)
-				{
-					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit)null);
+				if (refinery == null || !refinery.exists() || refinery.getHitPoints() <= 0) {
+					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit) null);
 				}
 			}
 
 			// if its job is repair
-			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Repair)
-			{
+			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Repair) {
 				Unit repairTargetUnit = workerData.getWorkerRepairUnit(worker);
-							
+
 				// 대상이 파괴되었거나, 수리가 다 끝난 경우
-				if (repairTargetUnit == null || !repairTargetUnit.exists() || repairTargetUnit.getHitPoints() <= 0 || repairTargetUnit.getHitPoints() == repairTargetUnit.getType().maxHitPoints())
-				{
-					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit)null);
+				if (repairTargetUnit == null || !repairTargetUnit.exists() || repairTargetUnit.getHitPoints() <= 0
+						|| repairTargetUnit.getHitPoints() == repairTargetUnit.getType().maxHitPoints()) {
+					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit) null);
 				}
 			}
 		}
+		
+		//////// 초반 긴급 방어 구축
+
+		if (MyBotModule.Broodwar.getFrameCount() < 7680 && MyBotModule.Broodwar.getFrameCount() > 240) {
+
+			List<BaseLocation> myBaseLocations = InformationManager.Instance()
+					.getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
+
+			for (BaseLocation myBase : myBaseLocations) {
+
+				for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(myBase.getPosition(), 30 * Config.TILE_SIZE)) {
+					if (unit.getPlayer() == StrategyManager.Instance().enemyPlayer) {
+						
+						
+						
+						
+
+						int numberOfUnitType_Zerg_Creep_Colony = 0;
+						int numberOfUnitType_Zerg_Sunken_Colony = 0;
+
+						Player myPlayer = MyBotModule.Broodwar.self();
+
+						// 저그의 경우 크립 콜로니 갯수를 셀 때 성큰 콜로니 갯수까지 포함해서 세어야, 크립 콜로니를 지정한 숫자까지만 만든다
+						numberOfUnitType_Zerg_Creep_Colony += myPlayer.allUnitCount(UnitType.Zerg_Creep_Colony);
+						numberOfUnitType_Zerg_Creep_Colony += BuildManager.Instance().buildQueue
+								.getItemCount(UnitType.Zerg_Creep_Colony);
+						numberOfUnitType_Zerg_Creep_Colony += ConstructionManager.Instance()
+								.getConstructionQueueItemCount(UnitType.Zerg_Creep_Colony, null);
+						numberOfUnitType_Zerg_Creep_Colony += myPlayer.allUnitCount(UnitType.Zerg_Sunken_Colony);
+						numberOfUnitType_Zerg_Creep_Colony += BuildManager.Instance().buildQueue
+								.getItemCount(UnitType.Zerg_Sunken_Colony);
+						numberOfUnitType_Zerg_Sunken_Colony += myPlayer.allUnitCount(UnitType.Zerg_Sunken_Colony);
+						numberOfUnitType_Zerg_Sunken_Colony += BuildManager.Instance().buildQueue
+								.getItemCount(UnitType.Zerg_Sunken_Colony);
+
+						// System.out.println("numberOfUnitType_Zerg_Creep_Colony : " +
+						// numberOfUnitType_Zerg_Creep_Colony);
+						// System.out.println("+++++");
+						// System.out.println("numberOfUnitType_Zerg_Sunken_Colony : " +
+						// numberOfUnitType_Zerg_Sunken_Colony);
+
+						for (Unit building : MyBotModule.Broodwar.self().getUnits())
+						{																	
+								if(building.getType().equals(UnitType.Zerg_Hatchery) && building.canCancelMorph())
+								{
+									building.cancelMorph();
+									System.out.println("해처리 취소");
+									
+								}
+						}
+						
+						
+						if (numberOfUnitType_Zerg_Creep_Colony < 2) {
+
+							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) < 1) {
+								
+
+								
+
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony,
+										BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
+
+							}
+						}
+
+						if (numberOfUnitType_Zerg_Creep_Colony>0 && numberOfUnitType_Zerg_Sunken_Colony < 2) {
+
+							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) < 1) {
+
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Sunken_Colony,
+										BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
+
+							}
+						}
+					}
+
+				}
+			}
+		}
+
 	}
+
+	
+		
+		
+		
+		
+		
+		
+		
+	
 
 
 	public void handleGasWorkers()
@@ -217,6 +226,8 @@ public class WorkerManager {
 				// get the number of workers currently assigned to it
 				int numAssigned = workerData.getNumAssignedWorkers(unit);
 
+				
+				
 				// if it's less than we want it to be, fill 'er up
 				// 단점 : 미네랄 일꾼은 적은데 가스 일꾼은 무조건 3~4명인 경우 발생.
 				for (int i = 0; i<(Config.WorkersPerRefinery - numAssigned); ++i)
@@ -733,7 +744,7 @@ public class WorkerManager {
 		{
 			double dist = unit.getDistance(worker);
 
-			if ((dist < 400) && (closestUnit == null || (dist < closestDist)))
+			if ((dist < 32*3) && (closestUnit == null || (dist < closestDist)))
 			{
 				closestUnit = unit;
 				closestDist = dist;
@@ -763,6 +774,8 @@ public class WorkerManager {
 				setMineralWorker(worker);
 			}
 		}
+		
+		// 0703 일단 싹 미네랄로 넣었다가 바꾸자
 	}
 	
 	public void setRepairWorker(Unit worker, Unit unitToRepair)

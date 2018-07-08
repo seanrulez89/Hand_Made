@@ -1,14 +1,17 @@
+package home_work;
 import java.util.*;
 import java.io.*;
 
 import bwapi.*;
 import bwta.*;
 
-public class Expansion {
+public class BuildOrder_Expansion {
 
-	BaseLocation nextEXP = StrategyManager.Instance().myMainBaseLocation;
+	
 
-	public void expansion() {
+	public BaseLocation expansion() {
+		
+		BaseLocation nextEXP = null;
 
 		List<BaseLocation> myBaseLocations = InformationManager.Instance()
 				.getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
@@ -60,12 +63,14 @@ public class Expansion {
 				}
 			}
 		}
+		
+		return nextEXP;
 	}
 
-	private static Expansion instance = new Expansion();
+	private static BuildOrder_Expansion instance = new BuildOrder_Expansion();
 
 	/// static singleton 객체를 리턴합니다
-	public static Expansion Instance() {
+	public static BuildOrder_Expansion Instance() {
 		return instance;
 	}
 

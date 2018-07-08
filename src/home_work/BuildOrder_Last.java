@@ -1,10 +1,11 @@
+package home_work;
 import java.util.*;
 import java.io.*;
 
 import bwapi.*;
 import bwta.*;
 
-public class LastBuildOrder {
+public class BuildOrder_Last {
 	
 	private CommandUtil commandUtil = new CommandUtil();
 	StrategyManager SM = StrategyManager.Instance();
@@ -16,10 +17,10 @@ public class LastBuildOrder {
 	Player enemyPlayer = SM.enemyPlayer;
 	Race enemyRace = SM.enemyRace;
 	
-	private static LastBuildOrder instance = new LastBuildOrder();
+	private static BuildOrder_Last instance = new BuildOrder_Last();
 
 	/// static singleton 객체를 리턴합니다
-	public static LastBuildOrder Instance() {
+	public static BuildOrder_Last Instance() {
 		return instance;
 	}
 	

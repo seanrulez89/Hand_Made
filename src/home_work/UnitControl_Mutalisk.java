@@ -1,28 +1,14 @@
+package home_work;
 import java.util.*;
-
-
-
-import java.io.*;
 
 import bwapi.*;
 import bwta.*;
 
-public class Mutalisk {
-	
-	
-	public class MTLSK
-	{
-		public Unitset ourUnits = null;
 
-	};
-	
-	public MTLSK mtlsk = new MTLSK();
+public class UnitControl_Mutalisk {
 	
 	
-	
-	
-	
-	
+
 	
 	
 	private CommandUtil commandUtil = new CommandUtil();
@@ -38,15 +24,14 @@ public class Mutalisk {
 	BaseLocation myMainBaseLocation = SM.myMainBaseLocation;
 	BaseLocation enemyMainBaseLocation = SM.enemyMainBaseLocation;
 	
-	Position gatherPoint = new Position(63 * 32, 63 * 32);;
-	Position endPoint = null;
+	static Position gatherPoint = null;
+	static Position endPoint = null;
 
 
 
 	StrategyManager.CombatState CombatStateNow = SM.combatState;
-	ArrayList<Unit> mutalisks = SM.myCombatUnitType2List;
+	ArrayList<Unit> mutalisks = SM.myMutaliskList;
 
-	boolean Mutal_flag;
 	public static boolean moveToEndPoint = false;
 	public static boolean underAttack = true;
 
@@ -55,8 +40,6 @@ public class Mutalisk {
 
 		enemyPlayer = SM.enemyPlayer;
 
-		double targetDistance = 100000000;
-		double tempDistance = 0;
 		
 		double targetHP = 10000;
 		double tempHP = 0;
@@ -427,30 +410,44 @@ public class Mutalisk {
 			return moveToEndPoint;
 		}
 
-		if (myUnitType == SM.myCombatUnitType1) {
-			numberOfTotal = SM.myCombatUnitType1List.size();
-		} else if (myUnitType == SM.myCombatUnitType2) {
-			numberOfTotal = SM.myCombatUnitType2List.size();
+		if (myUnitType == SM.myZergling) {
+			numberOfTotal = SM.myZerglingList.size();
+		} else if (myUnitType == SM.myMutalisk) {
+			numberOfTotal = SM.myMutaliskList.size();
 		} else {
 
 		}
 
 		List<Unit> unitsAround = MyBotModule.Broodwar.getUnitsInRadius(targetPosition, radius * Config.TILE_SIZE);
 
+		System.out.println("unitsAround : " + unitsAround.size());
+		System.out.println(targetPosition.getX());
+		System.out.println(targetPosition.getY());
+		
+		
+		
 		for (Unit unit : unitsAround) {
+			System.out.println("aaaaa");
 
 			if (unit.exists() && unit != null) {
-
+System.out.println("bbbbbbbb");
 				if (unit.getPlayer() == myPlayer) {
+					System.out.println("ccccc");
 					if (unit.getType() == myUnitType) {
+						System.out.println("dddd");
 						numberOfGathered++;
 					}
 				}
 			}
 		}
 
+		
+		System.out.println("numberOfGathered : " + numberOfGathered);
+		System.out.println("numberOfTotal * input_ratio : " + numberOfTotal * input_ratio);
+		
 		if (numberOfGathered > numberOfMinimum && numberOfGathered > numberOfTotal * input_ratio) {
 			moveToEndPoint = true;
+			System.out.println("-----------------");
 		}
 
 		return moveToEndPoint;
@@ -484,10 +481,14 @@ public class Mutalisk {
 	
 	
 	public Position getNextPlaceToGo() {
-		int a = 63 * 32;
-		int b = 63 * 32;
 		
-		Position nextPlace = new Position(a,b);
+		if(SM.enemyMainBaseLocation==null)
+		{
+			return SM.mySecondChokePoint.getPoint();
+		}
+		
+		
+		Position nextPlace = bwta.BWTA.getNearestChokepoint(SM.mySecondChokePoint.getCenter()).getCenter();
 
 		if (enemyMainBaseLocation != null) {
 			int x, y;
@@ -509,6 +510,8 @@ public class Mutalisk {
 
 			endPoint = new Position(x, y);
 
+			int a = 63 * 32;
+			int b = 63 * 32;
 
 
 			a = (enemyMainBaseLocation.getX() + myMainBaseLocation.getX()) / 2;
@@ -521,7 +524,6 @@ public class Mutalisk {
 				} else {
 					a = enemyMainBaseLocation.getX() / 2;
 				}
-
 			}
 
 			if (a / 32 == 59) // 대각이거나 가로로 나란하거나
@@ -531,21 +533,16 @@ public class Mutalisk {
 				} else {
 					b = enemyMainBaseLocation.getY();
 				}
-
 			} else // 세로로 나란히
 			{
 				;
 			}
+			
 			gatherPoint = new Position(a, b);
 		}
-		else
-		{
-			// 기지를 찾지 못 한 상태로 중앙으로 보낸다
-			return nextPlace;
-		}
 
-		if (endPoint != null && moveToEndPoint == true && SM.combatState == StrategyManager.CombatState.defenseMode
-				&& underAttack == false) {
+		if (endPoint != null && moveToEndPoint == true && underAttack == false
+				&& SM.combatState == StrategyManager.CombatState.defenseMode) {
 			nextPlace = endPoint;
 		} else if (gatherPoint != null) {
 			nextPlace = gatherPoint;
@@ -561,27 +558,22 @@ public class Mutalisk {
 	
 	
 	
-	public void myMutal() {
+	public void update() {
 		
-		if(SM.myCombatUnitType2List.size() == 0)
+		if(SM.myMutaliskList.size() == 0)
 		{
 			return;
 		}
 		
 		
-		Position averagePosition = getAveragePosition(SM.myCombatUnitType2List);
-		enoughGathered(UnitType.Zerg_Mutalisk, gatherPoint, 3, 0.8);
+		Position averagePosition = getAveragePosition(SM.myMutaliskList);
+		enoughGathered(UnitType.Zerg_Mutalisk, gatherPoint, 3, 0.5);
 		Unit invader = weAreUnderAttack(averagePosition);
 		Position nextPlace = getNextPlaceToGo();
 		Unit nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, averagePosition);
 		int timer = 0;
 		
-		/*
-		for (Unit mutal : SM.myCombatUnitType2List)
-		{
-			mtlsk.ourUnits.getLoadedUnits().add(mutal);		
-		}
-*/
+
 		
 		
 		
@@ -598,23 +590,24 @@ public class Mutalisk {
 			}
 		}
 
-		for (Unit mutal : SM.myCombatUnitType2List) {
+		for (Unit mutal : SM.myMutaliskList) {
 			
 			timer = (int) (mutal.getAirWeaponCooldown() / 1.5);
 
 			
-
+			System.out.println("underAttack : " + underAttack);
+			System.out.println("moveToEndPoint : " + moveToEndPoint);
 			
 
 			if (invader != null) {
 				
 				mutal.attack(invader);
-				// System.out.println("11111");
+				 System.out.println("11111");
 				// System.out.println("집지키러 가즈아");
 			} else if (SM.enemyMainBaseLocation == null) {
 				commandUtil.attackMove(mutal, SM.mySecondChokePoint.getPoint());
 				moveToEndPoint = false;
-				// System.out.println("22222");
+				 System.out.println("22222");
 				// System.out.println("아직 기지 못찾아서 앞마당으로 가라");
 
 			} else if (SM.combatState == StrategyManager.CombatState.attackStarted) {
@@ -628,7 +621,7 @@ public class Mutalisk {
 				} else {
 					commandUtil.attackMove(mutal, SM.enemyMainBaseLocation.getPosition());
 				}
-				// System.out.println("33333");
+				 System.out.println("33333");
 			}
 
 			else if (nextTarget != null && invader == null && mutalsAroundNextPlace.size() > 3) {
@@ -639,17 +632,17 @@ public class Mutalisk {
 					mutal.move(gatherPoint);
 				}
 
-				// System.out.println("44444");
+				 System.out.println("44444");
 				// System.out.println("잡아먹기");
 
-			} else if (mutalsAroundNextPlace.size() < 3 && SM.myCombatUnitType2List.size() < 5) {
+			} else if (mutalsAroundNextPlace.size() < 3 && SM.myMutaliskList.size() < 5) {
 
 				mutal.move(SM.mySecondChokePoint.getPoint());
 				moveToEndPoint = false;
-				// System.out.println("55555");
+				 System.out.println("55555");
 			}
 
-			else if (SM.myCombatUnitType2List.size() < 4 + SM.myCombatUnitType1List.size() / 4) // 6에서 점점 늘려보자는 취지
+			else if (SM.myMutaliskList.size() < 4 + SM.myZerglingList.size() / 4) // 6에서 점점 늘려보자는 취지
 			{
 				if (nextTarget != null) {
 					if (timer == 0) {
@@ -664,7 +657,7 @@ public class Mutalisk {
 				}
 
 				moveToEndPoint = false;
-				// System.out.println("66666");
+				 System.out.println("66666");
 
 			}
 
@@ -681,7 +674,7 @@ public class Mutalisk {
 				}
 
 				// System.out.println("어택땅으로 이동");
-				// System.out.println("7777");
+				 System.out.println("7777");
 			}
 
 		}

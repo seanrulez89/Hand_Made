@@ -1,3 +1,4 @@
+package home_work;
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.TilePosition;
@@ -85,7 +86,7 @@ public class GameCommander {
 	public void onUnitDestroy(Unit unit) {
 		// ResourceDepot 및 Worker 에 대한 처리
 		WorkerManager.Instance().onUnitDestroy(unit);
-
+		StrategyManager.Instance().onUnitDestroy(unit);
 		InformationManager.Instance().onUnitDestroy(unit); 
 	}
 	

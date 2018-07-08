@@ -1,3 +1,4 @@
+package home_work;
 import bwapi.Color;
 import bwapi.Position;
 import bwapi.Unit;
