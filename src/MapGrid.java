@@ -1,4 +1,6 @@
-package home_work;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import bwapi.Position;
@@ -8,23 +10,27 @@ import bwapi.UnitType;
 import bwapi.Unitset;
 import bwta.BWTA;
 
-public class DistanceMap {
+/// 지도를 바둑판처럼 Cell 들로 나누고, 매 frame 마다 각 Cell 의 timeLastVisited 시간정보, timeLastOpponentSeen 시간정보, ourUnits 와 oppUnits 목록을 업데이트 합니다
+public class MapGrid {
 
-	// 지도를 바둑판처럼 Cell 들로 나누고, 매 frame 마다 각 Cell 의 timeLastVisited 시간정보, timeLastOpponentSeen 시간정보, ourUnits 와 oppUnits 목록을 업데이트 한다
-	// 가장 마지막에 방문했던 시각이 언제인지 -> Scout 에 활용
-	// 가장 마지막에 적을 발견했 시각이 언제인지 -> 적 의도 파악, 적 부대 파악, 전략 수립에 활용
+	/// 지도를 바둑판처럼 Cell 들로 나누기 위해서 정의한 하나의 Cell
 	class GridCell
 	{
-		private int timeLastVisited;
-		private int timeLastOpponentSeen;
-		private Unitset ourUnits;
-		private Unitset oppUnits;
+		private int timeLastVisited; 		///< 가장 마지막에 방문했던 시각이 언제인지 -> Scout 에 활용		
+		private int timeLastOpponentSeen;	///< 가장 마지막에 적을 발견했던 시각이 언제인지 -> 적 의도 파악, 적 부대 파악, 전략 수립에 활용
+		private List<Unit> ourUnits= new ArrayList<Unit>();
+		private List<Unit> oppUnits= new ArrayList<Unit>();
 		private Position center;
 
 		public GridCell()
 		{
 			timeLastVisited = 0;
 			timeLastOpponentSeen = 0;
+		}
+		
+		public Position getCenter()
+		{
+			return center;
 		}
 	};
 	
@@ -33,92 +39,33 @@ public class DistanceMap {
 	private int mapHeight;
 	private int cols;
 	private int rows;
-	private int cells;
 	private int lastUpdated;
-	private int startRow;
-	private int startCol;
-
-	private int[] dist;
-	private char[] moveTo;
-	private Vector<GridCell> gridCells;
-	private Vector<TilePosition> sorted = new Vector<TilePosition>();
-
-	private static DistanceMap instance = new DistanceMap();
 	
-	public static DistanceMap Instance() {
+	public GridCell[] gridCells;
+
+	private static MapGrid instance = new MapGrid(MyBotModule.Broodwar.mapHeight() * 32, MyBotModule.Broodwar.mapHeight() * 32, Config.MAP_GRID_SIZE);
+	
+	/// static singleton 객체를 리턴합니다
+	public static MapGrid Instance() {
 		return instance;
 	}
-	
-	public DistanceMap()
-	{
-		this.dist = new int[MyBotModule.Broodwar.mapWidth() * MyBotModule.Broodwar.mapHeight()];
-		for(int i = 0 ; i < this.dist.length ; i++)
-		{
-			this.dist[i] = -1;
-		}
-		this.moveTo = new char[MyBotModule.Broodwar.mapWidth() * MyBotModule.Broodwar.mapHeight()];
-		for(int j = 0 ; j < this.moveTo.length ; j++)
-		{
-			this.moveTo[j] = 'X';
-		}
-		this.rows = MyBotModule.Broodwar.mapHeight();
-		this.cols = MyBotModule.Broodwar.mapWidth();
-		this.startRow = -1;
-		this.startCol = -1;
-	}
-	
-	public DistanceMap(int mapWidth, int mapHeight, int cellSize)
+
+	public MapGrid(int mapWidth, int mapHeight, int cellSize)
 	{
 		this.mapWidth = mapWidth;
 		this.mapHeight = mapHeight;
 		this.cellSize = cellSize;
 		this.cols = (mapWidth + cellSize - 1) / cellSize;
 		this.rows = (mapHeight + cellSize - 1) / cellSize;
-		this.cells = rows * cols;
+		this.gridCells = new GridCell[this.rows * this.cols];
+		for (int i = 0; i< this.gridCells.length ; ++i)
+		{
+			gridCells[i] = new GridCell();
+		}
 		this.lastUpdated = 0;
+		calculateCellCenters();
 	}
 
-	public int getDistItem(int index)
-	{
-		return dist[index];
-	}
-	
-	public int getDistItem(Position p)
-	{
-		return dist[getIndex(p.getY() / 32, p.getX() / 32)];
-	}
-	
-	public final int getIndex(final int row, final int col)
-	{
-		return row * cols + col;
-	}
-
-	public final int getIndex(final Position p)
-	{
-		return getIndex(p.getY() / 32, p.getX() / 32);
-	}
-	
-	public void setMoveTo(final int index, final char val)
-	{
-		moveTo[index] = val;
-	}
-	
-	public void setDistance(final int index, final int val)
-	{
-		dist[index] = val;
-	}
-	
-	public void setStartPosition(final int sr, final int sc)
-	{
-		startRow = sr;
-		startCol = sc;
-	}
-
-	public void addSorted(final TilePosition tp)
-	{
-		sorted.add(tp);
-	}
-	
 	public Position getLeastExplored()
 	{
 		int minSeen = 1000000;
@@ -200,7 +147,7 @@ public class DistanceMap {
 				}
 
 				cell.center = new Position(centerX, centerY);
-				assert(cell.center.isValid());
+				//assert(cell.center.isValid());
 			}
 		}
 	}
@@ -212,19 +159,19 @@ public class DistanceMap {
 
 	public GridCell getCellByIndex(int r, int c)
 	{
-		return gridCells.get(r * cols + c); 
+		return gridCells[r * cols + c];	
 	}
 	
 	// clear the vectors in the grid
 	public void clearGrid() {
-		for (int i = 0; i< gridCells.size(); ++i)
+		for (int i = 0; i< gridCells.length ; ++i)
 		{
-			gridCells.get(i).ourUnits.getLoadedUnits().clear();
-			gridCells.get(i).oppUnits.getLoadedUnits().clear();
+			gridCells[i].oppUnits = new ArrayList<Unit>();
+			gridCells[i].ourUnits = new ArrayList<Unit>();
 		}
 	}
 
-	// populate the grid with units
+	/// 각 Cell 의 timeLastVisited 시간정보, timeLastOpponentSeen 시간정보, ourUnits 와 oppUnits 목록 등을 업데이트 합니다
 	public void update()
 	{
 		// clear the grid
@@ -235,7 +182,7 @@ public class DistanceMap {
 		// add our units to the appropriate cell
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
-			getCell(unit).ourUnits.getLoadedUnits().add(unit);
+			getCell(unit).ourUnits.add(unit);
 			getCell(unit).timeLastVisited = MyBotModule.Broodwar.getFrameCount();
 		}
 
@@ -244,7 +191,7 @@ public class DistanceMap {
 		{
 			if (unit.getHitPoints() > 0)
 			{
-				getCell(unit).oppUnits.getLoadedUnits().add(unit);
+				getCell(unit).oppUnits.add(unit);
 				getCell(unit).timeLastOpponentSeen = MyBotModule.Broodwar.getFrameCount();
 			}
 		}
@@ -260,6 +207,8 @@ public class DistanceMap {
 		return getCellByIndex(pos.getY() / cellSize, pos.getX() / cellSize);
 	}
 	
+	/// 해당 position 근처에 있는 아군 혹은 적군 유닛들의 목록을 UnitSet 에 저장합니다<br>
+	/// BWAPI::Broodwar->self()->getUnitsOnTile, getUnitsInRectangle, getUnitsInRadius, getClosestUnit 함수와 유사하지만 쓰임새가 다릅니다
 	public void getUnitsNear(Unitset units, Position center, int radius, boolean ourUnits, boolean oppUnits)
 	{
 		final int x0 = Math.max((center.getX() - radius) / cellSize, 0);
@@ -277,7 +226,7 @@ public class DistanceMap {
 				GridCell cell = getCellByIndex(row, col);
 				if (ourUnits)
 				{
-					for (Unit unit : cell.ourUnits.getLoadedUnits())
+					for (Unit unit : cell.ourUnits)
 					{
 						Position d = new Position(unit.getPosition().getX() - center.getX(), unit.getPosition().getY() - center.getY());
 						if (d.getX() * d.getX() + d.getY() * d.getY() <= radiusSq)
@@ -291,7 +240,7 @@ public class DistanceMap {
 				}
 				if (oppUnits)
 				{
-					for (Unit unit : cell.oppUnits.getLoadedUnits()) 
+					for (Unit unit : cell.oppUnits) 
 					{
 						if (unit.getType() != UnitType.Unknown && unit.isVisible())
 						{
@@ -310,31 +259,26 @@ public class DistanceMap {
 		}
 	}
 
-	int	getCellSize()
+	public int	getCellSize()
 	{
 		return cellSize;
 	}
 
-	int getMapWidth(){
+	public int getMapWidth(){
 		return mapWidth;
 	}
 
-	int getMapHeight(){
+	public int getMapHeight(){
 		return mapHeight;
 	}
 
-	int getRows()
+	public int getRows()
 	{
 		return rows;
 	}
 
-	int getCols()
+	public int getCols()
 	{
 		return cols;
-	}
-	
-	public final Vector<TilePosition> getSortedTiles()
-	{
-		return sorted;
 	}
 }

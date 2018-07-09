@@ -1,4 +1,4 @@
-package home_work;
+
 import java.util.*;
 
 import bwapi.*;
@@ -66,7 +66,7 @@ public class UnitControl_Mutalisk {
 		ArrayList <Unit> normalBuilding = new ArrayList<Unit>();
 		ArrayList <Unit> elseUnit = new ArrayList<Unit>();
 		 
-		// 																			
+		 																			
 		for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(averagePosition, inRange)) { // 저글링 같은 근접공격유닛은 10배 해봐야 무의미한가?
 
 			if (enemy.getPlayer() == enemyPlayer) {
@@ -150,7 +150,7 @@ public class UnitControl_Mutalisk {
 				}
 				else
 				{
-					// 메딕, 드랍쉽 등등
+				//	 메딕, 드랍쉽 등등
 					elseUnit.add(enemy);
 				}
 
@@ -310,7 +310,7 @@ public class UnitControl_Mutalisk {
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 			if ((unit.getType().isBuilding() && unit.isUnderAttack())
 					|| (unit.getType().equals(UnitType.Zerg_Drone) && unit.isUnderAttack())) {
-				Unit tempEnemy = getNextTargetOf(unit.getType(), unit.getPosition()); // 반경 4개 타일안의 적을 찾을 것이다.
+				Unit tempEnemy = getNextTargetOf(unit.getType(), unit.getPosition());//  반경 4개 타일안의 적을 찾을 것이다.
 
 				if (tempEnemy != null) {
 					tempDistance = tempEnemy.getPosition().getDistance(myPosition);
@@ -339,7 +339,7 @@ public class UnitControl_Mutalisk {
 					if (positionDistance > tempDistance) {
 						positionDistance = tempDistance;
 						invader = unit;
-						// System.out.println("기지 주변 악당을 찾았다");
+						  // System.out.println("기지 주변 악당을 찾았다");
 					}
 				}
 			}
@@ -359,7 +359,7 @@ public class UnitControl_Mutalisk {
 				if (positionDistance > tempDistance) {
 					positionDistance = tempDistance;
 					invader = unit;
-					// System.out.println("길목2 주변 악당을 찾았다");
+					  // System.out.println("길목2 주변 악당을 찾았다");
 				}
 			}
 		}
@@ -378,7 +378,7 @@ public class UnitControl_Mutalisk {
 				if (positionDistance > tempDistance) {
 					positionDistance = tempDistance;
 					invader = unit;
-					// System.out.println("길목1 주변 악당을 찾았다");
+					  // System.out.println("길목1 주변 악당을 찾았다");
 				}
 			}
 		}
@@ -402,7 +402,7 @@ public class UnitControl_Mutalisk {
 		int numberOfMinimum = 5;
 
 		if (targetPosition == null) {
-			System.out.println("아직 기지 못 찾음");
+			 // System.out.println("아직 기지 못 찾음");
 			return false;
 		}
 
@@ -420,21 +420,21 @@ public class UnitControl_Mutalisk {
 
 		List<Unit> unitsAround = MyBotModule.Broodwar.getUnitsInRadius(targetPosition, radius * Config.TILE_SIZE);
 
-		System.out.println("unitsAround : " + unitsAround.size());
-		System.out.println(targetPosition.getX());
-		System.out.println(targetPosition.getY());
+		 // System.out.println("unitsAround : " + unitsAround.size());
+		 // System.out.println(targetPosition.getX());
+		 // System.out.println(targetPosition.getY());
 		
 		
 		
 		for (Unit unit : unitsAround) {
-			System.out.println("aaaaa");
+			 // System.out.println("aaaaa");
 
 			if (unit.exists() && unit != null) {
-System.out.println("bbbbbbbb");
+ // System.out.println("bbbbbbbb");
 				if (unit.getPlayer() == myPlayer) {
-					System.out.println("ccccc");
+					 // System.out.println("ccccc");
 					if (unit.getType() == myUnitType) {
-						System.out.println("dddd");
+						 // System.out.println("dddd");
 						numberOfGathered++;
 					}
 				}
@@ -442,12 +442,12 @@ System.out.println("bbbbbbbb");
 		}
 
 		
-		System.out.println("numberOfGathered : " + numberOfGathered);
-		System.out.println("numberOfTotal * input_ratio : " + numberOfTotal * input_ratio);
+		 // System.out.println("numberOfGathered : " + numberOfGathered);
+		 // System.out.println("numberOfTotal * input_ratio : " + numberOfTotal * input_ratio);
 		
 		if (numberOfGathered > numberOfMinimum && numberOfGathered > numberOfTotal * input_ratio) {
 			moveToEndPoint = true;
-			System.out.println("-----------------");
+			 // System.out.println("-----------------");
 		}
 
 		return moveToEndPoint;
@@ -526,7 +526,7 @@ System.out.println("bbbbbbbb");
 				}
 			}
 
-			if (a / 32 == 59) // 대각이거나 가로로 나란하거나
+			if (a / 32 == 59)//  대각이거나 가로로 나란하거나
 			{
 				if (enemyMainBaseLocation.getX() == myMainBaseLocation.getX()) {
 					;
@@ -595,20 +595,20 @@ System.out.println("bbbbbbbb");
 			timer = (int) (mutal.getAirWeaponCooldown() / 1.5);
 
 			
-			System.out.println("underAttack : " + underAttack);
-			System.out.println("moveToEndPoint : " + moveToEndPoint);
+			 // System.out.println("underAttack : " + underAttack);
+			 // System.out.println("moveToEndPoint : " + moveToEndPoint);
 			
 
 			if (invader != null) {
 				
 				mutal.attack(invader);
-				 System.out.println("11111");
-				// System.out.println("집지키러 가즈아");
+				  // System.out.println("11111");
+				  // System.out.println("집지키러 가즈아");
 			} else if (SM.enemyMainBaseLocation == null) {
 				commandUtil.attackMove(mutal, SM.mySecondChokePoint.getPoint());
 				moveToEndPoint = false;
-				 System.out.println("22222");
-				// System.out.println("아직 기지 못찾아서 앞마당으로 가라");
+				  // System.out.println("22222");
+				  // System.out.println("아직 기지 못찾아서 앞마당으로 가라");
 
 			} else if (SM.combatState == StrategyManager.CombatState.attackStarted) {
 				if (nextTarget != null) {
@@ -621,7 +621,7 @@ System.out.println("bbbbbbbb");
 				} else {
 					commandUtil.attackMove(mutal, SM.enemyMainBaseLocation.getPosition());
 				}
-				 System.out.println("33333");
+				  // System.out.println("33333");
 			}
 
 			else if (nextTarget != null && invader == null && mutalsAroundNextPlace.size() > 3) {
@@ -632,14 +632,14 @@ System.out.println("bbbbbbbb");
 					mutal.move(gatherPoint);
 				}
 
-				 System.out.println("44444");
-				// System.out.println("잡아먹기");
+				  // System.out.println("44444");
+				  // System.out.println("잡아먹기");
 
 			} else if (mutalsAroundNextPlace.size() < 3 && SM.myMutaliskList.size() < 5) {
 
 				mutal.move(SM.mySecondChokePoint.getPoint());
 				moveToEndPoint = false;
-				 System.out.println("55555");
+				  // System.out.println("55555");
 			}
 
 			else if (SM.myMutaliskList.size() < 4 + SM.myZerglingList.size() / 4) // 6에서 점점 늘려보자는 취지
@@ -657,7 +657,7 @@ System.out.println("bbbbbbbb");
 				}
 
 				moveToEndPoint = false;
-				 System.out.println("66666");
+				  // System.out.println("66666");
 
 			}
 
@@ -673,8 +673,8 @@ System.out.println("bbbbbbbb");
 					commandUtil.attackMove(mutal, nextPlace);
 				}
 
-				// System.out.println("어택땅으로 이동");
-				 System.out.println("7777");
+				  // System.out.println("어택땅으로 이동");
+				  // System.out.println("7777");
 			}
 
 		}
@@ -692,7 +692,7 @@ System.out.println("bbbbbbbb");
 	/*
 	private static Mutalisk instance = new Mutalisk();
 
-	/// static singleton 객체를 리턴합니다
+	/ static singleton 객체를 리턴합니다
 	public static Mutalisk Instance() {
 		return instance;
 	}

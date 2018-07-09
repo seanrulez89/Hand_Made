@@ -1,4 +1,4 @@
-package home_work;
+
 import java.util.*;
 import java.io.*;
 
@@ -10,6 +10,12 @@ public class BuildOrder_Expansion {
 	
 
 	public BaseLocation expansion() {
+		
+		if(StrategyManager.Instance().enemyMainBaseLocation==null)
+		{
+			return null;
+		}
+		
 		
 		BaseLocation nextEXP = null;
 
@@ -24,6 +30,23 @@ public class BuildOrder_Expansion {
 		double minDistance = 1000000000;
 		double distanceFromMyLocation = 0;
 		double distanceFromEnemyLocation = 0;
+		
+		int numberOfMyCombatUnitTrainingBuilding = 0;
+		numberOfMyCombatUnitTrainingBuilding += MyBotModule.Broodwar.self().allUnitCount(UnitType.Zerg_Hatchery);
+		numberOfMyCombatUnitTrainingBuilding += MyBotModule.Broodwar.self().allUnitCount(UnitType.Zerg_Lair);
+		numberOfMyCombatUnitTrainingBuilding += MyBotModule.Broodwar.self().allUnitCount(UnitType.Zerg_Hive);
+
+		numberOfMyCombatUnitTrainingBuilding += BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery);
+		numberOfMyCombatUnitTrainingBuilding += BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Lair);
+		numberOfMyCombatUnitTrainingBuilding += BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hive);
+
+		numberOfMyCombatUnitTrainingBuilding += ConstructionManager.Instance()
+				.getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null);
+		numberOfMyCombatUnitTrainingBuilding += ConstructionManager.Instance()
+				.getConstructionQueueItemCount(UnitType.Zerg_Lair, null);
+		numberOfMyCombatUnitTrainingBuilding += ConstructionManager.Instance()
+				.getConstructionQueueItemCount(UnitType.Zerg_Hive, null);
+		
 
 		for (BaseLocation myBaseLocation : myBaseLocations) {
 			if (EXPLocations.contains(myBaseLocation)) {
@@ -40,8 +63,23 @@ public class BuildOrder_Expansion {
 
 		for (BaseLocation EXPLocation : EXPLocations) {
 			
-			if(EXPLocation.getGeysers().size()==0)
+			System.out.println(numberOfMyCombatUnitTrainingBuilding);
+			
+			if(numberOfMyCombatUnitTrainingBuilding<=2)
 			{
+				if(EXPLocation.getGeysers().size()==1)
+				{
+					System.out.println("check");
+					continue;
+				}
+			}
+			else if(numberOfMyCombatUnitTrainingBuilding==3)
+			{
+				return StrategyManager.Instance().myMainBaseLocation;
+			}
+			else if(EXPLocation.getGeysers().size()==0)
+			{
+				System.out.println("out");
 				continue;
 			}
 			

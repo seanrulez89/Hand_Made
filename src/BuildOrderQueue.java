@@ -1,4 +1,4 @@
-package home_work;
+
 import java.awt.Point;
 import java.util.ArrayDeque;
 import java.util.Arrays;

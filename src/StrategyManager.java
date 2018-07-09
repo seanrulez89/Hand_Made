@@ -1,4 +1,4 @@
-package home_work;
+
 import java.*;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -29,6 +29,7 @@ import bwta.Chokepoint;
 public class StrategyManager {
 
 
+	
 	int attack_cnt;
 	public Position attackTargetPosition;
 
@@ -179,6 +180,7 @@ public class StrategyManager {
 
 	/// 변수 초기값을 설정합니다
 	void setVariables() {
+		
 		attack_cnt = 0;
 		attackTargetPosition = null;
 		
@@ -1386,12 +1388,13 @@ public class StrategyManager {
 
 	/// 방어건물 및 공격유닛 생산 건물을 건설합니다
 
-	void executeBuildingConstruction() {
+	public void executeBuildingConstruction() {
 
 		// InitialBuildOrder 진행중에는 아무것도 하지 않습니다
 		if (isInitialBuildOrderFinished == false) {
 			return;
 		}
+		
 
 		boolean isPossibleToConstructDefenseBuildingType1 = false;
 		boolean isPossibleToConstructDefenseBuildingType2 = false;
@@ -1471,27 +1474,11 @@ public class StrategyManager {
 				.getConstructionQueueItemCount(UnitType.Zerg_Hive, null);
 
 		// 공격 유닛 생산 건물 증설 : 돈이 남아돌면 실시. 최대 6개 까지만
-		if (BuildManager.Instance().getAvailableMinerals() > 300 && numberOfMyCombatUnitTrainingBuilding <= 2) {
-
-			// 게이트웨이 / 배럭 / 해처리 증설
-			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 && ConstructionManager
-					.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0) {
-				
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
-						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true); /// 해처리 추가 확장 0622
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor,
-						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true); 
-				
-				System.out.println("AA");
-
-			}
-		}
-		
-		else if (BuildManager.Instance().getAvailableMinerals() > 300 && numberOfMyCombatUnitTrainingBuilding == 4 || numberOfMyCombatUnitTrainingBuilding == 5 ) {
-
-			// 게이트웨이 / 배럭 / 해처리 증설
-			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 && ConstructionManager
-					.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0) {
+		if (BuildManager.Instance().getAvailableMinerals() > 300 && numberOfMyCombatUnitTrainingBuilding == 3 || numberOfMyCombatUnitTrainingBuilding == 5 || numberOfMyCombatUnitTrainingBuilding == 6) 
+		{
+			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0) 
+			{
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true); /// 해처리 추가 확장 0622
 
@@ -1499,42 +1486,28 @@ public class StrategyManager {
 
 			}
 		} 
-		
-		
-		/*
-		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding == 3) {
-			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0) {
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
-						BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true); // 해처리 추가 확장 0622
-				//BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor,
-				//		BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
-
-				System.out.println("BB");
-			}
-		} 
-		*/
-		
-		
-		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding < 10) {
-			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 && ConstructionManager
-					.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0) {
+		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding < 10) 
+		{
+			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0) 
+			{
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 						BuildOrder_Expansion.Instance().expansion().getTilePosition(), false); /// 해처리 추가 확장 0622
 
 				System.out.println("CC");
 
-				if (BuildOrder_Expansion.Instance().expansion().gas() > 0) {
+				if (BuildOrder_Expansion.Instance().expansion().getGeysers().size()==1) 
+				{
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor,
 							BuildOrder_Expansion.Instance().expansion().getTilePosition(), false); /// 해처리 추가 확장 0622
 
 					System.out.println("DD");
 				}
-
-				// 이거 되면 내 베이스 포문 돌면서 근처에 해처리 갯수보고 근처에 더 짓기 일단 몇 해처리 이상 먹었다 치고
-
 			}
 
-		} else {
+		} 
+		else 
+		{
 
 		}
 
