@@ -1449,7 +1449,7 @@ public class StrategyManager {
 
 				if (BuildManager.Instance().getAvailableMinerals() >= mySunkenColony.mineralPrice()) {
 
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(mySunkenColony,
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(mySunkenColony,
 							BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
 				}
 			}
@@ -1474,6 +1474,11 @@ public class StrategyManager {
 				.getConstructionQueueItemCount(UnitType.Zerg_Hive, null);
 
 		// 공격 유닛 생산 건물 증설 : 돈이 남아돌면 실시. 최대 6개 까지만
+		
+		BaseLocation nextExpansion = null;
+		nextExpansion = BuildOrder_Expansion.Instance().expansion();
+		
+		
 		if (BuildManager.Instance().getAvailableMinerals() > 300 && numberOfMyCombatUnitTrainingBuilding == 3 || numberOfMyCombatUnitTrainingBuilding == 5 || numberOfMyCombatUnitTrainingBuilding == 6) 
 		{
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 
@@ -1486,20 +1491,20 @@ public class StrategyManager {
 
 			}
 		} 
-		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding < 10) 
+		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding < 10 && nextExpansion!=null) 
 		{
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0) 
 			{
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
-						BuildOrder_Expansion.Instance().expansion().getTilePosition(), false); /// 해처리 추가 확장 0622
+						nextExpansion.getTilePosition(), false); /// 해처리 추가 확장 0622
 
 				System.out.println("CC");
 
-				if (BuildOrder_Expansion.Instance().expansion().getGeysers().size()==1) 
+				if (nextExpansion.getGeysers().size()==1) 
 				{
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor,
-							BuildOrder_Expansion.Instance().expansion().getTilePosition(), false); /// 해처리 추가 확장 0622
+							nextExpansion.getTilePosition(), false); /// 해처리 추가 확장 0622
 
 					System.out.println("DD");
 				}
@@ -1547,10 +1552,10 @@ public class StrategyManager {
 				isTimeToStartUpgradeType2 = true;
 			}
 			// 가스 좀 남으면 하라고 넣음
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 && myPlayer.gas() > 100 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5) {
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 || myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0 && myPlayer.gas() > 100 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5) {
 				isTimeToStartUpgradeType3 = true;
 			}
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 && myPlayer.gas() > 300 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5){
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 || myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0 && myPlayer.gas() > 300 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5){
 				isTimeToStartUpgradeType4 = true;
 			}
 			// 러커는 최우선으로 리서치한다

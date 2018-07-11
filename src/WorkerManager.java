@@ -32,7 +32,7 @@ public class WorkerManager {
 		handleGasWorkers();
 		handleIdleWorkers();
 		handleMoveWorkers();
-		handleCombatWorkers();
+	//	handleCombatWorkers();
 		handleRepairWorkers();
 	//	rebalanceWorkers(); 0628 이걸 하는건 좋은데 이걸 하니까 우왕좌왕 미네랄 못캐는 애들이 생기는듯 계속 새로 할당되서
 		
@@ -53,15 +53,28 @@ public class WorkerManager {
 				continue;
 			}
 
-			// 워커의 공격 능력 추가 - 170808 노승호
-			
-
+			if (worker.isUnderAttack() && workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Build) {
 				Unit target = getClosestEnemyUnitFromWorker(worker);
-				
-				if(target!=null && workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Build)
-				{
-				commandUtil.attackUnit(worker, target);
+
+				if (target != null) {
+					//commandUtil.attackUnit(worker, target);
+					setCombatWorker(worker);
+					commandUtil.attackUnit(worker, target);			
 				}
+
+			}
+			
+			
+			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat) {
+				Unit depot = getClosestResourceDepotFromWorker(worker);
+
+				if (worker.getDistance(depot.getPosition()) > 32 * 6) {
+					 setMineralWorker(worker);
+					 
+				}
+			}
+	
+				
 			
 			
 			
@@ -167,16 +180,16 @@ public class WorkerManager {
 						{																	
 								if(building.getType().equals(UnitType.Zerg_Hatchery) && building.canCancelMorph())
 								{
-									building.cancelMorph();
+									//building.cancelMorph(); 해처리를 취소하면 빌드가 다 밀려서 결국 망함
 									System.out.println("해처리 취소");
 									
 								}
 						}
 						
 						
-						if (numberOfUnitType_Zerg_Creep_Colony < 2) {
+						if (numberOfUnitType_Zerg_Creep_Colony < 3 && myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0) {
 
-							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) < 1) {
+							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) < 3) {
 								
 
 								
@@ -187,7 +200,7 @@ public class WorkerManager {
 							}
 						}
 
-						if (numberOfUnitType_Zerg_Creep_Colony>0 && numberOfUnitType_Zerg_Sunken_Colony < 2) {
+						if (numberOfUnitType_Zerg_Creep_Colony>2 && numberOfUnitType_Zerg_Sunken_Colony < 1) {
 
 							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) < 1) {
 
@@ -744,7 +757,7 @@ public class WorkerManager {
 		{
 			double dist = unit.getDistance(worker);
 
-			if ((dist < 32*3) && (closestUnit == null || (dist < closestDist)))
+			if ((dist < 32*5) && (closestUnit == null || (dist < closestDist)))
 			{
 				closestUnit = unit;
 				closestDist = dist;

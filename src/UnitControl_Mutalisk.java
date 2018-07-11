@@ -159,6 +159,18 @@ public class UnitControl_Mutalisk {
 		}
 		
 		
+		for(Unit enemy : defenseBuilding)
+		{
+			tempHP = enemy.getHitPoints();
+			if (targetHP > tempHP) {
+				targetHP = tempHP;
+				nextTarget = enemy;
+			}
+		}
+		
+		if(nextTarget!=null)
+		{return nextTarget;}
+		
 		for(Unit enemy : airToAir)
 		{
 			tempHP = enemy.getHitPoints();
@@ -196,18 +208,6 @@ public class UnitControl_Mutalisk {
 		if(nextTarget!=null)
 		{return nextTarget;}
 		
-		
-		for(Unit enemy : defenseBuilding)
-		{
-			tempHP = enemy.getHitPoints();
-			if (targetHP > tempHP) {
-				targetHP = tempHP;
-				nextTarget = enemy;
-			}
-		}
-		
-		if(nextTarget!=null)
-		{return nextTarget;}
 		
 		for(Unit enemy : airToGround)
 		{
@@ -350,7 +350,7 @@ public class UnitControl_Mutalisk {
 			moveToEndPoint = false;
 			return invader;
 		}
-
+/*
 		// 길목 주변에 악당이 등장하는 경우
 		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(SM.mySecondChokePoint.getPoint(), 8 * Config.TILE_SIZE)) {
 			if (unit.getPlayer() == enemyPlayer) {
@@ -388,7 +388,7 @@ public class UnitControl_Mutalisk {
 			moveToEndPoint = false;
 			return invader;
 		}
-		
+*/		
 		underAttack = false;
 		return invader;
 	}
