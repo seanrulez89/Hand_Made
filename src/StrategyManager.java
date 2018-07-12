@@ -1318,7 +1318,15 @@ public class StrategyManager {
 			// 서플라이가 다 꽉찼을때 새 서플라이를 지으면 지연이 많이 일어나므로, supplyMargin (게임에서의 서플라이 마진 값의 2배)만큼
 			// 부족해지면 새 서플라이를 짓도록 한다
 			// 이렇게 값을 정해놓으면, 게임 초반부에는 서플라이를 너무 일찍 짓고, 게임 후반부에는 서플라이를 너무 늦게 짓게 된다
-			int supplyMargin = 24;
+			int supplyMargin = 12;
+			
+			
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)>3)
+			{
+				supplyMargin = 36;
+			}
+			
+			
 
 			// currentSupplyShortage 를 계산한다
 			int currentSupplyShortage = MyBotModule.Broodwar.self().supplyUsed() + supplyMargin
@@ -1478,11 +1486,22 @@ public class StrategyManager {
 		BaseLocation nextExpansion = null;
 		nextExpansion = BuildOrder_Expansion.Instance().expansion();
 		
-		
-		if (BuildManager.Instance().getAvailableMinerals() > 300 && numberOfMyCombatUnitTrainingBuilding == 3 || numberOfMyCombatUnitTrainingBuilding == 5 || numberOfMyCombatUnitTrainingBuilding == 6) 
+		if (BuildManager.Instance().getAvailableMinerals() > 300 && numberOfMyCombatUnitTrainingBuilding == 3) 
 		{
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0) 
+			{
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true); /// 해처리 추가 확장 0622
+
+				System.out.println("AA");
+
+			}
+		} 
+		else if (BuildManager.Instance().getAvailableMinerals() > 300 && numberOfMyCombatUnitTrainingBuilding == 5 || numberOfMyCombatUnitTrainingBuilding == 6) 
+		{
+			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) <2 
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) <2) 
 			{
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true); /// 해처리 추가 확장 0622
@@ -1653,11 +1672,11 @@ public class StrategyManager {
 			return;
 		}
 
-		// 1초에 4번만 실행
+		/* 1초에 4번만 실행
 		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) {
 			return;
 		}
-
+		*/
 		if (myPlayer.supplyUsed() <= 390) {
 
 			for (Unit unit : myPlayer.getUnits()) {

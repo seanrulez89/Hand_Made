@@ -158,6 +158,18 @@ public class UnitControl_Mutalisk {
 
 		}
 		
+		for(Unit enemy : enemyWorker)
+		{
+			tempHP = enemy.getHitPoints();
+			if (targetHP > tempHP) {
+				targetHP = tempHP;
+				nextTarget = enemy;
+			}
+		}
+		
+		if(nextTarget!=null && nextTarget.isRepairing())
+		{return nextTarget;}
+		
 		
 		for(Unit enemy : defenseBuilding)
 		{
@@ -296,7 +308,7 @@ public class UnitControl_Mutalisk {
 	}
 	
 	
-	public Unit weAreUnderAttack(Position myPosition) {
+	public Position weAreUnderAttack(Position myPosition) {
 		// 이것이 결국  SM의 isTimeToDefense를 대체하면서 별도의 클래스로 만들어지던가 해야한다
 		Unit invader = null;
 		enemyPlayer = SM.enemyPlayer;
@@ -325,7 +337,7 @@ public class UnitControl_Mutalisk {
 		if (invader != null) {
 			underAttack = true;
 			moveToEndPoint = false;
-			return invader;
+			return invader.getPosition();
 		}
 
 		// 기지 주변에 악당이 등장하는 경우
@@ -348,7 +360,7 @@ public class UnitControl_Mutalisk {
 		if (invader != null) {
 			underAttack = true;
 			moveToEndPoint = false;
-			return invader;
+			return invader.getPosition();
 		}
 /*
 		// 길목 주변에 악당이 등장하는 경우
@@ -390,7 +402,7 @@ public class UnitControl_Mutalisk {
 		}
 */		
 		underAttack = false;
-		return invader;
+		return null;
 	}
 	
 	
@@ -568,7 +580,7 @@ public class UnitControl_Mutalisk {
 		
 		Position averagePosition = getAveragePosition(SM.myMutaliskList);
 		enoughGathered(UnitType.Zerg_Mutalisk, gatherPoint, 3, 0.5);
-		Unit invader = weAreUnderAttack(averagePosition);
+		Position invader = weAreUnderAttack(averagePosition);
 		Position nextPlace = getNextPlaceToGo();
 		Unit nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, averagePosition);
 		int timer = 0;
@@ -601,7 +613,16 @@ public class UnitControl_Mutalisk {
 
 			if (invader != null) {
 				
-				mutal.attack(invader);
+				if(mutal.getDistance(invader)>32*10)
+				{
+					mutal.move(invader);
+				}
+				else
+				{
+					mutal.attack(invader);
+				}
+				
+				
 				  // System.out.println("11111");
 				  // System.out.println("집지키러 가즈아");
 			} else if (SM.enemyMainBaseLocation == null) {

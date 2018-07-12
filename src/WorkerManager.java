@@ -146,7 +146,11 @@ public class WorkerManager {
 			for (BaseLocation myBase : myBaseLocations) {
 
 				for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(myBase.getPosition(), 30 * Config.TILE_SIZE)) {
-					if (unit.getPlayer() == StrategyManager.Instance().enemyPlayer) {
+					if (unit.getPlayer() == StrategyManager.Instance().enemyPlayer
+							&&unit.getType()!=UnitType.Terran_SCV
+							&&unit.getType()!=UnitType.Protoss_Probe
+							&&unit.getType()!=UnitType.Zerg_Drone
+							&&unit.getType()!=UnitType.Zerg_Overlord) {
 						
 						
 						
@@ -187,9 +191,9 @@ public class WorkerManager {
 						}
 						
 						
-						if (numberOfUnitType_Zerg_Creep_Colony < 3 && myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0) {
+						if (numberOfUnitType_Zerg_Creep_Colony < 1 && myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0) {
 
-							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) < 3) {
+							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) < 1) {
 								
 
 								
@@ -200,7 +204,7 @@ public class WorkerManager {
 							}
 						}
 
-						if (numberOfUnitType_Zerg_Creep_Colony>2 && numberOfUnitType_Zerg_Sunken_Colony < 1) {
+						if (myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) > 0 && numberOfUnitType_Zerg_Sunken_Colony < 1) {
 
 							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) < 1) {
 
