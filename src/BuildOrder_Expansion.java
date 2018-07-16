@@ -63,13 +63,13 @@ public class BuildOrder_Expansion {
 
 		for (BaseLocation EXPLocation : EXPLocations) {
 			
-			System.out.println(numberOfMyCombatUnitTrainingBuilding);
+//			System.out.println(numberOfMyCombatUnitTrainingBuilding);
 			
 			if(numberOfMyCombatUnitTrainingBuilding<=2)
 			{
 				if(EXPLocation.getGeysers().size()==1)
 				{
-					System.out.println("check");
+//					System.out.println("check");
 					continue;
 				}
 			}
@@ -79,7 +79,7 @@ public class BuildOrder_Expansion {
 			}
 			else if(EXPLocation.getGeysers().size()==0)
 			{
-				System.out.println("out");
+//				System.out.println("out");
 				continue;
 			}
 			

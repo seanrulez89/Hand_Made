@@ -138,8 +138,8 @@ public class UnitControl_Mutalisk {
 				}
 				else if(enemy.getType().equals(UnitType.Terran_Missile_Turret)
 						|| enemy.getType().equals(UnitType.Zerg_Spore_Colony)
-						|| enemy.getType().equals(UnitType.Protoss_Photon_Cannon)
-						|| enemy.getType().equals(UnitType.Terran_Bunker))
+						|| enemy.getType().equals(UnitType.Protoss_Photon_Cannon))
+//						|| enemy.getType().equals(UnitType.Terran_Bunker))
 				{
 					defenseBuilding.add(enemy);
 					
@@ -157,7 +157,9 @@ public class UnitControl_Mutalisk {
 			}
 
 		}
+
 		
+		/*
 		for(Unit enemy : enemyWorker)
 		{
 			tempHP = enemy.getHitPoints();
@@ -169,7 +171,7 @@ public class UnitControl_Mutalisk {
 		
 		if(nextTarget!=null && nextTarget.isRepairing())
 		{return nextTarget;}
-		
+		*/
 		
 		for(Unit enemy : defenseBuilding)
 		{
@@ -578,6 +580,13 @@ public class UnitControl_Mutalisk {
 		}
 		
 		
+
+		
+		
+		
+		
+		
+		
 		Position averagePosition = getAveragePosition(SM.myMutaliskList);
 		enoughGathered(UnitType.Zerg_Mutalisk, gatherPoint, 3, 0.5);
 		Position invader = weAreUnderAttack(averagePosition);
@@ -604,6 +613,9 @@ public class UnitControl_Mutalisk {
 
 		for (Unit mutal : SM.myMutaliskList) {
 			
+
+			
+			
 			timer = (int) (mutal.getAirWeaponCooldown() / 1.5);
 
 			
@@ -613,13 +625,13 @@ public class UnitControl_Mutalisk {
 
 			if (invader != null) {
 				
-				if(mutal.getDistance(invader)>32*10)
-				{
-					mutal.move(invader);
-				}
-				else
-				{
-					mutal.attack(invader);
+				nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, invader);
+				
+				
+				if (timer == 0) {
+					mutal.attack(nextTarget);
+				} else {
+					mutal.move(SM.myMainBaseLocation.getPosition());
 				}
 				
 				
@@ -658,7 +670,7 @@ public class UnitControl_Mutalisk {
 
 			} else if (mutalsAroundNextPlace.size() < 3 && SM.myMutaliskList.size() < 5) {
 
-				mutal.move(SM.mySecondChokePoint.getPoint());
+				mutal.move(SM.myFirstExpansionLocation.getPoint());
 				moveToEndPoint = false;
 				  // System.out.println("55555");
 			}

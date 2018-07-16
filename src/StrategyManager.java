@@ -11,9 +11,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 //import StrategyManager.CombatState;
-
+import bwapi.*;
 import bwapi.Game;
 import bwapi.Player;
 import bwapi.Position;
@@ -21,6 +22,7 @@ import bwapi.Race;
 import bwapi.TechType;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwapi.Unitset;
 import bwapi.UpgradeType;
 import bwta.BWTA;
 import bwta.BaseLocation;
@@ -174,6 +176,12 @@ public class StrategyManager {
 
 		BuildOrder_Initial initialBuildOrder = new BuildOrder_Initial();
 		initialBuildOrder.setInitialBuildOrder();
+		
+		
+
+		
+		
+		
 
 
 	}
@@ -237,7 +245,7 @@ public class StrategyManager {
 			necessaryNumberOfSunkenColony = 2;
 
 			// 방어 건물 건설 위치 설정
-			seedPositionStrategyOfMyDefenseBuildingType = BuildOrderItem.SeedPositionStrategy.SecondChokePoint; // 앞마당
+			seedPositionStrategyOfMyDefenseBuildingType = BuildOrderItem.SeedPositionStrategy.FirstChokePoint; // 앞마당
 			seedPositionStrategyOfMyCombatUnitTrainingBuildingType = BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation; // 앞마당
 			buildAtFirstChokePoint = BuildOrderItem.SeedPositionStrategy.FirstChokePoint;
 			SeedPositionSpecified = BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified;
@@ -293,6 +301,7 @@ public class StrategyManager {
 
 		UnitControl_MASTER.update();
 		
+
 
 
 	}
@@ -465,6 +474,10 @@ public class StrategyManager {
 		Position myAttackedBuildingPosition = null; 
 
 		
+		
+		
+		
+		
 		// seedPositionStrategyOfMyDefenseBuildingType 이것이 정하는 위치가 곧 집결지가 된다
 		// 아래 사전 정의된 경우를 제외하고서는 specified를 쓰면 된다
 		// 활용이 어렵다. 가령 공격을 동시에 여러 지점에서 받는다면 어디로 갈것인가?
@@ -490,6 +503,25 @@ public class StrategyManager {
 			myDefenseBuildingPosition = myMainBaseLocation.getPosition();
 			break;
 		}
+		
+		
+		if (isInitialBuildOrderFinished == true) {
+			myDefenseBuildingPosition = setTargetPositionTwo(myFirstExpansionLocation.getPosition(), mySecondChokePoint.getCenter(), 32);
+		}
+		else
+		{
+			myDefenseBuildingPosition = setTargetPositionTwo(myFirstExpansionLocation.getPosition(), myFirstChokePoint.getCenter(), 32);
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 
 		// 아군 공격유닛을 방어 건물이 세워져있는 위치로 배치시킵니다
 		// 아군 공격유닛을 아군 방어 건물 뒤쪽에 배치시켰다가 적들이 방어 건물을 공격하기 시작했을 때 다함께 싸우게하면 더 좋을 것입니다
@@ -1486,13 +1518,26 @@ public class StrategyManager {
 		BaseLocation nextExpansion = null;
 		nextExpansion = BuildOrder_Expansion.Instance().expansion();
 		
-		if (BuildManager.Instance().getAvailableMinerals() > 300 && numberOfMyCombatUnitTrainingBuilding == 3) 
+		
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Drone) > 22 && numberOfMyCombatUnitTrainingBuilding == 2 && nextExpansion!=null) 
 		{
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0) 
 			{
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true); /// 해처리 추가 확장 0622
+						nextExpansion.getTilePosition(), true); /// 해처리 추가 확장 0622
+
+				System.out.println("AA333");
+
+			}
+		}
+		else if (BuildManager.Instance().getAvailableMinerals() > 300 && numberOfMyCombatUnitTrainingBuilding == 3) 
+		{
+			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0) 
+			{
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false); /// 해처리 추가 확장 0622
 
 				System.out.println("AA");
 
@@ -1503,8 +1548,8 @@ public class StrategyManager {
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) <2 
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) <2) 
 			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true); /// 해처리 추가 확장 0622
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false); /// 해처리 추가 확장 0622
 
 				System.out.println("AA");
 
@@ -1515,14 +1560,14 @@ public class StrategyManager {
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0) 
 			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
 						nextExpansion.getTilePosition(), false); /// 해처리 추가 확장 0622
 
 				System.out.println("CC");
 
 				if (nextExpansion.getGeysers().size()==1) 
 				{
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor,
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 							nextExpansion.getTilePosition(), false); /// 해처리 추가 확장 0622
 
 					System.out.println("DD");
@@ -1571,10 +1616,10 @@ public class StrategyManager {
 				isTimeToStartUpgradeType2 = true;
 			}
 			// 가스 좀 남으면 하라고 넣음
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 || myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0 && myPlayer.gas() > 100 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5) {
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 || myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0 && myPlayer.gas() > 100 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5){
 				isTimeToStartUpgradeType3 = true;
 			}
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 || myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0 && myPlayer.gas() > 300 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5){
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 || myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0 && myPlayer.gas() > 100 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5){
 				isTimeToStartUpgradeType4 = true;
 			}
 			// 러커는 최우선으로 리서치한다
@@ -1639,8 +1684,9 @@ public class StrategyManager {
 		if (isTimeToStartUpgradeType3) {
 			if (myPlayer.getUpgradeLevel(necessaryUpgradeType3) < 3
 					&& myPlayer.isUpgrading(necessaryUpgradeType3) == false
+					&& myPlayer.isUpgrading(necessaryUpgradeType4) == false
 					&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType3) == 0) {
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType3, false);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType3, true);
 			}
 		}
 
@@ -1655,9 +1701,19 @@ public class StrategyManager {
 		// BWAPI 4.1.2 의 버그때문에, 오버로드 업그레이드를 위해서는 반드시 Zerg_Lair 가 있어야함
 		// 이말인즉 해처리 잔뜩 + 하이브 1개 있으면 업그레이드 못하고 꼭 레어를 필요로 한다는 의미이다.
 		if (myRace == Race.Zerg) {
+			
+			int numberOfLair = 0;
+			numberOfLair += myPlayer.allUnitCount(UnitType.Zerg_Lair);
+			numberOfLair += BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Lair);
+			numberOfLair += ConstructionManager.Instance()
+					.getConstructionQueueItemCount(UnitType.Zerg_Lair, null);
+			
+			
+			
+			
 			if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Pneumatized_Carapace) > 0) {
-				if (myPlayer.allUnitCount(UnitType.Zerg_Lair) == 0
-						&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Lair) == 0) {
+				if (numberOfLair == 0) 
+				{
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Lair, false);
 				}
 			}
@@ -1672,22 +1728,24 @@ public class StrategyManager {
 			return;
 		}
 
-		/* 1초에 4번만 실행
-		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) {
+		// 1초에 4번만 실행
+		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) {
 			return;
 		}
-		*/
+		
 		if (myPlayer.supplyUsed() <= 390) {
 
 			for (Unit unit : myPlayer.getUnits()) {
 
-				if (unit.getType() == InformationManager.Instance().getBasicCombatBuildingType()) {
+				if (unit.getType() == UnitType.Zerg_Hatchery
+						||unit.getType() == UnitType.Zerg_Lair
+						||unit.getType() == UnitType.Zerg_Hive) {
 
 					if (unit.isTraining() == false || unit.getLarva().size() > 0) {
 
 						UnitType nextUnitTypeToTrain = getNextCombatUnitTypeToTrain();
 
-						if (BuildManager.Instance().buildQueue.getItemCount(nextUnitTypeToTrain) == 0) {
+						if (BuildManager.Instance().buildQueue.getItemCount(nextUnitTypeToTrain) < myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)) {
 
 							BuildManager.Instance().buildQueue.queueAsLowestPriority(nextUnitTypeToTrain, false);
 
