@@ -1346,14 +1346,14 @@ public class StrategyManager {
 
 		// 게임에서는 서플라이 값이 200까지 있지만, BWAPI 에서는 서플라이 값이 400까지 있다
 		// 저글링 1마리가 게임에서는 서플라이를 0.5 차지하지만, BWAPI 에서는 서플라이를 1 차지한다
-		if (MyBotModule.Broodwar.self().supplyTotal() <= 400) {
+		if (MyBotModule.Broodwar.self().supplyTotal() < 400) {
 			// 서플라이가 다 꽉찼을때 새 서플라이를 지으면 지연이 많이 일어나므로, supplyMargin (게임에서의 서플라이 마진 값의 2배)만큼
 			// 부족해지면 새 서플라이를 짓도록 한다
 			// 이렇게 값을 정해놓으면, 게임 초반부에는 서플라이를 너무 일찍 짓고, 게임 후반부에는 서플라이를 너무 늦게 짓게 된다
 			int supplyMargin = 12;
 			
 			
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)>3)
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)>2)
 			{
 				supplyMargin = 36;
 			}
@@ -1527,23 +1527,18 @@ public class StrategyManager {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 						nextExpansion.getTilePosition(), true); /// 해처리 추가 확장 0622
 
-				System.out.println("AA333");
+				System.out.println("CC");
 
+				if (nextExpansion.getGeysers().size()>0) 
+				{
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
+							nextExpansion.getTilePosition(), false); /// 해처리 추가 확장 0622
+
+					System.out.println("DD");
+				}
 			}
 		}
 		else if (BuildManager.Instance().getAvailableMinerals() > 300 && numberOfMyCombatUnitTrainingBuilding == 3) 
-		{
-			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 
-					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0) 
-			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false); /// 해처리 추가 확장 0622
-
-				System.out.println("AA");
-
-			}
-		} 
-		else if (BuildManager.Instance().getAvailableMinerals() > 300 && numberOfMyCombatUnitTrainingBuilding == 5 || numberOfMyCombatUnitTrainingBuilding == 6) 
 		{
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) <2 
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) <2) 
@@ -1555,17 +1550,29 @@ public class StrategyManager {
 
 			}
 		} 
-		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding < 10 && nextExpansion!=null) 
+		else if (BuildManager.Instance().getAvailableMinerals() > 300 && numberOfMyCombatUnitTrainingBuilding == 5) 
 		{
-			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 
-					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0) 
+			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) <2 
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) <2) 
+			{
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false); /// 해처리 추가 확장 0622
+
+				System.out.println("AA");
+
+			}
+		} 
+		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding < 13 && nextExpansion!=null) 
+		{
+			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) <2 
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) <2) 
 			{
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
 						nextExpansion.getTilePosition(), false); /// 해처리 추가 확장 0622
 
 				System.out.println("CC");
 
-				if (nextExpansion.getGeysers().size()==1) 
+				if (nextExpansion.getGeysers().size()>0) 
 				{
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 							nextExpansion.getTilePosition(), false); /// 해처리 추가 확장 0622
@@ -1616,10 +1623,10 @@ public class StrategyManager {
 				isTimeToStartUpgradeType2 = true;
 			}
 			// 가스 좀 남으면 하라고 넣음
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 || myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0 && myPlayer.gas() > 100 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5){
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 1 && myPlayer.gas() > 100 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5){
 				isTimeToStartUpgradeType3 = true;
 			}
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 || myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0 && myPlayer.gas() > 100 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5){
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 && myPlayer.gas() > 100 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5){
 				isTimeToStartUpgradeType4 = true;
 			}
 			// 러커는 최우선으로 리서치한다
@@ -1636,6 +1643,17 @@ public class StrategyManager {
 					&& myPlayer.hasResearched(necessaryTechType2) == true) {
 				isTimeToStartResearchTech3 = true;
 			}
+			
+			if (myPlayer.getUpgradeLevel(necessaryUpgradeType3)==2 && myPlayer.completedUnitCount(UnitType.Zerg_Hive)==0)
+			{
+				isTimeToStartUpgradeType3 = false;
+			}
+			
+			if (myPlayer.getUpgradeLevel(necessaryUpgradeType4)==2 && myPlayer.completedUnitCount(UnitType.Zerg_Hive)==0)
+			{
+				isTimeToStartUpgradeType3 = false;
+			}		
+			
 		}
 
 		// 테크 리서치는 높은 우선순위로 우선적으로 실행
@@ -1684,9 +1702,16 @@ public class StrategyManager {
 		if (isTimeToStartUpgradeType3) {
 			if (myPlayer.getUpgradeLevel(necessaryUpgradeType3) < 3
 					&& myPlayer.isUpgrading(necessaryUpgradeType3) == false
-					&& myPlayer.isUpgrading(necessaryUpgradeType4) == false
 					&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType3) == 0) {
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType3, true);
+				
+				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) 
+				{
+					if(unit.getType().equals(UnitType.Zerg_Spire) && unit.isUpgrading()==false)
+					{
+						BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType3, true, unit.getID());	
+					}
+				}
+				
 			}
 		}
 
@@ -1694,7 +1719,7 @@ public class StrategyManager {
 			if (myPlayer.getUpgradeLevel(necessaryUpgradeType4) < 3
 					&& myPlayer.isUpgrading(necessaryUpgradeType4) == false
 					&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType4) == 0) {
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType4, false);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType4, true);
 			}
 		}
 
@@ -1745,7 +1770,7 @@ public class StrategyManager {
 
 						UnitType nextUnitTypeToTrain = getNextCombatUnitTypeToTrain();
 
-						if (BuildManager.Instance().buildQueue.getItemCount(nextUnitTypeToTrain) < myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)) {
+						if (BuildManager.Instance().buildQueue.getItemCount(nextUnitTypeToTrain) < myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)*2) {
 
 							BuildManager.Instance().buildQueue.queueAsLowestPriority(nextUnitTypeToTrain, false);
 

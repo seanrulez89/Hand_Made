@@ -63,13 +63,11 @@ public class BuildOrder_Expansion {
 
 		for (BaseLocation EXPLocation : EXPLocations) {
 			
-//			System.out.println(numberOfMyCombatUnitTrainingBuilding);
-			
+		/*
 			if(numberOfMyCombatUnitTrainingBuilding<=2)
 			{
 				if(EXPLocation.getGeysers().size()==1)
 				{
-//					System.out.println("check");
 					continue;
 				}
 			}
@@ -79,10 +77,9 @@ public class BuildOrder_Expansion {
 			}
 			else if(EXPLocation.getGeysers().size()==0)
 			{
-//				System.out.println("out");
 				continue;
 			}
-			
+			*/
 
 			for (BaseLocation myBaseLocation : myBaseLocations) {
 				distanceFromMyLocation = EXPLocation.getGroundDistance(myBaseLocation);
@@ -90,13 +87,11 @@ public class BuildOrder_Expansion {
 				for (BaseLocation enemyBaseLocation : enemyBaseLocations) {
 					distanceFromEnemyLocation = EXPLocation.getGroundDistance(enemyBaseLocation);
 
-					if (minDistance > distanceFromMyLocation) {
-						if (distanceFromMyLocation < distanceFromEnemyLocation) {
+					if (minDistance > distanceFromMyLocation && distanceFromMyLocation < distanceFromEnemyLocation) 
+					{
 							minDistance = distanceFromMyLocation;
 							nextEXP = EXPLocation;
-							// System.out.println(nextEXP);
-						}
-
+					
 					}
 				}
 			}

@@ -28,7 +28,7 @@ public class BuildOrder_Last {
 	
 	public void lastBuildOrder() {
 
-		if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Attacks) >= 1)
+		if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) >= 1)
 		{
 
 			int chamberNumber = myPlayer.allUnitCount(UnitType.Zerg_Evolution_Chamber)
@@ -102,19 +102,12 @@ public class BuildOrder_Last {
 
 			
 			
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) == 1 && greaterSpireNumber == 0)
-			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Greater_Spire,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
-				
-			}
-			
-			if (greaterSpireNumber == 1 && spireNumber == 1)
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) == 1 && spireNumber == 1)
 			{
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Spire,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
-				
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);				
 			}
+			
 			
 			if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) == 1 && ultraliskCavernNumber == 0)
 			{

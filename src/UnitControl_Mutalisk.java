@@ -85,12 +85,15 @@ public class UnitControl_Mutalisk {
 				{
 					airToAir.add(enemy);					
 				}
-				else if(enemy.getType().equals(UnitType.Terran_Ghost)
+				else if(enemy.getType().equals(UnitType.Terran_Ghost) // 공중방어 건물도 지대공으로 넣어봤다 180718
 						|| enemy.getType().equals(UnitType.Terran_Goliath)
 						|| enemy.getType().equals(UnitType.Terran_Marine)
 						|| enemy.getType().equals(UnitType.Zerg_Hydralisk)
 						|| enemy.getType().equals(UnitType.Protoss_Dragoon)
-						|| enemy.getType().equals(UnitType.Protoss_Archon))
+						|| enemy.getType().equals(UnitType.Protoss_Archon)
+						|| enemy.getType().equals(UnitType.Terran_Missile_Turret)
+						|| enemy.getType().equals(UnitType.Zerg_Spore_Colony)
+						|| enemy.getType().equals(UnitType.Protoss_Photon_Cannon))
 				{
 					groundToAir.add(enemy);					
 				}
@@ -159,7 +162,7 @@ public class UnitControl_Mutalisk {
 		}
 
 		
-		/*
+		
 		for(Unit enemy : enemyWorker)
 		{
 			tempHP = enemy.getHitPoints();
@@ -169,21 +172,16 @@ public class UnitControl_Mutalisk {
 			}
 		}
 		
-		if(nextTarget!=null && nextTarget.isRepairing())
-		{return nextTarget;}
-		*/
-		
-		for(Unit enemy : defenseBuilding)
-		{
-			tempHP = enemy.getHitPoints();
-			if (targetHP > tempHP) {
-				targetHP = tempHP;
-				nextTarget = enemy;
-			}
-		}
-		
 		if(nextTarget!=null)
-		{return nextTarget;}
+		{
+			 if(nextTarget.isRepairing()||nextTarget.isConstructing())
+			 {return nextTarget;}
+		}
+				
+		
+		
+		
+
 		
 		for(Unit enemy : airToAir)
 		{
@@ -198,6 +196,18 @@ public class UnitControl_Mutalisk {
 		{return nextTarget;}
 		
 		for(Unit enemy : groundToAir)
+		{
+			tempHP = enemy.getHitPoints();
+			if (targetHP > tempHP) {
+				targetHP = tempHP;
+				nextTarget = enemy;
+			}
+		}
+		
+		if(nextTarget!=null)
+		{return nextTarget;}
+		
+		for(Unit enemy : defenseBuilding)
 		{
 			tempHP = enemy.getHitPoints();
 			if (targetHP > tempHP) {
@@ -614,6 +624,18 @@ public class UnitControl_Mutalisk {
 		for (Unit mutal : SM.myMutaliskList) {
 			
 
+			if(mutal.isIrradiated())
+			{
+				mutal.move(SM.enemyMainBaseLocation.getPosition());
+				continue;
+			}
+			
+			if(mutal.isUnderStorm())
+			{
+				mutal.move(SM.myMainBaseLocation.getPosition());
+			}
+			
+			
 			
 			
 			timer = (int) (mutal.getAirWeaponCooldown() / 1.5);
