@@ -9,7 +9,7 @@ public class BuildOrder_Expansion {
 
 	
 
-	public BaseLocation expansion() {
+	public static BaseLocation expansion() {
 		
 		if(StrategyManager.Instance().enemyMainBaseLocation==null)
 		{
@@ -100,11 +100,14 @@ public class BuildOrder_Expansion {
 		return nextEXP;
 	}
 
+	
+	/*
 	private static BuildOrder_Expansion instance = new BuildOrder_Expansion();
 
 	/// static singleton 객체를 리턴합니다
 	public static BuildOrder_Expansion Instance() {
 		return instance;
 	}
+	*/
 
 }

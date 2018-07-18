@@ -162,7 +162,7 @@ public class UnitControl_Mutalisk {
 		}
 
 		
-		
+		/*
 		for(Unit enemy : enemyWorker)
 		{
 			tempHP = enemy.getHitPoints();
@@ -174,10 +174,10 @@ public class UnitControl_Mutalisk {
 		
 		if(nextTarget!=null)
 		{
-			 if(nextTarget.isRepairing()||nextTarget.isConstructing())
+			 if(nextTarget.isRepairing())
 			 {return nextTarget;}
 		}
-				
+		*/	
 		
 		
 		
@@ -624,6 +624,8 @@ public class UnitControl_Mutalisk {
 		for (Unit mutal : SM.myMutaliskList) {
 			
 
+			timer = (int) (mutal.getAirWeaponCooldown() / 1.5);
+			
 			if(mutal.isIrradiated())
 			{
 				mutal.move(SM.enemyMainBaseLocation.getPosition());
@@ -633,12 +635,44 @@ public class UnitControl_Mutalisk {
 			if(mutal.isUnderStorm())
 			{
 				mutal.move(SM.myMainBaseLocation.getPosition());
+				continue;
 			}
 			
+			if(nextTarget != null && nextTarget.isStimmed())
+			{
+				int medic = 0;
+				for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(nextTarget.getPosition(), 32*2))
+				{
+					if(unit.getType().equals(UnitType.Terran_Medic))
+					{
+						medic++;
+					}
+				}
+				
+				if(medic!=0)
+				{
+					mutal.move(SM.myMainBaseLocation.getPosition());
+			//		System.out.println("STP01");
+					continue;
+				}
+				
+
+			}
+			
+			/*
+			if(invader != null && getNextTargetOf(UnitType.Zerg_Mutalisk, invader).isStimmed())
+			{
+				mutal.move(SM.myMainBaseLocation.getPosition());
+				System.out.println("STP02");
+				continue;				
+			}
+			*/
 			
 			
 			
-			timer = (int) (mutal.getAirWeaponCooldown() / 1.5);
+			
+			
+			
 
 			
 			 // System.out.println("underAttack : " + underAttack);

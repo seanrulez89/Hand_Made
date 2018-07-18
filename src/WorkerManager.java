@@ -28,6 +28,25 @@ public class WorkerManager {
 		// 1초에 1번만 실행한다
 		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
 
+		int mineralWorkerCount = 0;
+		for (Unit worker : workerData.getWorkers()) 
+		{
+			if (worker.isCompleted() && worker != null && workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Minerals) 
+			{
+				mineralWorkerCount++;
+			}
+		}
+		
+		if(mineralWorkerCount==0)//이렇게 하면 다음 업데이트에서는 할당된 미네랄 일꾼이 있다고 생각해서 결국 채취를 못하고 재분배 하는 문제가 발생함
+		{
+			for (Unit worker : workerData.getWorkers())
+			{
+				setMineralWorker(worker);
+			}
+			return;
+		}
+			
+		
 		updateWorkerStatus();
 		handleGasWorkers();
 		handleIdleWorkers();

@@ -66,23 +66,23 @@ public class BuildOrder_Last {
 				if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) < 3
 						&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
 						&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Carapace, true);
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Carapace, true);
 				}
 			}
 			
 			
 			if (queensNestNumber == 0 && BuildManager.Instance().getAvailableMinerals() > UnitType.Zerg_Queens_Nest.mineralPrice()) {
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Queens_Nest,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Queens_Nest,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				
 	//			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Spire,
 	//					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 
 			}
 			
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Queens_Nest) == 1 && hiveNumber == 0 && BuildManager.Instance().getAvailableMinerals() > UnitType.Zerg_Hive.mineralPrice())
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Queens_Nest) == 1 && hiveNumber == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hive,
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hive,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);	
 			}
 			
@@ -91,7 +91,7 @@ public class BuildOrder_Last {
 				if (myPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) == 0
 						&& myPlayer.isUpgrading(UpgradeType.Adrenal_Glands) == false
 						&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Adrenal_Glands) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Adrenal_Glands, true);
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Adrenal_Glands, true);
 				}
 				
 				
@@ -104,8 +104,9 @@ public class BuildOrder_Last {
 			
 			if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) == 1 && spireNumber == 1)
 			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Spire,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);				
+			//	BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony, true);	
+			//	BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Spire, BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			//	BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Spore_Colony, false);
 			}
 			
 			
@@ -122,7 +123,7 @@ public class BuildOrder_Last {
 				if (myPlayer.getUpgradeLevel(UpgradeType.Chitinous_Plating) == 0
 						&& myPlayer.isUpgrading(UpgradeType.Chitinous_Plating) == false
 						&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Chitinous_Plating) == 0) {
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Chitinous_Plating, true);
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Chitinous_Plating, true);
 				}
 				
 				
