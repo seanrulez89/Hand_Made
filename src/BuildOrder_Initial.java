@@ -129,8 +129,8 @@ public class BuildOrder_Initial {
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Mutalisk,
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Mutalisk,
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+//		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Mutalisk,
+//				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		
 //		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 //				BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
