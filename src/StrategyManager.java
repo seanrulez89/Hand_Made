@@ -53,7 +53,7 @@ public class StrategyManager {
 	public UnitType myZergling; /// 저글링
 	public UnitType myMutalisk; /// 뮤탈리스크
 	public UnitType myUltralisk; /// #미정
-	public UnitType myCombatUnitType4; /// #미정
+	public UnitType myHydralisk; /// #미정
 	public UnitType myCombatUnitType5; /// #미정
 
 	// 아군 특수 유닛 첫번째, 두번째 타입
@@ -64,19 +64,19 @@ public class StrategyManager {
 	public int necessaryNumberOfZergling; /// 공격을 시작하기위해 필요한 최소한의 유닛 숫자
 	public int necessaryNumberOfMutalisk; /// 공격을 시작하기위해 필요한 최소한의 유닛 숫자
 	public int necessaryNumberOfUltralisk; /// 공격을 시작하기위해 필요한 최소한의 유닛 숫자
-	public int necessaryNumberOfCombatUnitType4; /// 공격을 시작하기위해 필요한 최소한의 유닛 숫자
+	public int necessaryNumberOfHydralisk; /// 공격을 시작하기위해 필요한 최소한의 유닛 숫자
 	public int necessaryNumberOfCombatUnitType5;
 
 	public int myKilledZerglings; /// 첫번째 유닛 타입의 사망자 숫자 누적값
 	public int myKilledMutalisks; /// 두번째 유닛 타입의 사망자 숫자 누적값
 	public int myKilledUltralisks;
-	public int myKilledCombatUnitCount4;
+	public int myKilledHydralisks;
 	public int myKilledCombatUnitCount5;
 
 	public int numberOfCompletedZerglings; /// 첫번째 유닛 타입의 현재 유닛 숫자
 	public int numberOfCompletedMutalisks; /// 두번째 유닛 타입의 현재 유닛 숫자
 	public int numberOfCompletedUltralisks; /// 세번째 유닛 타입의 현재 유닛 숫자
-	public int numberOfCompletedCombatUnitType4; /// 네번째 유닛 타입의 현재 유닛 숫자
+	public int numberOfCompletedHydralisks; /// 네번째 유닛 타입의 현재 유닛 숫자
 	public int numberOfCompletedCombatUnitType5;
 
 
@@ -85,7 +85,7 @@ public class StrategyManager {
 	public ArrayList<Unit> myZerglingList = new ArrayList<Unit>(); // 저글링
 	public ArrayList<Unit> myMutaliskList = new ArrayList<Unit>(); // 뮤탈리스크
 	public ArrayList<Unit> myUltraliskList = new ArrayList<Unit>(); // 울트라리스크
-	public ArrayList<Unit> myCombatUnitType4List = new ArrayList<Unit>(); // #미정
+	public ArrayList<Unit> myHydraliskList = new ArrayList<Unit>(); // #미정
 	public ArrayList<Unit> myCombatUnitType5List = new ArrayList<Unit>(); // #미정
 
 	// 아군 방어 건물 첫번째 타입
@@ -200,7 +200,7 @@ public class StrategyManager {
 		myKilledZerglings = 0; // 죽은 마린 숫자
 		myKilledMutalisks = 0;
 		myKilledUltralisks = 0;
-		myKilledCombatUnitCount4 = 0;
+		myKilledHydralisks = 0;
 		myKilledCombatUnitCount5 = 0;
 
 		numberOfCompletedEnemyCombatUnit = 0;
@@ -218,7 +218,7 @@ public class StrategyManager {
 			myZergling = UnitType.Zerg_Zergling;
 			myMutalisk = UnitType.Zerg_Mutalisk;
 			myUltralisk = UnitType.Zerg_Ultralisk;
-			// myCombatUnitType4 = UnitType.Terran_Science_Vessel;
+			myHydralisk = UnitType.Zerg_Hydralisk;
 			// myCombatUnitType5 = UnitType.Terran_Wraith;
 
 			// 특수 유닛 종류 설정
@@ -235,7 +235,7 @@ public class StrategyManager {
 			// MaxNumberOfCombatUnitType4 = 4 ;
 
 			// 공격 유닛 생산 순서 설정
-			buildOrderArrayOfMyCombatUnitType = new int[] {1,1,2,1,1,3}; // 마린 마린 마린 메딕 시즈 베슬
+			buildOrderArrayOfMyCombatUnitType = new int[] {2,4}; // 마린 마린 마린 메딕 시즈 베슬
 			nextTargetIndexOfBuildOrderArray = 0; // 다음 생산 순서 index
 
 			// 방어 건물 종류 및 건설 갯수 설정
@@ -531,7 +531,7 @@ public class StrategyManager {
 
 			// 0704 각 타입별 유닛 컨트롤 기능을 구현하면 굳이 현재 메서드에서 모든 유닛을 제어하지 않아도 된다
 			// 이 부분에서 방어할 지역이나 콕 집어 공격할 유닛만 리턴해주고, 그걸 개별 유닛컨트롤 클래스에서 알아서 적절히 대응을 하는 방법도 고려
-			if(unit.getType() == UnitType.Zerg_Mutalisk) // 0627 뮤탈코드 테스트를 위한 건너뛰기 조치
+			if(unit.getType() == UnitType.Zerg_Mutalisk || unit.getType() == UnitType.Zerg_Hydralisk) // 0627 뮤탈코드 테스트를 위한 건너뛰기 조치
 			{
 				continue;
 			}
@@ -1538,15 +1538,23 @@ public class StrategyManager {
 				}
 			}
 		}
-		else if (BuildManager.Instance().getAvailableMinerals() > 300 && numberOfMyCombatUnitTrainingBuilding == 3) 
+		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding == 3) 
 		{
-			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) <2 
-					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) <2) 
+			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) ==0 
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) ==0) 
 			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
-						BuildOrderItem.SeedPositionStrategy.FirstChokePoint, false); /// 해처리 추가 확장 0622
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
+						nextExpansion.getTilePosition(), true); /// 해처리 추가 확장 0622
 
-				System.out.println("3");
+				System.out.println("3-1");
+
+				if (nextExpansion.getGeysers().size()>0) 
+				{
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
+							nextExpansion.getTilePosition(), false); /// 해처리 추가 확장 0622
+
+					System.out.println("3-2");
+				}
 
 			}
 		}
@@ -1586,8 +1594,8 @@ public class StrategyManager {
 		} 
 		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding < 13 && nextExpansion!=null) 
 		{
-			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) <2 
-					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) <2) 
+			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) ==0 
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) ==0) 
 			{
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
 						nextExpansion.getTilePosition(), false); /// 해처리 추가 확장 0622
@@ -1869,7 +1877,25 @@ public class StrategyManager {
 		else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 2) {
 
 
-				nextUnitTypeToTrain = myMutalisk;
+			if(myPlayer.minerals() > 1000)
+			{
+				nextUnitTypeToTrain = myZergling;
+			}
+			else
+			{
+				if(myPlayer.completedUnitCount(UnitType.Zerg_Spire)>0)
+				{
+					nextUnitTypeToTrain = myMutalisk;
+				}
+				else
+				{
+					nextUnitTypeToTrain = myHydralisk;
+				}
+				
+			}
+			
+			
+				
 			
 			
 		} else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 3) {
@@ -1890,6 +1916,19 @@ public class StrategyManager {
 			
 			
 		} 
+		else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 4) {
+
+
+			if(myPlayer.minerals() > 1000)
+			{
+				nextUnitTypeToTrain = myZergling;
+			}
+			else
+			{
+				nextUnitTypeToTrain = myHydralisk;
+			}
+	
+		}
 		else 
 		{
 			;
@@ -2184,6 +2223,7 @@ public class StrategyManager {
 		myZerglingList.clear();
 		myMutaliskList.clear();
 		myUltraliskList.clear();
+		myHydraliskList.clear();
 
 		for (Unit unit : myPlayer.getUnits()) {
 			if (unit == null || unit.exists() == false || unit.getHitPoints() <= 0)
@@ -2198,8 +2238,8 @@ public class StrategyManager {
 			} else if (unit.getType() == myUltralisk) {
 				myUltraliskList.add(unit);
 				myAllCombatUnitList.add(unit);
-			} else if (unit.getType() == myCombatUnitType4) {
-				myCombatUnitType4List.add(unit);
+			} else if (unit.getType() == myHydralisk) {
+				myHydraliskList.add(unit);
 				myAllCombatUnitList.add(unit);
 			}
 			else if (unit.getType() == myCombatUnitType5) {

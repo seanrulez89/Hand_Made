@@ -73,6 +73,7 @@ public class WorkerManager {
 			}
 
 			if (worker.isUnderAttack() && workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Build) {
+				
 				Unit target = getClosestEnemyUnitFromWorker(worker);
 
 				if (target != null) {

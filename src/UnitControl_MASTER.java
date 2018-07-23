@@ -9,7 +9,7 @@ import bwta.*;
 public class UnitControl_MASTER {
 
 	UnitControl_Mutalisk Mutalisk;// = new UnitControl_Mutalisk();
-	
+	UnitControl_Hydralisk Hydralisk;
 	
 	public void update() {
 		
@@ -18,7 +18,12 @@ public class UnitControl_MASTER {
 				&& MyBotModule.Broodwar.getFrameCount() % 6 == 0) // 0.25초마다 실행
 		{
 			Mutalisk = new UnitControl_Mutalisk();
-			Mutalisk.update();			
+			Mutalisk.update();	
+			
+			Hydralisk = new UnitControl_Hydralisk();
+			Hydralisk.update();	
+			
+			
 		}
 		
 		

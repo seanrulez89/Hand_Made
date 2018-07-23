@@ -5,11 +5,7 @@ import bwapi.*;
 import bwta.*;
 
 
-public class UnitControl_Mutalisk {
-	
-	
-
-	
+public class UnitControl_Hydralisk {
 	
 	private CommandUtil commandUtil = new CommandUtil();
 	StrategyManager SM = StrategyManager.Instance();
@@ -30,7 +26,7 @@ public class UnitControl_Mutalisk {
 
 
 	StrategyManager.CombatState CombatStateNow = SM.combatState;
-	ArrayList<Unit> mutalisks = SM.myMutaliskList;
+	ArrayList<Unit> Hydralisks = SM.myHydraliskList;
 
 	public static boolean moveToEndPoint = false;
 	public static boolean underAttack = true;
@@ -46,9 +42,10 @@ public class UnitControl_Mutalisk {
 		
 		int inRange = 0;
 		
-		if(myUnitType == UnitType.Zerg_Mutalisk)
+		if(myUnitType == UnitType.Zerg_Hydralisk)
 		{
-			inRange = 7 * Config.TILE_SIZE;
+			inRange = 6 * Config.TILE_SIZE;
+//			System.out.println("seekRange : " + myUnitType.seekRange());
 		}
 		else
 		{
@@ -75,7 +72,7 @@ public class UnitControl_Mutalisk {
 				if(enemy.getType().equals(UnitType.Terran_Valkyrie)
 						|| enemy.getType().equals(UnitType.Terran_Wraith)
 						|| enemy.getType().equals(UnitType.Terran_Battlecruiser)
-						|| enemy.getType().equals(UnitType.Zerg_Mutalisk)
+						|| enemy.getType().equals(UnitType.Zerg_Hydralisk)
 						|| enemy.getType().equals(UnitType.Zerg_Devourer)
 						|| enemy.getType().equals(UnitType.Zerg_Scourge)
 						|| enemy.getType().equals(UnitType.Protoss_Scout)
@@ -374,7 +371,7 @@ public class UnitControl_Mutalisk {
 			moveToEndPoint = false;
 			return invader.getPosition();
 		}
-/*
+		/*
 		// 길목 주변에 악당이 등장하는 경우
 		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(SM.mySecondChokePoint.getPoint(), 8 * Config.TILE_SIZE)) {
 			if (unit.getPlayer() == enemyPlayer) {
@@ -391,9 +388,9 @@ public class UnitControl_Mutalisk {
 		if (invader != null) {
 			underAttack = true;
 			moveToEndPoint = false;
-			return invader;
+			return invader.getPosition();
 		}
-		
+				
 		// 길목 주변에 악당이 등장하는 경우
 		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(SM.myFirstChokePoint.getPoint(), 8 * Config.TILE_SIZE)) {
 			if (unit.getPlayer() == enemyPlayer) {
@@ -423,7 +420,7 @@ public class UnitControl_Mutalisk {
 
 		int numberOfGathered = 0;
 		int numberOfTotal = 0;
-		int numberOfMinimum = 9;
+		int numberOfMinimum = 5;
 
 		if (targetPosition == null) {
 			 // System.out.println("아직 기지 못 찾음");
@@ -436,8 +433,8 @@ public class UnitControl_Mutalisk {
 
 		if (myUnitType == SM.myZergling) {
 			numberOfTotal = SM.myZerglingList.size();
-		} else if (myUnitType == SM.myMutalisk) {
-			numberOfTotal = SM.myMutaliskList.size();
+		} else if (myUnitType == SM.myHydralisk) {
+			numberOfTotal = SM.myHydraliskList.size();
 		} else {
 
 		}
@@ -491,7 +488,7 @@ public class UnitControl_Mutalisk {
 		{
 			Unit tempEnemy = null;
 			
-			for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 7 * Config.TILE_SIZE)) 
+			for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 6 * Config.TILE_SIZE)) 
 			{
 				
 				
@@ -523,7 +520,7 @@ public class UnitControl_Mutalisk {
 		
 		averagePosition = new Position(x,y);
 		
-		MyBotModule.Broodwar.drawCircleMap(averagePosition, 7 * Config.TILE_SIZE, Color.Red);
+		MyBotModule.Broodwar.drawCircleMap(averagePosition, 6 * Config.TILE_SIZE, Color.Red);
 		
 		return averagePosition;
 	}
@@ -542,56 +539,9 @@ public class UnitControl_Mutalisk {
 		
 		Position nextPlace = bwta.BWTA.getNearestChokepoint(SM.mySecondChokePoint.getCenter()).getCenter();
 
-		if (enemyMainBaseLocation != null) {
-			int x, y;
-
-			x = enemyMainBaseLocation.getX();
-			y = enemyMainBaseLocation.getY();
-
-			if (x < 63 * 32) {
-				x = 0;
-			} else {
-				x = 127 * 32;
-			}
-
-			if (y < 63 * 32) {
-				y = 0;
-			} else {
-				y = 127 * 32;
-			}
-
-			endPoint = new Position(x, y);
-
-			int a = 63 * 32;
-			int b = 63 * 32;
-
-
-			a = (enemyMainBaseLocation.getX() + myMainBaseLocation.getX()) / 2;
-			b = (enemyMainBaseLocation.getY() + myMainBaseLocation.getY()) / 2;
-
-			if (50 * 32 < a && a < 70 * 32) {
-
-				if (enemyMainBaseLocation.getX() < myMainBaseLocation.getX()) {
-					a = myMainBaseLocation.getX() / 2;
-				} else {
-					a = enemyMainBaseLocation.getX() / 2;
-				}
-			}
-
-			if (a / 32 == 59)//  대각이거나 가로로 나란하거나
-			{
-				if (enemyMainBaseLocation.getX() == myMainBaseLocation.getX()) {
-					;
-				} else {
-					b = enemyMainBaseLocation.getY();
-				}
-			} else // 세로로 나란히
-			{
-				;
-			}
-			
-			gatherPoint = new Position(a, b);
-		}
+		endPoint = SM.enemyMainBaseLocation.getPosition();
+		gatherPoint = SM.enemySecondChokePoint.getPoint();
+		
 
 		if (endPoint != null && moveToEndPoint == true && underAttack == false
 				&& SM.combatState == StrategyManager.CombatState.defenseMode) {
@@ -612,7 +562,7 @@ public class UnitControl_Mutalisk {
 	
 	public void update() {
 		
-		if(SM.myMutaliskList.size() == 0)
+		if(SM.myHydraliskList.size() == 0)
 		{
 			return;
 		}
@@ -625,11 +575,11 @@ public class UnitControl_Mutalisk {
 		
 		
 		
-		Position averagePosition = getAveragePosition(SM.myMutaliskList);
-		enoughGathered(UnitType.Zerg_Mutalisk, gatherPoint, 3, 0.5);
+		Position averagePosition = getAveragePosition(SM.myHydraliskList);
+		enoughGathered(UnitType.Zerg_Hydralisk, gatherPoint, 3, 0.5);
 		Position invader = weAreUnderAttack(averagePosition);
 		Position nextPlace = getNextPlaceToGo();
-		Unit nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, averagePosition);
+		Unit nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, averagePosition);
 		int timer = 0;
 		
 
@@ -637,35 +587,39 @@ public class UnitControl_Mutalisk {
 		
 		
 		
-		ArrayList<Unit> mutalsAroundNextPlace = new ArrayList<Unit>();
+		ArrayList<Unit> HydralisksAroundNextPlace = new ArrayList<Unit>();
 		if (SM.enemyMainBaseLocation != null) {
 			List<Unit> unitsAroundNextPlace = MyBotModule.Broodwar
 					.getUnitsInRadius(SM.enemyMainBaseLocation.getPosition(), 8 * Config.TILE_SIZE);
 
 			for (Unit unit : unitsAroundNextPlace) {
-				if (unit.getPlayer() == SM.myPlayer && unit.getType() == UnitType.Zerg_Mutalisk) {
-					mutalsAroundNextPlace.add(unit);
+				if (unit.getPlayer() == SM.myPlayer && unit.getType() == UnitType.Zerg_Hydralisk) {
+					HydralisksAroundNextPlace.add(unit);
 				}
 			}
 		}
 
-		for (Unit mutal : SM.myMutaliskList) {
+		for (Unit Hydralisk : SM.myHydraliskList) {
 			
 
-			timer = (int) (mutal.getAirWeaponCooldown() / 1.5);
+			timer = (int) (Hydralisk.getGroundWeaponCooldown() / 1.5);
 			
-			if(mutal.isIrradiated())
+			//System.out.println("timer : " + timer);
+			
+			if(Hydralisk.isIrradiated())
 			{
-				mutal.move(SM.enemyMainBaseLocation.getPosition());
+				Hydralisk.move(SM.enemyMainBaseLocation.getPosition());
 				continue;
 			}
 			
-			if(mutal.isUnderStorm())
+			if(Hydralisk.isUnderStorm())
 			{
-				mutal.move(SM.myMainBaseLocation.getPosition());
+				Hydralisk.move(SM.myMainBaseLocation.getPosition());
 				continue;
 			}
 			
+			
+			/*
 			if(nextTarget != null && nextTarget.isStimmed())
 			{
 				int medic = 0;
@@ -679,18 +633,19 @@ public class UnitControl_Mutalisk {
 				
 				if(medic!=0)
 				{
-					mutal.move(SM.myMainBaseLocation.getPosition());
+					Hydralisk.move(SM.myMainBaseLocation.getPosition());
 			//		System.out.println("STP01");
 					continue;
 				}
 				
 
 			}
+			*/
 			
 			/*
-			if(invader != null && getNextTargetOf(UnitType.Zerg_Mutalisk, invader).isStimmed())
+			if(invader != null && getNextTargetOf(UnitType.Zerg_Hydralisk, invader).isStimmed())
 			{
-				mutal.move(SM.myMainBaseLocation.getPosition());
+				Hydral.move(SM.myMainBaseLocation.getPosition());
 				System.out.println("STP02");
 				continue;				
 			}
@@ -709,88 +664,93 @@ public class UnitControl_Mutalisk {
 
 			if (invader != null) {
 				
-				nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, invader);
+				nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, invader);
 				
 				
 				if (timer == 0) {
-					mutal.attack(nextTarget);
-				} else if(mutal.isUnderAttack()) {
-					mutal.move(SM.myMainBaseLocation.getPosition());
+					Hydralisk.attack(nextTarget);
+				} else if(Hydralisk.isUnderAttack()) {
+					Hydralisk.move(SM.myMainBaseLocation.getPosition());
 				}
 				
 				
-				   System.out.println("11111");
+				  // System.out.println("11111");
 				  // System.out.println("집지키러 가즈아");
 			} else if (SM.enemyMainBaseLocation == null) {
-				commandUtil.attackMove(mutal, SM.mySecondChokePoint.getPoint());
+				commandUtil.attackMove(Hydralisk, SM.mySecondChokePoint.getPoint());
 				moveToEndPoint = false;
-				   System.out.println("22222");
+				  // System.out.println("22222");
 				  // System.out.println("아직 기지 못찾아서 앞마당으로 가라");
 
 			} else if (SM.combatState == StrategyManager.CombatState.attackStarted) {
 				if (nextTarget != null) {
 					if (timer == 0) {
-						mutal.attack(nextTarget);
-					} else if(mutal.isUnderAttack()) {
-						mutal.move(SM.myMainBaseLocation.getPosition());
+						Hydralisk.attack(nextTarget);
+					} else if(Hydralisk.isUnderAttack()) {
+						Hydralisk.move(SM.myMainBaseLocation.getPosition());
 					}
 
 				} else {
-					commandUtil.attackMove(mutal, SM.enemyMainBaseLocation.getPosition());
+					commandUtil.attackMove(Hydralisk, SM.enemyMainBaseLocation.getPosition());
 				}
-				   System.out.println("33333");
+				  // System.out.println("33333");
 			}
 
-			else if (nextTarget != null && invader == null && mutalsAroundNextPlace.size() > 3) {
+			else if (nextTarget != null && invader == null && HydralisksAroundNextPlace.size() > 3) {
 
 				if (timer == 0) {
-					mutal.attack(nextTarget);
-				} else if(mutal.isUnderAttack()) {
-					mutal.move(gatherPoint);
+					Hydralisk.attack(nextTarget);
+				} else if(Hydralisk.isUnderAttack()) {
+					Hydralisk.move(SM.myMainBaseLocation.getPosition());
 				}
 
-				   System.out.println("44444");
+				  // System.out.println("44444");
 				  // System.out.println("잡아먹기");
 
-			} else if (mutalsAroundNextPlace.size() < 6 && SM.myMutaliskList.size() < 7) {
+			} 
+			/*
+			else if (HydralisksAroundNextPlace.size() < 3 && SM.myHydraliskList.size() < 5) {
 
-				mutal.move(SM.myFirstExpansionLocation.getPoint());
+				Hydralisk.move(SM.myFirstExpansionLocation.getPoint());
 				moveToEndPoint = false;
 				   System.out.println("55555");
 			}
-
-			else if (SM.myMutaliskList.size() < 4 + SM.myZerglingList.size() / 4) // 6에서 점점 늘려보자는 취지
+			*/
+			else if (SM.myHydraliskList.size() < 16)// + SM.myZerglingList.size() / 4) // 6에서 점점 늘려보자는 취지
 			{
 				if (nextTarget != null) {
 					if (timer == 0) {
-						mutal.attack(nextTarget);
-					} else { // 후퇴하는 상황이므로 무브로 처리함
-						mutal.move(SM.myMainBaseLocation.getPosition());
+						Hydralisk.attack(nextTarget);
+					} else if(Hydralisk.isUnderAttack()) {
+						Hydralisk.move(SM.myMainBaseLocation.getPosition());
 					}
 
 				} else {
-					commandUtil.attackMove(mutal, SM.mySecondChokePoint.getPoint());
+					//System.out.println("ATMV");
+					commandUtil.attackMove(Hydralisk, SM.mySecondChokePoint.getPoint());
 				}
 
 				moveToEndPoint = false;
-				   System.out.println("66666");
+				  // System.out.println("66666");
 
 			}
 
 			else {
 				if (nextTarget != null) {
 					if (timer == 0) {
-						mutal.attack(nextTarget);
-					} else if(mutal.isUnderAttack()) {
-						mutal.move(SM.myMainBaseLocation.getPosition());
+						Hydralisk.attack(nextTarget);
+					} else if(Hydralisk.isUnderAttack()) {
+						Hydralisk.move(SM.myMainBaseLocation.getPosition());
 					}
 
 				} else {
-					commandUtil.attackMove(mutal, nextPlace);
+					commandUtil.attackMove(Hydralisk, nextPlace);
 				}
 
 				  // System.out.println("어택땅으로 이동");
-				   System.out.println("7777");
+				
+				//System.out.println(SM.myHydraliskList.size());
+				//System.out.println("7777");
 			}
 
 		}
@@ -806,13 +766,12 @@ public class UnitControl_Mutalisk {
 
 	
 	/*
-	private static Mutalisk instance = new Mutalisk();
+	private static Hydralisk instance = new Hydralisk();
 
 	/ static singleton 객체를 리턴합니다
-	public static Mutalisk Instance() {
+	public static Hydralisk Instance() {
 		return instance;
 	}
 	*/
-	
 
 }

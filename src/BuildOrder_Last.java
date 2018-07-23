@@ -27,6 +27,17 @@ public class BuildOrder_Last {
 	
 	
 	public void lastBuildOrder() {
+		
+		int spireNumber = myPlayer.allUnitCount(UnitType.Zerg_Spire)
+				+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spire)
+				+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spire, null);
+		
+		if(myPlayer.gas()>1000 && spireNumber == 0)
+		{
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Spire,
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);			
+		}
+		
 
 		if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) >= 1)
 		{
@@ -47,9 +58,6 @@ public class BuildOrder_Last {
 					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Greater_Spire)
 					+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Greater_Spire, null);
 			
-			int spireNumber = myPlayer.allUnitCount(UnitType.Zerg_Spire)
-					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spire)
-					+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spire, null);
 			
 			int ultraliskCavernNumber = myPlayer.allUnitCount(UnitType.Zerg_Ultralisk_Cavern)
 					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Ultralisk_Cavern)
