@@ -10,12 +10,14 @@ public class UnitControl_MASTER {
 
 	UnitControl_Mutalisk Mutalisk;// = new UnitControl_Mutalisk();
 	UnitControl_Hydralisk Hydralisk;
+	UnitControl_Overlord Overlord;
+	UnitControl_Lurker Lurker;
 	
 	public void update() {
 		
 		if(StrategyManager.Instance().enemyMainBaseLocation!=null 
 				&& StrategyManager.Instance().combatState != StrategyManager.CombatState.eliminateEnemy
-				&& MyBotModule.Broodwar.getFrameCount() % 6 == 0) // 0.25초마다 실행
+				) // 0.25초마다 실행 && MyBotModule.Broodwar.getFrameCount() % 6 == 0
 		{
 			Mutalisk = new UnitControl_Mutalisk();
 			Mutalisk.update();	
@@ -23,8 +25,14 @@ public class UnitControl_MASTER {
 			Hydralisk = new UnitControl_Hydralisk();
 			Hydralisk.update();	
 			
+			Lurker = new UnitControl_Lurker();
+			Lurker.update();
+			
 			
 		}
+		
+		Overlord = new UnitControl_Overlord();
+		Overlord.update();
 		
 		
 		

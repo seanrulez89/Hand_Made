@@ -32,7 +32,7 @@ public class StrategyManager {
 
 
 	
-	int attack_cnt;
+	static int attack_cnt;
 	public Position attackTargetPosition;
 
 	UnitControl_MASTER UnitControl_MASTER;
@@ -54,7 +54,7 @@ public class StrategyManager {
 	public UnitType myMutalisk; /// 뮤탈리스크
 	public UnitType myUltralisk; /// #미정
 	public UnitType myHydralisk; /// #미정
-	public UnitType myCombatUnitType5; /// #미정
+	public UnitType myLurker; /// #미정
 
 	// 아군 특수 유닛 첫번째, 두번째 타입
 	public UnitType mySpecialUnitType1; /// 옵저버 사이언스베쓸 오버로드
@@ -65,19 +65,19 @@ public class StrategyManager {
 	public int necessaryNumberOfMutalisk; /// 공격을 시작하기위해 필요한 최소한의 유닛 숫자
 	public int necessaryNumberOfUltralisk; /// 공격을 시작하기위해 필요한 최소한의 유닛 숫자
 	public int necessaryNumberOfHydralisk; /// 공격을 시작하기위해 필요한 최소한의 유닛 숫자
-	public int necessaryNumberOfCombatUnitType5;
+	public int necessaryNumberOfLurker;
 
 	public int myKilledZerglings; /// 첫번째 유닛 타입의 사망자 숫자 누적값
 	public int myKilledMutalisks; /// 두번째 유닛 타입의 사망자 숫자 누적값
 	public int myKilledUltralisks;
 	public int myKilledHydralisks;
-	public int myKilledCombatUnitCount5;
+	public int myKilledLurkers;
 
 	public int numberOfCompletedZerglings; /// 첫번째 유닛 타입의 현재 유닛 숫자
 	public int numberOfCompletedMutalisks; /// 두번째 유닛 타입의 현재 유닛 숫자
 	public int numberOfCompletedUltralisks; /// 세번째 유닛 타입의 현재 유닛 숫자
 	public int numberOfCompletedHydralisks; /// 네번째 유닛 타입의 현재 유닛 숫자
-	public int numberOfCompletedCombatUnitType5;
+	public int numberOfCompletedLurkers;
 
 
 	// 아군 공격 유닛 목록
@@ -86,7 +86,7 @@ public class StrategyManager {
 	public ArrayList<Unit> myMutaliskList = new ArrayList<Unit>(); // 뮤탈리스크
 	public ArrayList<Unit> myUltraliskList = new ArrayList<Unit>(); // 울트라리스크
 	public ArrayList<Unit> myHydraliskList = new ArrayList<Unit>(); // #미정
-	public ArrayList<Unit> myCombatUnitType5List = new ArrayList<Unit>(); // #미정
+	public ArrayList<Unit> myLurkerList = new ArrayList<Unit>(); // #미정
 
 	// 아군 방어 건물 첫번째 타입
 	public UnitType myCreepColony; /// 파일런 벙커 크립콜로니
@@ -201,7 +201,7 @@ public class StrategyManager {
 		myKilledMutalisks = 0;
 		myKilledUltralisks = 0;
 		myKilledHydralisks = 0;
-		myKilledCombatUnitCount5 = 0;
+		myKilledLurkers = 0;
 
 		numberOfCompletedEnemyCombatUnit = 0;
 		numberOfCompletedEnemyWorkerUnit = 0;
@@ -219,7 +219,7 @@ public class StrategyManager {
 			myMutalisk = UnitType.Zerg_Mutalisk;
 			myUltralisk = UnitType.Zerg_Ultralisk;
 			myHydralisk = UnitType.Zerg_Hydralisk;
-			// myCombatUnitType5 = UnitType.Terran_Wraith;
+			myLurker = UnitType.Zerg_Lurker;
 
 			// 특수 유닛 종류 설정
 			mySpecialUnitType1 = UnitType.Zerg_Overlord;
@@ -230,7 +230,7 @@ public class StrategyManager {
 			necessaryNumberOfMutalisk = 5; // 공격을 시작하기위해 필요한 최소한의 메딕 유닛 숫자
 			necessaryNumberOfUltralisk = 4; // 공격을 시작하기위해 필요한 최소한의 메딕 유닛 숫자
 			// necessaryNumberOfCombatUnitType4 = 1; // 공격을 시작하기위해 필요한 최소한의 메딕 유닛 숫자
-			// necessaryNumberOfCombatUnitType5 = 2;
+			// necessaryNumberOfLurker = 2;
 
 			// MaxNumberOfCombatUnitType4 = 4 ;
 
@@ -297,8 +297,6 @@ public class StrategyManager {
 
 
 
-
-
 		UnitControl_MASTER.update();
 		
 
@@ -327,6 +325,16 @@ public class StrategyManager {
 				MyBotModule.Broodwar.drawTextScreen(100, y, "Attack Mode" + attack_cnt);
 				combatState = CombatState.attackStarted;
 			}
+			
+			
+			/// 적군을 Eliminate 시키는 모드로 전환할지 여부를 판단합니다
+			if (isTimeToStartElimination()) {
+				MyBotModule.Broodwar.drawTextScreen(100, y, "Eliminate Mode");
+				combatState = CombatState.eliminateEnemy;
+			}
+			
+			
+			
 		}
 
 		// 공격을 시작한 후에는 공격을 계속 실행하다가, 거의 적군 기지를 파괴하면 Eliminate 시키기를 합니다
@@ -348,6 +356,8 @@ public class StrategyManager {
 				MyBotModule.Broodwar.drawTextScreen(100, y, "Eliminate Mode");
 				combatState = CombatState.eliminateEnemy;
 			}
+			
+			
 		} else if (combatState == CombatState.eliminateEnemy) {
 
 			/// 적군을 Eliminate 시키도록 아군 공격 유닛들에게 지시합니다
@@ -366,6 +376,7 @@ public class StrategyManager {
 		MyBotModule.Broodwar.drawTextScreen(100, 240, "Wave Count : " + attack_cnt);
 		// 유닛 종류별로 최소 숫자 이상 있으면
 
+		/*
 		if (attack_cnt == 0) {
 			if (myZerglingList.size() >= necessaryNumberOfZergling
 					&& myMutaliskList.size() >= necessaryNumberOfMutalisk) {
@@ -373,7 +384,10 @@ public class StrategyManager {
 				return true; // first wave
 			}
 		}
-		else if(myZerglingList.size() > 18)
+		else if
+		*/
+			
+		if(myZerglingList.size() > 18)
 		{
 			attack_cnt = attack_cnt + 1;
 			return true;
@@ -438,6 +452,11 @@ public class StrategyManager {
 		}
 		*/
 		
+		if(enemyMainBaseLocation==null)
+		{
+			return false;
+		}
+		
 		
 		
 		// 적군 본진에 아군 유닛이 30 이상 도착했으면 거의 게임 끝난 것
@@ -449,13 +468,13 @@ public class StrategyManager {
 			}
 		}
 		
-		if (myUnitCountAroundEnemyMainBaseLocation > 30) {
+		if (myUnitCountAroundEnemyMainBaseLocation > 24) {
 			System.out.println("eli case 1");
 			return true;
 		}
 
 		// 30분이 경과했고 내 유닛이 80 이상이라면 
-		if (MyBotModule.Broodwar.getFrameCount() > 24*60*30 && myPlayer.supplyUsed() > 80 * 2) {
+		if (MyBotModule.Broodwar.getFrameCount() > 24*60*30 && myPlayer.supplyUsed() > 100 * 2) {
 			System.out.println("eli case 2");
 			return true;
 		}
@@ -531,7 +550,7 @@ public class StrategyManager {
 
 			// 0704 각 타입별 유닛 컨트롤 기능을 구현하면 굳이 현재 메서드에서 모든 유닛을 제어하지 않아도 된다
 			// 이 부분에서 방어할 지역이나 콕 집어 공격할 유닛만 리턴해주고, 그걸 개별 유닛컨트롤 클래스에서 알아서 적절히 대응을 하는 방법도 고려
-			if(unit.getType() == UnitType.Zerg_Mutalisk || unit.getType() == UnitType.Zerg_Hydralisk) // 0627 뮤탈코드 테스트를 위한 건너뛰기 조치
+			if(unit.getType() == UnitType.Zerg_Mutalisk || unit.getType() == UnitType.Zerg_Hydralisk || unit.getType() == UnitType.Zerg_Lurker) // 0627 뮤탈코드 테스트를 위한 건너뛰기 조치
 			{
 				continue;
 			}
@@ -966,8 +985,9 @@ public class StrategyManager {
 							// 전략이나 업그레이드 등 전략적인 사유로 공격을 나가서는 안된다면
 							// 이 부분에서 그런것을 체크해야 한다
 							// 가령 아래 레이스는 은신이 개발 안되면 모두 공격나가도 공격 안따라가는 것이다.
-							if (unit.getType() == UnitType.Zerg_Mutalisk)// && myCombatUnitType5List.size()<6 &&
-																			// !myPlayer.hasResearched(TechType.Cloaking_Field))
+							if (unit.getType() == UnitType.Zerg_Mutalisk
+									|| unit.getType() == UnitType.Zerg_Zergling
+									|| unit.getType() == UnitType.Zerg_Lurker)
 							{							
 								hasCommanded = true;
 							} else {
@@ -1047,11 +1067,7 @@ public class StrategyManager {
 
 							}
 
-							// canAttack 기능이 없는 유닛타입 중 러커는 일반 공격유닛처럼 targetPosition 을 향해 이동시킵니다
-							else if (unit.getType() == UnitType.Zerg_Lurker) {
-								commandUtil.move(unit, attackTargetPosition);
-								hasCommanded = true;
-							} else if (unit.getType() == UnitType.Terran_Science_Vessel) {
+							else if (unit.getType() == UnitType.Terran_Science_Vessel) {
 
 								// Position targetMyUnitPosition = null;
 
@@ -1538,7 +1554,7 @@ public class StrategyManager {
 				}
 			}
 		}
-		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding == 3) 
+		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding == 3 && nextExpansion!=null) 
 		{
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) ==0 
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) ==0) 
@@ -1653,10 +1669,10 @@ public class StrategyManager {
 				isTimeToStartUpgradeType2 = true;
 			}
 			// 가스 좀 남으면 하라고 넣음
-			if (myPlayer.getUpgradeLevel(necessaryUpgradeType4) == 3 && myPlayer.gas() > 100 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5){
+			if (myPlayer.getUpgradeLevel(necessaryUpgradeType4) == 3 && myPlayer.gas() > 100){
 				isTimeToStartUpgradeType3 = true;
 			}
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 && myPlayer.gas() > 100 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 5){
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 && myPlayer.gas() > 100){
 				isTimeToStartUpgradeType4 = true;
 			}
 			// 러커는 최우선으로 리서치한다
@@ -2224,6 +2240,7 @@ public class StrategyManager {
 		myMutaliskList.clear();
 		myUltraliskList.clear();
 		myHydraliskList.clear();
+		myLurkerList.clear();
 
 		for (Unit unit : myPlayer.getUnits()) {
 			if (unit == null || unit.exists() == false || unit.getHitPoints() <= 0)
@@ -2242,8 +2259,8 @@ public class StrategyManager {
 				myHydraliskList.add(unit);
 				myAllCombatUnitList.add(unit);
 			}
-			else if (unit.getType() == myCombatUnitType5) {
-				myCombatUnitType5List.add(unit);
+			else if (unit.getType() == myLurker || unit.getType() == UnitType.Zerg_Lurker_Egg) {
+				myLurkerList.add(unit);
 				myAllCombatUnitList.add(unit);
 			} else if (unit.getType() == myCreepColony) {
 				myCreepColonyList.add(unit);

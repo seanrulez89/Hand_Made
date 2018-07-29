@@ -32,9 +32,9 @@ public class BuildOrder_Last {
 				+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spire)
 				+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spire, null);
 		
-		if(myPlayer.gas()>1000 && spireNumber == 0)
+		if(myPlayer.hasResearched(TechType.Lurker_Aspect)==true && spireNumber == 0)
 		{
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Spire,
+			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spire,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);			
 		}
 		

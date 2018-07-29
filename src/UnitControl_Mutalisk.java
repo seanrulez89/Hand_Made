@@ -23,7 +23,8 @@ public class UnitControl_Mutalisk {
 
 	BaseLocation myMainBaseLocation = SM.myMainBaseLocation;
 	BaseLocation enemyMainBaseLocation = SM.enemyMainBaseLocation;
-	
+
+	static Position startPoint = null;
 	static Position gatherPoint = null;
 	static Position endPoint = null;
 
@@ -48,7 +49,7 @@ public class UnitControl_Mutalisk {
 		
 		if(myUnitType == UnitType.Zerg_Mutalisk)
 		{
-			inRange = 7 * Config.TILE_SIZE;
+			inRange = 8 * Config.TILE_SIZE;
 		}
 		else
 		{
@@ -70,6 +71,11 @@ public class UnitControl_Mutalisk {
 		for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(averagePosition, inRange)) { // 저글링 같은 근접공격유닛은 10배 해봐야 무의미한가?
 
 			if (enemy.getPlayer() == enemyPlayer) {
+				
+				if(enemy.isVisible() == false)
+				{
+					continue;
+				}
 				
 
 				if(enemy.getType().equals(UnitType.Terran_Valkyrie)
@@ -333,29 +339,29 @@ public class UnitControl_Mutalisk {
 		// 건물이나 드론이 얻어맞는 경우
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
 			if ((unit.getType().isBuilding() && unit.isUnderAttack())
-					|| (unit.getType().equals(UnitType.Zerg_Drone) && unit.isUnderAttack())) {
-				Unit tempEnemy = getNextTargetOf(unit.getType(), unit.getPosition());//  반경 4개 타일안의 적을 찾을 것이다.
-
-				if (tempEnemy != null) {
-					tempDistance = tempEnemy.getPosition().getDistance(myPosition);
-					if (positionDistance > tempDistance) {
-						positionDistance = tempDistance;
-						invader = tempEnemy;
-					}
+					|| (unit.getType().equals(UnitType.Zerg_Drone) && unit.isUnderAttack())
+					&& (unit.getType() != UnitType.Zerg_Sunken_Colony)) {
+				
+				tempDistance = unit.getPosition().getDistance(myPosition);
+				if (positionDistance > tempDistance) {
+					positionDistance = tempDistance;
+					invader = unit;
 				}
 			}
 		}
 
+		/*
 		if (invader != null) {
 			underAttack = true;
 			moveToEndPoint = false;
 			return invader.getPosition();
 		}
+		*/
 
 		// 기지 주변에 악당이 등장하는 경우
 		for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(myPlayer)) {
 
-			for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getPosition(), 8 * Config.TILE_SIZE)) {
+			for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getPosition(), 13 * Config.TILE_SIZE)) {
 
 				if (unit.getPlayer() == enemyPlayer) {
 
@@ -374,45 +380,7 @@ public class UnitControl_Mutalisk {
 			moveToEndPoint = false;
 			return invader.getPosition();
 		}
-/*
-		// 길목 주변에 악당이 등장하는 경우
-		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(SM.mySecondChokePoint.getPoint(), 8 * Config.TILE_SIZE)) {
-			if (unit.getPlayer() == enemyPlayer) {
-
-				tempDistance = unit.getPosition().getDistance(myPosition);
-				if (positionDistance > tempDistance) {
-					positionDistance = tempDistance;
-					invader = unit;
-					  // System.out.println("길목2 주변 악당을 찾았다");
-				}
-			}
-		}
-
-		if (invader != null) {
-			underAttack = true;
-			moveToEndPoint = false;
-			return invader;
-		}
 		
-		// 길목 주변에 악당이 등장하는 경우
-		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(SM.myFirstChokePoint.getPoint(), 8 * Config.TILE_SIZE)) {
-			if (unit.getPlayer() == enemyPlayer) {
-
-				tempDistance = unit.getPosition().getDistance(myPosition);
-				if (positionDistance > tempDistance) {
-					positionDistance = tempDistance;
-					invader = unit;
-					  // System.out.println("길목1 주변 악당을 찾았다");
-				}
-			}
-		}
-
-		if (invader != null) {
-			underAttack = true;
-			moveToEndPoint = false;
-			return invader;
-		}
-*/		
 		underAttack = false;
 		return null;
 	}
@@ -425,40 +393,38 @@ public class UnitControl_Mutalisk {
 		int numberOfTotal = 0;
 		int numberOfMinimum = 9;
 
-		if (targetPosition == null) {
+		if (SM.enemyMainBaseLocation == null) {
 			 // System.out.println("아직 기지 못 찾음");
 			return false;
 		}
 
+		
 		if (moveToEndPoint == true) {
 			return moveToEndPoint;
 		}
-
+		
+		
 		if (myUnitType == SM.myZergling) {
 			numberOfTotal = SM.myZerglingList.size();
 		} else if (myUnitType == SM.myMutalisk) {
 			numberOfTotal = SM.myMutaliskList.size();
+		} else if (myUnitType == SM.myHydralisk) {
+			numberOfTotal = SM.myHydraliskList.size();
 		} else {
 
 		}
 
 		List<Unit> unitsAround = MyBotModule.Broodwar.getUnitsInRadius(targetPosition, radius * Config.TILE_SIZE);
 
-		 // System.out.println("unitsAround : " + unitsAround.size());
-		 // System.out.println(targetPosition.getX());
-		 // System.out.println(targetPosition.getY());
-		
 		
 		
 		for (Unit unit : unitsAround) {
-			 // System.out.println("aaaaa");
 
 			if (unit.exists() && unit != null) {
- // System.out.println("bbbbbbbb");
+
 				if (unit.getPlayer() == myPlayer) {
-					 // System.out.println("ccccc");
+
 					if (unit.getType() == myUnitType) {
-						 // System.out.println("dddd");
 						numberOfGathered++;
 					}
 				}
@@ -466,12 +432,12 @@ public class UnitControl_Mutalisk {
 		}
 
 		
-		 // System.out.println("numberOfGathered : " + numberOfGathered);
-		 // System.out.println("numberOfTotal * input_ratio : " + numberOfTotal * input_ratio);
-		
 		if (numberOfGathered > numberOfMinimum && numberOfGathered > numberOfTotal * input_ratio) {
 			moveToEndPoint = true;
-			 // System.out.println("-----------------");
+		}
+		else
+		{
+			moveToEndPoint = false;
 		}
 
 		return moveToEndPoint;
@@ -605,6 +571,91 @@ public class UnitControl_Mutalisk {
 		return nextPlace;
 
 	}
+	
+	
+	public void setStartGatherEndPoint ()
+	{
+		
+
+		if(SM.enemyMainBaseLocation==null)
+		{
+			startPoint = SM.myFirstChokePoint.getPoint();
+			gatherPoint = SM.mySecondChokePoint.getPoint();
+			endPoint = SM.mySecondChokePoint.getPoint();
+			return;
+		}
+		
+		
+		
+		startPoint = SM.mySecondChokePoint.getPoint();
+		endPoint = SM.enemyMainBaseLocation.getPoint();		
+		// 몇시 방향이냐가 아니고 4분면에서 몇사분면인가를 판단
+		int enemyMainBasePosition = 0;
+		
+		if(SM.enemyMainBaseLocation.getX()/32 > 63 && SM.enemyMainBaseLocation.getY()/32 > 63)
+		{
+			enemyMainBasePosition = 4;
+		}
+		else if(SM.enemyMainBaseLocation.getX()/32 < 63 && SM.enemyMainBaseLocation.getY()/32 > 63)
+		{
+			enemyMainBasePosition = 3;
+		}
+		else if(SM.enemyMainBaseLocation.getX()/32 < 63 && SM.enemyMainBaseLocation.getY()/32 < 63)
+		{
+			enemyMainBasePosition = 2;
+		}
+		else
+		{
+			enemyMainBasePosition = 1;
+		}
+		
+		
+		
+		if(MyBotModule.Broodwar.mapFileName().equals("(4)CircuitBreaker.scx"))
+		{
+			if(enemyMainBasePosition == 1)
+			{
+				gatherPoint = new Position(42*32,3*32);
+			}
+			else if(enemyMainBasePosition == 2)
+			{
+				gatherPoint = new Position(85*32,3*32);
+			}
+			else if(enemyMainBasePosition == 3)
+			{
+				gatherPoint = new Position(85*32,123*32);
+			}
+			else
+			{
+				gatherPoint = new Position(42*32,123*32);
+			}	
+		}
+		else
+		{
+			if(enemyMainBasePosition == 1)
+			{
+				gatherPoint = new Position(123*32,73*32);
+			}
+			else if(enemyMainBasePosition == 2)
+			{
+				gatherPoint = new Position(73*32,3*32);
+			}
+			else if(enemyMainBasePosition == 3)
+			{
+				gatherPoint = new Position(3*32,53*32);
+			}
+			else
+			{
+				gatherPoint = new Position(55*32,123*32);
+			}	
+			
+			
+		}
+		
+		
+		
+		
+	}
 
 	
 	
@@ -617,8 +668,7 @@ public class UnitControl_Mutalisk {
 			return;
 		}
 		
-		
-
+		 setStartGatherEndPoint();
 		
 		
 		
@@ -626,46 +676,33 @@ public class UnitControl_Mutalisk {
 		
 		
 		Position averagePosition = getAveragePosition(SM.myMutaliskList);
-		enoughGathered(UnitType.Zerg_Mutalisk, gatherPoint, 3, 0.5);
+		boolean endGame = enoughGathered(UnitType.Zerg_Mutalisk, gatherPoint, 3, 0.5);
 		Position invader = weAreUnderAttack(averagePosition);
-		Position nextPlace = getNextPlaceToGo();
+		//Position nextPlace = getNextPlaceToGo();
 		Unit nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, averagePosition);
-		int timer = 0;
-		
 
 		
-		
-		
-		
-		ArrayList<Unit> mutalsAroundNextPlace = new ArrayList<Unit>();
-		if (SM.enemyMainBaseLocation != null) {
-			List<Unit> unitsAroundNextPlace = MyBotModule.Broodwar
-					.getUnitsInRadius(SM.enemyMainBaseLocation.getPosition(), 8 * Config.TILE_SIZE);
 
-			for (Unit unit : unitsAroundNextPlace) {
-				if (unit.getPlayer() == SM.myPlayer && unit.getType() == UnitType.Zerg_Mutalisk) {
-					mutalsAroundNextPlace.add(unit);
-				}
-			}
-		}
+	
 
-		for (Unit mutal : SM.myMutaliskList) {
+		for (Unit Mutalisk : SM.myMutaliskList) 
+		{
 			
 
-			timer = (int) (mutal.getAirWeaponCooldown() / 1.5);
 			
-			if(mutal.isIrradiated())
+			
+			if(Mutalisk.isIrradiated())
 			{
-				mutal.move(SM.enemyMainBaseLocation.getPosition());
+				Mutalisk.move(SM.enemyMainBaseLocation.getPosition());
 				continue;
 			}
 			
-			if(mutal.isUnderStorm())
+			if(Mutalisk.isUnderStorm())
 			{
-				mutal.move(SM.myMainBaseLocation.getPosition());
+				Mutalisk.move(SM.myMainBaseLocation.getPosition());
 				continue;
 			}
-			
+			/*
 			if(nextTarget != null && nextTarget.isStimmed())
 			{
 				int medic = 0;
@@ -687,7 +724,7 @@ public class UnitControl_Mutalisk {
 
 			}
 			
-			/*
+			
 			if(invader != null && getNextTargetOf(UnitType.Zerg_Mutalisk, invader).isStimmed())
 			{
 				mutal.move(SM.myMainBaseLocation.getPosition());
@@ -697,103 +734,78 @@ public class UnitControl_Mutalisk {
 			*/
 			
 			
-			
-			
-			
-			
 
-			
-			 // System.out.println("underAttack : " + underAttack);
-			 // System.out.println("moveToEndPoint : " + moveToEndPoint);
-			
 
-			if (invader != null) {
-				
+			if (invader != null) 
+			{	
 				nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, invader);
-				
-				
-				if (timer == 0) {
-					mutal.attack(nextTarget);
-				} else if(mutal.isUnderAttack()) {
-					mutal.move(SM.myMainBaseLocation.getPosition());
-				}
-				
-				
-				   System.out.println("11111");
-				  // System.out.println("집지키러 가즈아");
-			} else if (SM.enemyMainBaseLocation == null) {
-				commandUtil.attackMove(mutal, SM.mySecondChokePoint.getPoint());
-				moveToEndPoint = false;
-				   System.out.println("22222");
-				  // System.out.println("아직 기지 못찾아서 앞마당으로 가라");
-
-			} else if (SM.combatState == StrategyManager.CombatState.attackStarted) {
-				if (nextTarget != null) {
-					if (timer == 0) {
-						mutal.attack(nextTarget);
-					} else if(mutal.isUnderAttack()) {
-						mutal.move(SM.myMainBaseLocation.getPosition());
-					}
-
-				} else {
-					commandUtil.attackMove(mutal, SM.enemyMainBaseLocation.getPosition());
-				}
-				   System.out.println("33333");
 			}
-
-			else if (nextTarget != null && invader == null && mutalsAroundNextPlace.size() > 3) {
-
-				if (timer == 0) {
-					mutal.attack(nextTarget);
-				} else if(mutal.isUnderAttack()) {
-					mutal.move(gatherPoint);
-				}
-
-				   System.out.println("44444");
-				  // System.out.println("잡아먹기");
-
-			} else if (mutalsAroundNextPlace.size() < 6 && SM.myMutaliskList.size() < 7) {
-
-				mutal.move(SM.myFirstExpansionLocation.getPoint());
-				moveToEndPoint = false;
-				   System.out.println("55555");
-			}
-
-			else if (SM.myMutaliskList.size() < 4 + SM.myZerglingList.size() / 4) // 6에서 점점 늘려보자는 취지
+	
+			
+		
+			
+			
+			
+			if (nextTarget != null) 
 			{
-				if (nextTarget != null) {
-					if (timer == 0) {
-						mutal.attack(nextTarget);
-					} else { // 후퇴하는 상황이므로 무브로 처리함
-						mutal.move(SM.myMainBaseLocation.getPosition());
-					}
-
-				} else {
-					commandUtil.attackMove(mutal, SM.mySecondChokePoint.getPoint());
+				if (Mutalisk.getAirWeaponCooldown() == 0) 
+				{
+					System.out.println(1);
+					Mutalisk.attack(nextTarget);
+					continue; //컨티뉴를 하면 무조건 이 타겟을 치고 안하면 근처를 친다 왜냐하면 어택땅이 기본 상태라서 근접유닛은 안하는게 낫겠다 자꾸 병목현상되니까
+				} 
+				else if(Mutalisk.getAirWeaponCooldown() > 10)
+				{
+					System.out.println(2);
+					Mutalisk.move(SM.myMainBaseLocation.getPosition());
+					continue;
 				}
 
+			}
+			
+			if(SM.enemyMainBaseLocation == null)
+			{
+				System.out.println(3);
+				commandUtil.attackMove(Mutalisk, startPoint);
+			}
+			else if (SM.myMutaliskList.size() <= 6) 
+			{
 				moveToEndPoint = false;
-				   System.out.println("66666");
-
+				
+				if (MyBotModule.Broodwar.getUnitsInRadius(startPoint, 4 * Config.TILE_SIZE)
+						.contains(Mutalisk) == false) {
+					//Mutalisk.move(startPoint);
+					commandUtil.attackMove(Mutalisk, startPoint);
+					System.out.println(4);
+					continue;
+				}
+				else
+				{
+					System.out.println(5);
+					commandUtil.attackMove(Mutalisk, startPoint);
+				}
+				
 			}
+			else 
+			{
 
-			else {
-				if (nextTarget != null) {
-					if (timer == 0) {
-						mutal.attack(nextTarget);
-					} else if(mutal.isUnderAttack()) {
-						mutal.move(SM.myMainBaseLocation.getPosition());
-					}
-
-				} else {
-					commandUtil.attackMove(mutal, nextPlace);
+				if (endGame == false) 
+				{
+					System.out.println(7);
+					commandUtil.attackMove(Mutalisk, gatherPoint);
+					moveToEndPoint = false;
+				}
+				else 
+				{
+					System.out.println(6);
+					commandUtil.attackMove(Mutalisk, endPoint);
 				}
 
-				  // System.out.println("어택땅으로 이동");
-				   System.out.println("7777");
 			}
-
 		}
+	
+
+		
 
 	}
 
