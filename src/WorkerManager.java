@@ -625,13 +625,35 @@ public class WorkerManager {
 			if (unit.isCompleted() && (workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Move || workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Idle))
 			{
 				// if it is a new closest distance, set the pointer
-				double distance = unit.getDistance(buildingPosition.toPosition());
+/*				double distance = unit.getDistance(buildingPosition.toPosition());
 				if (closestMovingWorker == null || (distance < closestMovingWorkerDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ))
 				{
 					if (BWTA.isConnected(unit.getTilePosition(), buildingPosition)) {
 						closestMovingWorker = unit;
 						closestMovingWorkerDistance = distance;
 					}
+				}
+*/				
+				// 건물짓기최적일꾼선택 알고리즘 수정	20180729	shsh0823.lee
+				double distance = unit.getDistance(buildingPosition.toPosition());
+
+				// 이미 선택된 일꾼이 있으면, 현재 차례의 일꾼과 최적성 비교를 해봐야 함
+				if(closestMovingWorker!=null) { 
+					// 선택된 일꾼이 미네랄, 가스 전부 없는데 현재 일꾼은 둘 중에 하나라도 있으면 볼 것 없이 패스
+					if(!closestMovingWorker.isCarryingMinerals() && !closestMovingWorker.isCarryingMinerals()) {
+						if(unit.isCarryingMinerals() || unit.isCarryingGas()) {
+							continue;
+						}
+					}
+					// 선택된 일꾼의 거리보다 현재 일꾼의 거리가 크거나 같으면 패스
+					if(distance >= closestMovingWorkerDistance) {
+						continue;
+					}
+				}
+				// 위에 걸러지지 않은 케이스에 대해 최적일꾼 변경
+				if (BWTA.isConnected(unit.getTilePosition(), buildingPosition)) {
+					closestMovingWorker = unit;
+					closestMovingWorkerDistance = distance;
 				}
 			}
 
@@ -640,13 +662,36 @@ public class WorkerManager {
 				&& (workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Move && workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Idle && workerData.getWorkerJob(unit) != WorkerData.WorkerJob.Build))
 			{
 				// if it is a new closest distance, set the pointer
-				double distance = unit.getDistance(buildingPosition.toPosition());
+/*				double distance = unit.getDistance(buildingPosition.toPosition());
 				if (closestMiningWorker == null || (distance < closestMiningWorkerDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ))
 				{
 					if (BWTA.isConnected(unit.getTilePosition(), buildingPosition)) {
 						closestMiningWorker = unit;
 						closestMiningWorkerDistance = distance;
 					}
+				}
+*/	
+
+				// 건물짓기최적일꾼선택 알고리즘 수정	20180729	shsh0823.lee
+				double distance = unit.getDistance(buildingPosition.toPosition());
+
+				// 이미 선택된 일꾼이 있으면, 현재 차례의 일꾼과 최적성 비교를 해봐야 함
+				if(closestMiningWorker!=null) { 
+					// 선택된 일꾼이 미네랄, 가스 전부 없는데 현재 일꾼은 둘 중에 하나라도 있으면 볼 것 없이 패스
+					if(!closestMiningWorker.isCarryingMinerals() && !closestMiningWorker.isCarryingMinerals()) {
+						if(unit.isCarryingMinerals() || unit.isCarryingGas()) {
+							continue;
+						}
+					}
+					// 선택된 일꾼의 거리보다 현재 일꾼의 거리가 크거나 같으면 패스
+					if(distance >= closestMiningWorkerDistance) {
+						continue;
+					}
+				}
+				// 위에 걸러지지 않은 케이스에 대해 최적일꾼 변경
+				if (BWTA.isConnected(unit.getTilePosition(), buildingPosition)) {
+					closestMiningWorker = unit;
+					closestMiningWorkerDistance = distance;
 				}
 			}
 		}
