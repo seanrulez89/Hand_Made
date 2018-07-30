@@ -31,11 +31,12 @@ public class UnitControl_MASTER {
 			
 		}
 		
-		Overlord = new UnitControl_Overlord();
-		Overlord.update();
-		
-		
-		
+		if(StrategyManager.Instance().combatState != StrategyManager.CombatState.eliminateEnemy)
+		{
+			Overlord = new UnitControl_Overlord();
+			Overlord.update();
+		}
+
 	}
 	
 	

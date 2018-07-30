@@ -235,7 +235,7 @@ public class StrategyManager {
 			// MaxNumberOfCombatUnitType4 = 4 ;
 
 			// 공격 유닛 생산 순서 설정
-			buildOrderArrayOfMyCombatUnitType = new int[] {2,4}; // 마린 마린 마린 메딕 시즈 베슬
+			buildOrderArrayOfMyCombatUnitType = new int[] {2,3,4}; // 마린 마린 마린 메딕 시즈 베슬
 			nextTargetIndexOfBuildOrderArray = 0; // 다음 생산 순서 index
 
 			// 방어 건물 종류 및 건설 갯수 설정
@@ -387,16 +387,18 @@ public class StrategyManager {
 		else if
 		*/
 			
-		if(myZerglingList.size() > 18)
-		{
-			attack_cnt = attack_cnt + 1;
-			return true;
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) > 10 || myPlayer.completedUnitCount(UnitType.Zerg_Lurker)>4) {
+			
+			if(myHydraliskList.size()>12)
+			{
+				attack_cnt = attack_cnt + 1;
+				return true;
+			}
+			
 		}
-		else if (myUltraliskList.size() >= necessaryNumberOfUltralisk) {
-			attack_cnt = attack_cnt + 1;
-			return true;
-
-		}
+		
+		
+		
 		return false;
 	}
 
@@ -907,222 +909,19 @@ public class StrategyManager {
 	/// 아군 공격 유닛들에게 공격을 지시합니다
 	public void commandMyCombatUnitToAttack() {
 
-		// 최종 타겟은 적군의 Main BaseLocation
-
-		/////////////// 20170806 권순우 공격지점 설정
-
-		BaseLocation targetEnemyBaseLocation = enemyMainBaseLocation;
-		Chokepoint targetPoint = enemySecondChokePoint;
-		
-
-
-		if (targetPoint != null) {
-
-			// 권순우 0617 두 지점사이의 위치를 구해서 이동목표로 삼는 것인데 그 지점을 여러개 설정하는 끔찍한 모습이다.
-			Position position01 = setTargetPositionTwo(mySecondChokePoint.getPoint(), enemySecondChokePoint.getPoint(),	1);
-			position01 = setTargetPositionTwo(position01, enemySecondChokePoint.getPoint(), 1);
-			position01 = setTargetPositionTwo(position01, enemySecondChokePoint.getPoint(), 30);
-
-			Position position02 = setTargetPositionTwo(position01, enemySecondChokePoint.getPoint(), 30);
-			Position position03 = setTargetPositionOne(enemySecondChokePoint.getPoint(), 35);
-			Position position04 = setTargetPositionTwo(position03, enemyFirstExpansionLocation.getPoint(), 45);
-			Position position05 = setTargetPositionTwo(position04, enemyMainBaseLocation.getPoint(), 45);
-			Position position06 = setTargetPositionOne(enemyMainBaseLocation.getPoint().getPoint(), 100);
-
-			// Position position07 = setTargetPositionTwo(mySecondChokePoint.getPoint(),
-			// enemySecondChokePoint.getPoint(), 30);
-
-			// for (Unit unit : myAllCombatUnitList)
-
-			attackTargetPosition = position01;
-			if (myAllCombatUnitList.size() > 0.5 * myAllCombatUnitList.size()) {
-				attackTargetPosition = position02;
-				if (myAllCombatUnitList.size() > 0.5 * myAllCombatUnitList.size()) {
-					attackTargetPosition = position03;
-					if (myAllCombatUnitList.size() > 0.5 * myAllCombatUnitList.size()) {
-						attackTargetPosition = position04;
-						if (myAllCombatUnitList.size() > 0.5 * myAllCombatUnitList.size()) {
-							attackTargetPosition = position05;
-							if (myAllCombatUnitList.size() > 0.5 * myAllCombatUnitList.size()) {
-								attackTargetPosition = position06;
-							}
-						}
-					}
-				}
+		for (Unit unit : myAllCombatUnitList) 
+		{
+			if(unit.getType().equals(UnitType.Zerg_Zergling))
+			{
+				commandUtil.attackMove(unit, enemyMainBaseLocation.getPosition());
 			}
 
-			/*
-			 * 권순우 0617 노승호의 역작이다. 올해는 아래 코드를 변형해서 오버로드를 은신캐 근처로 이동시키는 코드를 짜면 되겠다.
-			 * 
-			 * 제일 좋은 것은 은신캐 근처에서 가장 가까운 오버로드를 이동시키는 것인데 적군 유닛의 위치를 중심으로 가장 가까운 아군 유닛중에서
-			 * 오버로드면 와라!
-			 * 
-			 * 
-			 * 
-			 * for (Unit scanner : MyBotModule.Broodwar.self().getUnits()) {
-			 * 
-			 * if (scanner.getType() == UnitType.Terran_Comsat_Station) { for(Unit
-			 * isInvisible : MyBotModule.Broodwar.getUnitsInRadius(scanner.getPoint(), 256 *
-			 * Config.TILE_SIZE)) { if(isInvisible.isBurrowed() == true ||
-			 * isInvisible.isCloaked() == true) { if(scanner.getEnergy() >=
-			 * TechType.Scanner_Sweep.energyCost()) {
-			 * scanner.useTech(TechType.Scanner_Sweep, isInvisible);
-			 * System.out.println("스캔!"); } } } } }//20170808 스캐너 구현 완료.
-			 */
 
-			// 모든 아군 공격유닛들로 하여금 targetPosition 을 향해 공격하게 한다
-			for (Unit unit : myAllCombatUnitList) {
-
-				boolean hasCommanded = false;
-
-				// 따로 명령 내린 적이 없으면, targetPosition 을 향해 공격 이동시킵니다
-				if (hasCommanded == false) {
-
-					if (unit.isIdle()) {
-
-						if (unit.canAttack()) {
-							// 권순우 0617 공격을 할 수는 있지만
-							// 전략이나 업그레이드 등 전략적인 사유로 공격을 나가서는 안된다면
-							// 이 부분에서 그런것을 체크해야 한다
-							// 가령 아래 레이스는 은신이 개발 안되면 모두 공격나가도 공격 안따라가는 것이다.
-							if (unit.getType() == UnitType.Zerg_Mutalisk
-									|| unit.getType() == UnitType.Zerg_Zergling
-									|| unit.getType() == UnitType.Zerg_Lurker)
-							{							
-								hasCommanded = true;
-							} else {
-								commandUtil.attackMove(unit, attackTargetPosition);
-								hasCommanded = true;
-							}
-						}
-
-						else {
-
-							/*
-							 * 권순우 0617 가장 까다로운 부분이다. 메딕, 사이언스 베슬 등 특수 유닛은 일단 전투지역으로 이동을 시키고 뭔가를 해야되는데 이 부분을
-							 * 해결하는 것이 매우 까다롭다.
-							 * 
-							 * 올해는 각 유닛별로 고유번호가 있다는 것을 알았으니 단순히 가까운 유닛을 찾는 것이 아니라 전담 마크 개념을 구현해 볼 수 있을 것이다.
-							 * 과연?
-							 */
-
-							// canAttack 기능이 없는 유닛타입 중 메딕은 마린 유닛에 대해 Heal 하러 가게 하고, 마린 유닛이 없으면 아군 지역으로 돌아오게
-							// 합니다
-							if (unit.getType() == UnitType.Terran_Medic) {
-
-								Position targetMyUnitPosition = null;
-								Random random = new Random();
-								Unit randomMarine;
-
-								int breakCondition = 0;
-								int size = myZerglingList.size();
-								int isNear = 100;
-
-								while (true) {
-									randomMarine = myZerglingList.get(random.nextInt(size));
-									if (randomMarine == null || randomMarine.exists() == false
-											|| randomMarine.getHitPoints() < 0) {
-										// 일단 마린이 null이거나, 죽었거나, 풀피면 다른 마린을 찾는다
-										continue;
-									}
-									if (randomMarine.getHitPoints() < randomMarine.getInitialHitPoints()) {
-										// 맞긴 했는데 아직 살았다면 힐줘라
-										unit.useTech(TechType.Healing, randomMarine);
-										// hasCommanded = true;
-										break;
-									} else if (breakCondition == size) {
-										// 가까운 마린이면 그냥 따라가고
-										// 멀면 새로운 마린을 찾아서 따라가고
-										// 루프 탈출
-
-										if (unit.getDistance(randomMarine) < isNear) {
-											unit.follow(randomMarine);
-											// hasCommanded = true;
-											break;
-										} else {
-											isNear = isNear + 10;
-										}
-									} else {
-										breakCondition = breakCondition + 1;
-									}
-								}
-
-								for (Unit myUnit : myZerglingList) {
-									if (myUnit == null || myUnit.exists() == false || myUnit.getHitPoints() < 0) {
-										continue;
-									}
-									if (myUnit.getHitPoints() < myUnit.getInitialHitPoints()
-											|| random.nextInt() % 2 == 0) {
-										targetMyUnitPosition = myUnit.getPosition();
-										break;
-									}
-								}
-								if (targetMyUnitPosition != null) {
-									unit.useTech(TechType.Healing, targetMyUnitPosition);
-									hasCommanded = true;
-								} else {
-									unit.useTech(TechType.Healing, mySecondChokePoint.getCenter());
-									hasCommanded = true;
-								}
-
-							}
-
-							else if (unit.getType() == UnitType.Terran_Science_Vessel) {
-
-								// Position targetMyUnitPosition = null;
-
-								Random random = new Random();
-
-								Unit randomMarine;
-
-								int breakCondition = 0;
-								int size = myZerglingList.size();
-								int isNear = 100;
-
-								while (true) {
-									randomMarine = myZerglingList.get(random.nextInt(size));
-									if (randomMarine.isStartingAttack() || randomMarine.isAttacking()
-											|| randomMarine.isUnderAttack()) {
-										unit.follow(randomMarine);
-										hasCommanded = true;
-										break;
-									} else if (breakCondition == size) {
-										// 가까운 마린이면 그냥 따라가고
-										// 멀면 새로운 마린을 찾아서 따라가고
-										// 루프 탈출
-										if (unit.getDistance(randomMarine) < isNear) {
-											unit.follow(randomMarine);
-											hasCommanded = true;
-											break;
-										} else {
-											isNear = isNear + 10;
-										}
-									} else {
-										breakCondition = breakCondition + 1;
-									}
-								}
-
-								for (Unit myUnit : myZerglingList) {
-									unit.follow(myUnit);
-									hasCommanded = true;
-
-								}
-
-							}
-
-							// canAttack 기능이 없는 다른 유닛타입 (하이템플러, 옵저버, 사이언스베슬, 오버로드) 는
-							// 따로 명령을 내린 적이 없으면 다른 공격유닛들과 동일하게 이동하도록 되어있습니다.
-							else {
-								commandUtil.move(unit, attackTargetPosition);
-								hasCommanded = true;
-							}
-						}
-					}
-				}
-			}
 		}
+
 	}
 
+	
 	/// 적군을 Eliminate 시키도록 아군 공격 유닛들에게 지시합니다
 	void commandMyCombatUnitToEliminate() {
 
@@ -1151,74 +950,59 @@ public class StrategyManager {
 
 		for (Unit unit : myAllCombatUnitList) {
 
-			boolean hasCommanded = false;
-
-			if (unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode
-					|| unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
-				//hasCommanded = controlSiegeTankUnitType(unit);
-			}
+			
 
 			// 따로 명령 내린 적이 없으면, 적군의 남은 건물 혹은 랜덤 위치로 이동시킨다
-			if (hasCommanded == false) {
+			
 
-				if (unit.isIdle()) {
+				if (unit.isIdle()) 
+				{
 
 					Position targetPosition = null;
-					if (targetEnemyBuilding != null) {
+					if (targetEnemyBuilding != null) 
+					{
 						targetPosition = targetEnemyBuilding.getPosition();
-					} else {
+					} 
+					else 
+					{
 						targetPosition = new Position(random.nextInt(mapWidth * Config.TILE_SIZE),
 								random.nextInt(mapHeight * Config.TILE_SIZE));
 					}
 
-					if (unit.canAttack()) {
+					if (unit.canAttack()) 
+					{
 						commandUtil.attackMove(unit, targetPosition);
-						hasCommanded = true;
-					} else {
-
-						// canAttack 기능이 없는 유닛타입 중 메딕은 마린 유닛에 대해 Heal 하러 가게 하고, 마린 유닛이 없으면 아군 지역으로 돌아오게
-						// 합니다
-						if (unit.getType() == UnitType.Terran_Medic) {
-							Position targetMyUnitPosition = null;
-
-							for (Unit myUnit : myZerglingList) {
-
-								if (myUnit == null || myUnit.exists() == false || myUnit.getHitPoints() < 0) {
-									continue;
-								}
-
-								if (myUnit.getHitPoints() < myUnit.getInitialHitPoints() || random.nextInt() % 2 == 0) {
-									targetMyUnitPosition = myUnit.getPosition();
-									break;
+						
+					} 
+					else 
+					{
+						// canAttack 기능이 없는 유닛타입 예를 들면 럴커
+						if (unit.getType() == UnitType.Zerg_Lurker) 
+						{
+							if(unit.getDistance(targetPosition) < 6*Config.TILE_SIZE)
+							{
+								if(unit.isBurrowed()==false)
+								{
+									unit.burrow();
 								}
 							}
-
-							if (targetMyUnitPosition != null) {
-
-								unit.useTech(TechType.Healing, targetMyUnitPosition);
-								hasCommanded = true;
-							} else {
-								unit.useTech(TechType.Healing, mySecondChokePoint.getCenter());
-								hasCommanded = true;
-							}
+							else
+							{
+								if(unit.isBurrowed()==true)
+								{
+									unit.unburrow();
+								}
+								
+								commandUtil.move(unit, targetPosition);
+							}	
 						}
-
-						// canAttack 기능이 없는 유닛타입 중 러커는 일반 공격유닛처럼 targetPosition 을 향해 이동시킵니다
-						else if (unit.getType() == UnitType.Zerg_Lurker) {
-							commandUtil.move(unit, targetPosition);
-							hasCommanded = true;
-						}
-
-						// canAttack 기능이 없는 다른 유닛타입 (하이템플러, 옵저버, 사이언스베슬, 오버로드) 는
-						// 따로 명령을 내린 적이 없으면 다른 공격유닛들과 동일하게 이동하도록 되어있습니다.
-
-						else {
-							commandUtil.move(unit, targetPosition);
-							hasCommanded = true;
+						else // 오버로드
+						{
+							commandUtil.move(unit, targetPosition);	
 						}
 					}
 				}
-			}
+			
 		}
 	}
 
@@ -1855,7 +1639,16 @@ public class StrategyManager {
 
 						if (BuildManager.Instance().buildQueue.getItemCount(nextUnitTypeToTrain) < myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)*2) {
 
-							BuildManager.Instance().buildQueue.queueAsLowestPriority(nextUnitTypeToTrain, false);
+							if(nextUnitTypeToTrain == UnitType.Zerg_Mutalisk)
+							{
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(nextUnitTypeToTrain, true);
+							}
+							else
+							{
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(nextUnitTypeToTrain, false);
+							}
+							
+							
 
 							nextTargetIndexOfBuildOrderArray++;
 
@@ -1893,26 +1686,15 @@ public class StrategyManager {
 		else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 2) {
 
 
-			if(myPlayer.minerals() > 1000)
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Spire)>0 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk)<12)
 			{
-				nextUnitTypeToTrain = myZergling;
+				nextUnitTypeToTrain = myMutalisk;
 			}
 			else
 			{
-				if(myPlayer.completedUnitCount(UnitType.Zerg_Spire)>0)
-				{
-					nextUnitTypeToTrain = myMutalisk;
-				}
-				else
-				{
-					nextUnitTypeToTrain = myHydralisk;
-				}
-				
+				nextUnitTypeToTrain = myHydralisk;
 			}
-			
-			
 				
-			
 			
 		} else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 3) {
 
@@ -1920,13 +1702,18 @@ public class StrategyManager {
 			if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern)>0 ) {
 				nextUnitTypeToTrain = myUltralisk;
 			}
-			else if (myZerglingList.size() < 2.0 * myMutaliskList.size()) 
+			else if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk)<15)
+			{
+				nextUnitTypeToTrain = myHydralisk;
+			}
+			
+			else if (myZerglingList.size() < myHydraliskList.size()) 
 			{
 				nextUnitTypeToTrain = myZergling;
 			} 
 			else 
 			{
-				nextUnitTypeToTrain = myMutalisk;
+				nextUnitTypeToTrain = myHydralisk;
 			}
 			
 			
@@ -2262,7 +2049,11 @@ public class StrategyManager {
 			else if (unit.getType() == myLurker || unit.getType() == UnitType.Zerg_Lurker_Egg) {
 				myLurkerList.add(unit);
 				myAllCombatUnitList.add(unit);
-			} else if (unit.getType() == myCreepColony) {
+			}
+			else if (unit.getType() == UnitType.Zerg_Overlord) {
+				myAllCombatUnitList.add(unit);
+			}
+			else if (unit.getType() == myCreepColony) {
 				myCreepColonyList.add(unit);
 			} else if (unit.getType() == mySunkenColony) {
 				mySunkenColonyList.add(unit);

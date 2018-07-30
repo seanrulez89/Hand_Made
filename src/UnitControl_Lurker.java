@@ -24,9 +24,9 @@ public class UnitControl_Lurker {
 			return;
 		}
 		
-		if(SM.myLurkerList.size() < 7)
+		if(SM.myLurkerList.size() < 6)
 		{
-			if(myPlayer.gas()>300)
+			if(myPlayer.gas()>200)
 			{
 				SM.myHydraliskList.get(0).morph(UnitType.Zerg_Lurker);
 			}
@@ -34,7 +34,7 @@ public class UnitControl_Lurker {
 		
 		if(SM.myLurkerList.size() > 0)
 		{
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Lurker) > 4)
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) > 10 || myPlayer.completedUnitCount(UnitType.Zerg_Lurker)>4) // 공격나가는 시점
 			{
 				for(Unit unit : SM.myLurkerList)
 				{
@@ -67,9 +67,11 @@ public class UnitControl_Lurker {
 						{
 							unit.unburrow();
 						}
+						
+						unit.move(SM.enemyMainBaseLocation.getPosition());
 					}
 					
-					unit.move(SM.enemyMainBaseLocation.getPosition());
+					
 					
 				}
 			}

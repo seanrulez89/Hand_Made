@@ -460,16 +460,10 @@ public class UnitControl_Hydralisk {
 	}
 
 	
+	public void setStartGatherEndPoint ()
+	{
+		
 
-	
-	
-	public void update() {
-		
-		if(SM.myHydraliskList.size() == 0)
-		{
-			return;
-		}
-		
 		if(SM.enemyMainBaseLocation==null)
 		{
 			startPoint = SM.myFirstChokePoint.getPoint();
@@ -482,6 +476,23 @@ public class UnitControl_Hydralisk {
 			gatherPoint = SM.enemySecondChokePoint.getPoint();
 			endPoint = SM.enemyMainBaseLocation.getPoint();
 		}
+		
+		
+		
+		
+	}
+	
+
+	
+	
+	public void update() {
+		
+		if(SM.myHydraliskList.size() == 0)
+		{
+			return;
+		}
+		
+		setStartGatherEndPoint();
 
 		
 		
@@ -618,27 +629,26 @@ public class UnitControl_Hydralisk {
 				}
 				
 			}
-			else 
+			else if(myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) > 10 || myPlayer.completedUnitCount(UnitType.Zerg_Lurker)>4)// 공격나가는 시점
 			{
-				if(endGame==true)
+
+				if (endGame == false) 
+				{
+					//System.out.println(7);
+					commandUtil.attackMove(Hydralisk, gatherPoint);
+					moveToEndPoint = false;
+				}
+				else 
 				{
 					//System.out.println(6);
 					commandUtil.attackMove(Hydralisk, endPoint);
 				}
-				else if(SM.myHydraliskList.size() > 12)
-				{
-					if(SM.myHydraliskList.size() > 24)
-					{
-						//System.out.println(7);
-						commandUtil.attackMove(Hydralisk, gatherPoint);
-					}
-					else
-					{
-						//System.out.println(8);
-						commandUtil.attackMove(Hydralisk, startPoint);
-					}
-				}
 
+			}
+			else
+			{
+				
+				commandUtil.attackMove(Hydralisk, startPoint);
 			}
 		}
 	}

@@ -676,7 +676,7 @@ public class UnitControl_Mutalisk {
 		
 		
 		Position averagePosition = getAveragePosition(SM.myMutaliskList);
-		boolean endGame = enoughGathered(UnitType.Zerg_Mutalisk, gatherPoint, 3, 0.5);
+		boolean endGame = enoughGathered(UnitType.Zerg_Mutalisk, gatherPoint, 5, 0.5);
 		Position invader = weAreUnderAttack(averagePosition);
 		//Position nextPlace = getNextPlaceToGo();
 		Unit nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, averagePosition);
@@ -791,13 +791,13 @@ public class UnitControl_Mutalisk {
 
 				if (endGame == false) 
 				{
-					System.out.println(7);
+					//System.out.println(7);
 					commandUtil.attackMove(Mutalisk, gatherPoint);
 					moveToEndPoint = false;
 				}
 				else 
 				{
-					System.out.println(6);
+					//System.out.println(6);
 					commandUtil.attackMove(Mutalisk, endPoint);
 				}
 

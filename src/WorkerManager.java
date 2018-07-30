@@ -53,7 +53,7 @@ public class WorkerManager {
 		handleMoveWorkers();
 	//	handleCombatWorkers();
 		handleRepairWorkers();
-	//	rebalanceWorkers(); 0628 이걸 하는건 좋은데 이걸 하니까 우왕좌왕 미네랄 못캐는 애들이 생기는듯 계속 새로 할당되서
+	//	rebalanceWorkers(); //0628 이걸 하는건 좋은데 이걸 하니까 우왕좌왕 미네랄 못캐는 애들이 생기는듯 계속 새로 할당되서
 		
 	}
 	

@@ -46,10 +46,10 @@ public class BuildOrder_Initial {
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-		
 
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
+				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 
 
 		
@@ -67,7 +67,7 @@ public class BuildOrder_Initial {
 		
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
-				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+				BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
 		
 
 		 
@@ -79,6 +79,14 @@ public class BuildOrder_Initial {
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		
+		
+
+		
+		
+		
+		
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
