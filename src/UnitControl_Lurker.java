@@ -34,7 +34,8 @@ public class UnitControl_Lurker {
 		
 		if(SM.myLurkerList.size() > 0)
 		{
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) > 10 || myPlayer.completedUnitCount(UnitType.Zerg_Lurker)>4) // 공격나가는 시점
+			//if(myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) > 10 || myPlayer.completedUnitCount(UnitType.Zerg_Lurker)>4) // 공격나가는 시점
+			if(SM.isTimeToStartAttack() == true) // 공격나가는 시점
 			{
 				for(Unit unit : SM.myLurkerList)
 				{

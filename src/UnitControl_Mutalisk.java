@@ -736,7 +736,7 @@ public class UnitControl_Mutalisk {
 			
 
 
-			if (invader != null) 
+			if (invader != null && Mutalisk.isAttacking()==false) 
 			{	
 				nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, invader);
 			}

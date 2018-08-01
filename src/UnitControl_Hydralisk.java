@@ -582,7 +582,7 @@ public class UnitControl_Hydralisk {
 			
 
 			
-			if (invader != null) 
+			if (invader != null && Hydralisk.isAttacking()==false)
 			{	
 				nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, invader);
 			}
@@ -629,7 +629,8 @@ public class UnitControl_Hydralisk {
 				}
 				
 			}
-			else if(myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) > 10 || myPlayer.completedUnitCount(UnitType.Zerg_Lurker)>4)// 공격나가는 시점
+			//else if(myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) > 10 || myPlayer.completedUnitCount(UnitType.Zerg_Lurker)>4)// 공격나가는 시점
+			else if(SM.isTimeToStartAttack() == true)// 공격나가는 시점		
 			{
 
 				if (endGame == false) 
