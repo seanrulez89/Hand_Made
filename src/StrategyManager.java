@@ -2018,47 +2018,47 @@ public class StrategyManager {
 		enemyFirstChokePoint = InformationManager.Instance().getFirstChokePoint(enemyPlayer);
 		enemySecondChokePoint = InformationManager.Instance().getSecondChokePoint(enemyPlayer);
 
-		// 아군 방어 건물 목록, 공격 유닛 목록
-		myCreepColonyList.clear();
-		mySunkenColonyList.clear();
-
-		myAllCombatUnitList.clear();
-		myZerglingList.clear();
-		myMutaliskList.clear();
-		myUltraliskList.clear();
-		myHydraliskList.clear();
-		myLurkerList.clear();
-
-		for (Unit unit : myPlayer.getUnits()) {
-			if (unit == null || unit.exists() == false || unit.getHitPoints() <= 0)
-				continue;
-
-			if (unit.getType() == myZergling) {
-				myZerglingList.add(unit);
-				myAllCombatUnitList.add(unit);
-			} else if (unit.getType() == myMutalisk) {
-				myMutaliskList.add(unit);
-				myAllCombatUnitList.add(unit);
-			} else if (unit.getType() == myUltralisk) {
-				myUltraliskList.add(unit);
-				myAllCombatUnitList.add(unit);
-			} else if (unit.getType() == myHydralisk) {
-				myHydraliskList.add(unit);
-				myAllCombatUnitList.add(unit);
-			}
-			else if (unit.getType() == myLurker || unit.getType() == UnitType.Zerg_Lurker_Egg) {
-				myLurkerList.add(unit);
-				myAllCombatUnitList.add(unit);
-			}
-			else if (unit.getType() == UnitType.Zerg_Overlord) {
-				myAllCombatUnitList.add(unit);
-			}
-			else if (unit.getType() == myCreepColony) {
-				myCreepColonyList.add(unit);
-			} else if (unit.getType() == mySunkenColony) {
-				mySunkenColonyList.add(unit);
-			}
-		}
+//		// 아군 방어 건물 목록, 공격 유닛 목록
+//		myCreepColonyList.clear();
+//		mySunkenColonyList.clear();
+//
+//		myAllCombatUnitList.clear();
+//		myZerglingList.clear();
+//		myMutaliskList.clear();
+//		myUltraliskList.clear();
+//		myHydraliskList.clear();
+//		myLurkerList.clear();
+//
+//		for (Unit unit : myPlayer.getUnits()) {
+//			if (unit == null || unit.exists() == false || unit.getHitPoints() <= 0)
+//				continue;
+//
+//			if (unit.getType() == myZergling) {
+//				myZerglingList.add(unit);
+//				myAllCombatUnitList.add(unit);
+//			} else if (unit.getType() == myMutalisk) {
+//				myMutaliskList.add(unit);
+//				myAllCombatUnitList.add(unit);
+//			} else if (unit.getType() == myUltralisk) {
+//				myUltraliskList.add(unit);
+//				myAllCombatUnitList.add(unit);
+//			} else if (unit.getType() == myHydralisk) {
+//				myHydraliskList.add(unit);
+//				myAllCombatUnitList.add(unit);
+//			}
+//			else if (unit.getType() == myLurker || unit.getType() == UnitType.Zerg_Lurker_Egg) {
+//				myLurkerList.add(unit);
+//				myAllCombatUnitList.add(unit);
+//			}
+//			else if (unit.getType() == UnitType.Zerg_Overlord) {
+//				myAllCombatUnitList.add(unit);
+//			}
+//			else if (unit.getType() == myCreepColony) {
+//				myCreepColonyList.add(unit);
+//			} else if (unit.getType() == mySunkenColony) {
+//				mySunkenColonyList.add(unit);
+//			}
+//		}
 	}
 
 	/// 권순우 0617 죽은 유닛을 세는 단순한 로직인데
@@ -2070,7 +2070,17 @@ public class StrategyManager {
 		if (unit.getType().isNeutral()) {
 			return;
 		}
-
+		// 죽은 유닛 삭제
+		ArrayList<Unit> unitList = getUnitList(unit);
+		if (unitList != null) {
+			boolean check = deleteUnitInList(unit, unitList);
+			if(!check) {
+			}
+		}
+		if(isCombatUnit(unit)) {
+			myAllCombatUnitList.remove(unit);
+		}
+		
 		if (unit.getPlayer() == myPlayer) {
 			if (unit.getType() == myZergling) {
 				myKilledZerglings++;
@@ -2095,4 +2105,88 @@ public class StrategyManager {
 		}
 	}
 
+	public void onUnitMorph(Unit unit) {
+		if (unit.getType().isNeutral()) {
+			return;
+		}
+		ArrayList<Unit> unitList = getUnitList(unit);
+		if (unitList != null) {
+			unitList.add(unit);
+			if(isCombatUnit(unit)) {
+				myAllCombatUnitList.add(unit);
+			}
+		}
+		ArrayList<Unit> bfUnitList = getBfUnitList(unit);
+		if(bfUnitList!=null) {
+			boolean check = deleteUnitInList(unit, bfUnitList);
+			if(!check) {
+			}
+		}
+		
+	}
+	
+	public ArrayList<Unit> getBfUnitList(Unit unit){
+		if(unit.getType()==mySunkenColony) {
+			return myCreepColonyList;
+		}else if(unit.getType()==myLurker || unit.getType()==UnitType.Zerg_Lurker_Egg) {
+			return myHydraliskList;
+		}else {
+			return null;
+		}
+	}
+
+	public ArrayList<Unit> getUnitList(Unit unit) {
+		if (unit.getType() == myZergling) {
+			return myZerglingList;
+		} else if (unit.getType() == myMutalisk) {
+			return myMutaliskList;
+		} else if (unit.getType() == myUltralisk) {
+			return myUltraliskList;
+		} else if (unit.getType() == myHydralisk) {
+			return myHydraliskList;
+		} else if (unit.getType() == myLurker || unit.getType() == UnitType.Zerg_Lurker_Egg) {
+			return myLurkerList;
+		} else if (unit.getType() == UnitType.Zerg_Overlord) {
+			return null;
+		} else if (unit.getType() == myCreepColony) {
+			return myCreepColonyList;
+		} else if (unit.getType() == mySunkenColony) {
+			return mySunkenColonyList;
+		} else {
+			return null;
+		}
+	}
+
+	public boolean isCombatUnit(Unit unit) {
+		if (unit.getType() == myZergling) {
+			return true;
+		} else if (unit.getType() == myMutalisk) {
+			return true;
+		} else if (unit.getType() == myUltralisk) {
+			return true;
+		} else if (unit.getType() == myHydralisk) {
+			return true;
+		} else if (unit.getType() == myLurker || unit.getType() == UnitType.Zerg_Lurker_Egg) {
+			return true;
+		} else if (unit.getType() == UnitType.Zerg_Overlord) {
+			return true;
+		} else if (unit.getType() == myCreepColony) {
+			return false;
+		} else if (unit.getType() == mySunkenColony) {
+			return false;
+		} else {
+			return false;
+		}
+	}
+	private boolean deleteUnitInList(Unit unit, ArrayList<Unit> list) {
+		for(int i = 0; i<list.size(); i++) {
+			if(list.get(i).getID()==unit.getID()) {
+				list.remove(i);
+				return true;
+			}
+		}
+		return false;
+		
+	}
+	
 }

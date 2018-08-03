@@ -94,6 +94,8 @@ public class GameCommander {
 	/// Zerg 종족의 유닛은 건물 건설이나 지상유닛/공중유닛 생산에서 거의 대부분 Morph 형태로 진행됩니다
 	public void onUnitMorph(Unit unit) { 
 		InformationManager.Instance().onUnitMorph(unit);
+		StrategyManager.Instance().onUnitMorph(unit);
+
 
 		// Zerg 종족 Worker 의 Morph 에 대한 처리
 		WorkerManager.Instance().onUnitMorph(unit);

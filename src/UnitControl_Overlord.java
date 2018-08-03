@@ -68,8 +68,19 @@ public class UnitControl_Overlord {
 		}
 		
 		
+		// 유닛리스트 관리 알고리즘 수정 20180803 shsh0823.lee
+		for(Unit unit : myAttackUnitList) {
+			for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 6*Config.TILE_SIZE)) {
+				if(enemy.getPlayer()==enemyPlayer) {
+					explorationSite.add(unit.getPosition());
+					if(explorationSite.size()==2) {
+						break;
+					}
+				}
+			}
+		}
 		
-		Iterator<Unit> ITR = myAttackUnitList.iterator();
+/*		Iterator<Unit> ITR = myAttackUnitList.iterator();
 		
 		if(myAttackUnitList.size()>0)
 		{
@@ -94,12 +105,12 @@ public class UnitControl_Overlord {
 				}
 			}
 		}
-		
 		if(myAttackUnitList.size()>2)
 		{
 			explorationSite.add(myAttackUnitList.get(0).getPosition());
 			explorationSite.add(myAttackUnitList.get(1).getPosition());
 		}
+ */		
 		
 		if(myAttackUnitList.size()==1)
 		{
