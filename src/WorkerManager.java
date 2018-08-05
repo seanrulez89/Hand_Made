@@ -836,8 +836,44 @@ public class WorkerManager {
 
 		// ResourceDepot 건물이 신규 생성되면, 자료구조 추가 처리를 한 후, rebalanceWorkers 를 한다
 		if (unit.getType().isResourceDepot() && unit.getPlayer() == MyBotModule.Broodwar.self()) {
-			workerData.addDepot(unit);
-			rebalanceWorkers();
+			List<Unit> depotList = workerData.getDepots();
+			
+			
+			// 단순 유닛생산용 해처리들은 depot에 할당하지 못하도록 수정 shsh0823.lee 2018.08.05
+			List<BaseLocation> baseLocationList = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
+			int baseLocationSize = baseLocationList.size();
+
+			// baseLocation에 기존 depot 존재 시 마킹
+			boolean[] occupied = new boolean[baseLocationSize];
+			for(int i = 0; i<baseLocationSize; i++) {
+				for(Unit depot : depotList) {
+					double distance = baseLocationList.get(i).getPosition().getDistance(depot.getPosition());
+//					System.out.println("baseLocation : " + baseLocationList.get(i).getPosition());
+//					System.out.println("depot : " + depot.getPosition());
+//					System.out.println("distance : " + distance);
+					if(distance<10) {
+						occupied[i] = true;
+						break;
+					}
+				}
+			}
+			
+			// 지금 완성된 해처리 근처에 마킹되지 않은 baseLocation 있을 시 depot에 추가
+			for(int i = 0; i<baseLocationSize; i++) {
+				if(occupied[i]) {
+					continue;
+				}
+				double distance = baseLocationList.get(i).getPosition().getDistance(unit.getPosition());
+				if(distance<10) {
+//					System.out.println("baseLocation : " + baseLocationList.get(i).getPosition());
+//					System.out.println("depot : " + unit.getPosition());
+//					System.out.println("distance : " + distance);
+					workerData.addDepot(unit);
+					rebalanceWorkers();
+					break;
+				}
+			}
+//			System.out.println("depotList : " + depotList);
 		}
 
 		// 일꾼이 신규 생성되면, 자료구조 추가 처리를 한다.
