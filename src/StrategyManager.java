@@ -389,7 +389,10 @@ public class StrategyManager {
 			
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) > 10 || myPlayer.completedUnitCount(UnitType.Zerg_Lurker)>4) {
 			
-			if(myHydraliskList.size()>12)
+			
+			
+			
+			if(myHydraliskList.size()>24)
 			{
 				attack_cnt = attack_cnt + 1;
 				return true;
@@ -405,9 +408,7 @@ public class StrategyManager {
 	/// 방어 모드로 전환할 때인지 여부를 리턴합니다
 	boolean isTimeToStartDefense() {
 
-		if (myZerglingList.size() < 10) {
-			return true;
-		}
+		
 
 		int enemyUnitCountAroundMyMainBaseLocation = 0;
 
@@ -911,7 +912,7 @@ public class StrategyManager {
 
 		for (Unit unit : myAllCombatUnitList) 
 		{
-			if(unit.getType().equals(UnitType.Zerg_Zergling))
+			if(unit.getType().equals(UnitType.Zerg_Zergling) || unit.getType().equals(UnitType.Zerg_Ultralisk))
 			{
 				commandUtil.attackMove(unit, enemyMainBaseLocation.getPosition());
 			}
@@ -1699,7 +1700,7 @@ public class StrategyManager {
 		} else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 3) {
 
 			
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern)>0 ) {
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern)>0 && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk)<6) {
 				nextUnitTypeToTrain = myUltralisk;
 			}
 			else if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk)<15)
@@ -2126,6 +2127,8 @@ public class StrategyManager {
 	}
 	
 	public ArrayList<Unit> getBfUnitList(Unit unit){
+		
+		/*
 		if(unit.getType()==mySunkenColony) {
 			return myCreepColonyList;
 		}else if(unit.getType()==myLurker || unit.getType()==UnitType.Zerg_Lurker_Egg) {
@@ -2133,6 +2136,24 @@ public class StrategyManager {
 		}else {
 			return null;
 		}
+		*/
+		
+		
+		if(unit.getType()==mySunkenColony) {
+			return myCreepColonyList;
+		}else if(unit.getType()==UnitType.Zerg_Lurker_Egg) {
+			return myHydraliskList;
+		}else if(unit.getType()==myLurker) { 
+				return myLurkerList;
+		}
+		else {
+			return null;
+		}
+		
+		
+		
+		
+		
 	}
 
 	public ArrayList<Unit> getUnitList(Unit unit) {

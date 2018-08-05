@@ -17,7 +17,7 @@ public class UnitControl_MASTER {
 		
 		if(StrategyManager.Instance().enemyMainBaseLocation!=null 
 				&& StrategyManager.Instance().combatState != StrategyManager.CombatState.eliminateEnemy
-				) // 0.25초마다 실행 && MyBotModule.Broodwar.getFrameCount() % 6 == 0
+				&& MyBotModule.Broodwar.getFrameCount() % 2 == 0)
 		{
 			Mutalisk = new UnitControl_Mutalisk();
 			Mutalisk.update();	

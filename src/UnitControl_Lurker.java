@@ -24,11 +24,14 @@ public class UnitControl_Lurker {
 			return;
 		}
 		
+		//System.out.println("LURKER : " + SM.myLurkerList.size());
+		
+		
 		if(SM.myLurkerList.size() < 6)
 		{
 			if(myPlayer.gas()>200)
 			{
-				SM.myHydraliskList.get(0).morph(UnitType.Zerg_Lurker);
+				SM.myHydraliskList.get(SM.myHydraliskList.size()-1).morph(UnitType.Zerg_Lurker);
 			}
 		}
 		
@@ -80,13 +83,23 @@ public class UnitControl_Lurker {
 			{
 				for(Unit unit : SM.myLurkerList)
 				{
-					if(MyBotModule.Broodwar.getUnitsInRadius(SM.mySecondChokePoint.getCenter(), 3*Config.TILE_SIZE).contains(unit)==false)
+					
+					boolean isNear = false;
+					for(Unit myUnit : MyBotModule.Broodwar.getUnitsInRadius(SM.mySecondChokePoint.getCenter(), 3*Config.TILE_SIZE))
+					{
+						if(myUnit.getID() == unit.getID())
+						{
+							isNear=true;
+							break;
+						}
+					}
+					
+					if(isNear==false)
 					{
 						if(unit.isBurrowed()==true)
 						{
-							unit.unburrow();
+							unit.unburrow();	
 						}
-						
 						unit.move(SM.mySecondChokePoint.getCenter());
 					}
 					else

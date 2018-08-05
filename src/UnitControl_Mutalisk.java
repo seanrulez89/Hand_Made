@@ -1,9 +1,10 @@
 
 import java.util.*;
 
+
 import bwapi.*;
 import bwta.*;
-
+import bwta.Region;
 
 public class UnitControl_Mutalisk {
 	
@@ -656,6 +657,55 @@ public class UnitControl_Mutalisk {
 		
 		
 	}
+	
+	public Position setFleePoint (Unit unit)
+	{
+		Position position = SM.myMainBaseLocation.getPosition();
+		
+		int currentEnemy = 0;
+		int minEnemy = 100000;
+		
+		for(int i = -1 ; i < 2 ; i++)
+		{
+			for(int j = -1 ; j < 2 ; j++)
+			{
+				Position tempPosition = new Position(unit.getX()+3*Config.TILE_SIZE*i, unit.getY()+3*Config.TILE_SIZE*j);
+				
+				currentEnemy = 0;
+				for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(tempPosition, 48))
+				{
+					if(enemy.getPlayer() == enemyPlayer && enemy.canAttack())
+					{
+						currentEnemy++;
+					}
+				}
+				
+				if(currentEnemy<minEnemy)
+				{
+					minEnemy = currentEnemy;
+					position = tempPosition;
+				}
+				
+				
+				
+				
+						
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		return position;
+	}
+	
 
 	
 	
@@ -750,14 +800,33 @@ public class UnitControl_Mutalisk {
 			{
 				if (Mutalisk.getAirWeaponCooldown() == 0) 
 				{
+					/* 홀드컨트롤 구현완료
+					if(Mutalisk.getDistance(nextTarget.getPosition()) > 3*Config.TILE_SIZE)
+					{
+						System.out.println(1);
+						Mutalisk.move(nextTarget.getPosition());
+					}
+					else
+					{
+						System.out.println(1111);
+						Mutalisk.holdPosition();
+					}
+					*/
+					
+					
 					System.out.println(1);
 					Mutalisk.attack(nextTarget);
 					continue; //컨티뉴를 하면 무조건 이 타겟을 치고 안하면 근처를 친다 왜냐하면 어택땅이 기본 상태라서 근접유닛은 안하는게 낫겠다 자꾸 병목현상되니까
 				} 
-				else if(Mutalisk.getAirWeaponCooldown() > 10)
+				else
 				{
 					System.out.println(2);
-					Mutalisk.move(SM.myMainBaseLocation.getPosition());
+					
+					
+					
+					//Mutalisk.move(SM.myMainBaseLocation.getPosition());
+					Mutalisk.move(setFleePoint(Mutalisk));
+					
 					continue;
 				}
 
@@ -766,23 +835,26 @@ public class UnitControl_Mutalisk {
 			if(SM.enemyMainBaseLocation == null)
 			{
 				System.out.println(3);
-				commandUtil.attackMove(Mutalisk, startPoint);
+				//commandUtil.attackMove(Mutalisk, startPoint);
+				Mutalisk.move(startPoint);
 			}
 			else if (SM.myMutaliskList.size() <= 6) 
 			{
 				moveToEndPoint = false;
 				
-				if (MyBotModule.Broodwar.getUnitsInRadius(startPoint, 4 * Config.TILE_SIZE)
+				if (MyBotModule.Broodwar.getUnitsInRadius(startPoint, 1 * Config.TILE_SIZE)
 						.contains(Mutalisk) == false) {
 					//Mutalisk.move(startPoint);
-					commandUtil.attackMove(Mutalisk, startPoint);
+					//commandUtil.attackMove(Mutalisk, startPoint);
+					Mutalisk.move(startPoint);
 					System.out.println(4);
 					continue;
 				}
 				else
 				{
 					System.out.println(5);
-					commandUtil.attackMove(Mutalisk, startPoint);
+					//commandUtil.attackMove(Mutalisk, startPoint);
+					Mutalisk.move(startPoint);
 				}
 				
 			}
@@ -792,13 +864,15 @@ public class UnitControl_Mutalisk {
 				if (endGame == false) 
 				{
 					//System.out.println(7);
-					commandUtil.attackMove(Mutalisk, gatherPoint);
+					//commandUtil.attackMove(Mutalisk, gatherPoint);
+					Mutalisk.move(gatherPoint);
 					moveToEndPoint = false;
 				}
 				else 
 				{
 					//System.out.println(6);
-					commandUtil.attackMove(Mutalisk, endPoint);
+					//commandUtil.attackMove(Mutalisk, endPoint);
+					Mutalisk.move(endPoint);
 				}
 
 			}

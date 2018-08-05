@@ -24,7 +24,7 @@ public class UnitControl_Hydralisk {
 	static Position gatherPoint = null;
 	static Position endPoint = null;
 	
-
+	int balanceIndex = 0;
 
 
 
@@ -482,6 +482,62 @@ public class UnitControl_Hydralisk {
 		
 	}
 	
+	public void defenseBalance(Unit unit) {
+		
+		List<BaseLocation> myBaseLocations = InformationManager.Instance()
+				.getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
+		
+		ArrayList<Position> defenseSite = new ArrayList<Position>();
+		
+		Iterator <BaseLocation> lir = myBaseLocations.iterator();		
+		while(lir.hasNext())
+		{
+
+			
+			Position position = lir.next().getPosition();
+			
+			defenseSite.add(position);
+			
+			Position chokePoint = bwta.BWTA.getNearestChokepoint(position).getCenter();
+			defenseSite.add(chokePoint);
+			
+		}
+		
+		
+		Iterator <Position> iter = defenseSite.iterator();	
+		while(iter.hasNext())
+		{
+			Position position = iter.next();
+			
+			if(position.equals(SM.myFirstChokePoint.getPoint()))
+			{
+				iter.remove();
+			}
+			else if(position.equals(SM.myFirstExpansionLocation.getPosition()))
+			{
+				iter.remove();
+			}
+		}
+
+		
+		
+		defenseSite.add(SM.mySecondChokePoint.getPoint());	
+		
+		
+		
+		int num = defenseSite.size();
+		
+
+		if(balanceIndex>=num)
+		{
+			balanceIndex=0;
+		}
+		commandUtil.attackMove(unit, defenseSite.get(balanceIndex));				
+		balanceIndex++;
+		
+	
+	}
+	
 
 	
 	
@@ -494,6 +550,8 @@ public class UnitControl_Hydralisk {
 		
 		setStartGatherEndPoint();
 
+		
+		//System.out.println("HYDRA : " + SM.myHydraliskList.size());
 		
 		
 		
@@ -613,22 +671,14 @@ public class UnitControl_Hydralisk {
 				//System.out.println(3);
 				commandUtil.attackMove(Hydralisk, startPoint);
 			}
-			else if (SM.myHydraliskList.size() <= 12) 
-			{
-				if (MyBotModule.Broodwar.getUnitsInRadius(startPoint, 4 * Config.TILE_SIZE)
-						.contains(Hydralisk) == false) {
-					//Hydralisk.move(startPoint);
-					commandUtil.attackMove(Hydralisk, startPoint);
-					//System.out.println(4);
-					continue;
-				}
-				else
-				{
-					//System.out.println(5);
-					commandUtil.attackMove(Hydralisk, startPoint);
-				}
-				
-			}
+			
+			
+			
+			
+			
+			
+
+			
 			//else if(myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) > 10 || myPlayer.completedUnitCount(UnitType.Zerg_Lurker)>4)// 공격나가는 시점
 			else if(SM.isTimeToStartAttack() == true)// 공격나가는 시점		
 			{
@@ -646,6 +696,19 @@ public class UnitControl_Hydralisk {
 				}
 
 			}
+			else if (SM.myHydraliskList.size() >18) 
+			{
+				
+				
+				defenseBalance(Hydralisk);
+				
+				
+				
+			}
+			
+			
+			
+			
 			else
 			{
 				
