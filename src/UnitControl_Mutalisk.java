@@ -490,7 +490,7 @@ public class UnitControl_Mutalisk {
 		
 		averagePosition = new Position(x,y);
 		
-		MyBotModule.Broodwar.drawCircleMap(averagePosition, 7 * Config.TILE_SIZE, Color.Red);
+		//MyBotModule.Broodwar.drawCircleMap(averagePosition, 7 * Config.TILE_SIZE, Color.Red);
 		
 		return averagePosition;
 	}
@@ -674,7 +674,7 @@ public class UnitControl_Mutalisk {
 				currentEnemy = 0;
 				for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(tempPosition, 48))
 				{
-					if(enemy.getPlayer() == enemyPlayer && enemy.canAttack())
+					if(enemy.getPlayer() == enemyPlayer && enemy.canAttack()) // 벙커와 터렛과 기타등등 모두 포함해야함 canattack이 좀 이상한거 같아
 					{
 						currentEnemy++;
 					}
@@ -814,13 +814,13 @@ public class UnitControl_Mutalisk {
 					*/
 					
 					
-					System.out.println(1);
+					//System.out.println(1);
 					Mutalisk.attack(nextTarget);
 					continue; //컨티뉴를 하면 무조건 이 타겟을 치고 안하면 근처를 친다 왜냐하면 어택땅이 기본 상태라서 근접유닛은 안하는게 낫겠다 자꾸 병목현상되니까
 				} 
 				else
 				{
-					System.out.println(2);
+					//System.out.println(2);
 					
 					
 					
@@ -834,7 +834,7 @@ public class UnitControl_Mutalisk {
 			
 			if(SM.enemyMainBaseLocation == null)
 			{
-				System.out.println(3);
+				//System.out.println(3);
 				//commandUtil.attackMove(Mutalisk, startPoint);
 				Mutalisk.move(startPoint);
 			}
@@ -847,12 +847,12 @@ public class UnitControl_Mutalisk {
 					//Mutalisk.move(startPoint);
 					//commandUtil.attackMove(Mutalisk, startPoint);
 					Mutalisk.move(startPoint);
-					System.out.println(4);
+					//System.out.println(4);
 					continue;
 				}
 				else
 				{
-					System.out.println(5);
+					//System.out.println(5);
 					//commandUtil.attackMove(Mutalisk, startPoint);
 					Mutalisk.move(startPoint);
 				}

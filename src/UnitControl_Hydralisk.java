@@ -426,7 +426,7 @@ public class UnitControl_Hydralisk {
 		
 		averagePosition = new Position(x,y);
 		
-		MyBotModule.Broodwar.drawCircleMap(averagePosition, 5 * Config.TILE_SIZE, Color.Red);
+		//MyBotModule.Broodwar.drawCircleMap(averagePosition, 5 * Config.TILE_SIZE, Color.Red);
 		
 		return averagePosition;
 	}
@@ -696,7 +696,7 @@ public class UnitControl_Hydralisk {
 				}
 
 			}
-			else if (SM.myHydraliskList.size() >18) 
+			else if (SM.myHydraliskList.size() >12) 
 			{
 				
 				

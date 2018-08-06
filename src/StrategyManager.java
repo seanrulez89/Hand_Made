@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
+
 
 //import StrategyManager.CombatState;
 import bwapi.*;
@@ -392,12 +395,18 @@ public class StrategyManager {
 			
 			
 			
-			if(myHydraliskList.size()>24)
+			if(myHydraliskList.size()>18)
 			{
 				attack_cnt = attack_cnt + 1;
 				return true;
 			}
 			
+		}
+		
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Zergling) > 30) {
+
+				attack_cnt = attack_cnt + 1;
+				return true;		
 		}
 		
 		
@@ -553,7 +562,10 @@ public class StrategyManager {
 
 			// 0704 각 타입별 유닛 컨트롤 기능을 구현하면 굳이 현재 메서드에서 모든 유닛을 제어하지 않아도 된다
 			// 이 부분에서 방어할 지역이나 콕 집어 공격할 유닛만 리턴해주고, 그걸 개별 유닛컨트롤 클래스에서 알아서 적절히 대응을 하는 방법도 고려
-			if(unit.getType() == UnitType.Zerg_Mutalisk || unit.getType() == UnitType.Zerg_Hydralisk || unit.getType() == UnitType.Zerg_Lurker) // 0627 뮤탈코드 테스트를 위한 건너뛰기 조치
+			if(unit.getType() == UnitType.Zerg_Mutalisk 
+					|| unit.getType() == UnitType.Zerg_Hydralisk 
+					|| unit.getType() == UnitType.Zerg_Lurker
+					|| unit.getType().equals(UnitType.Zerg_Zergling)) // 0627 뮤탈코드 테스트를 위한 건너뛰기 조치
 			{
 				continue;
 			}
@@ -912,7 +924,7 @@ public class StrategyManager {
 
 		for (Unit unit : myAllCombatUnitList) 
 		{
-			if(unit.getType().equals(UnitType.Zerg_Zergling) || unit.getType().equals(UnitType.Zerg_Ultralisk))
+			if(unit.getType().equals(UnitType.Zerg_Ultralisk))
 			{
 				commandUtil.attackMove(unit, enemyMainBaseLocation.getPosition());
 			}
@@ -1670,6 +1682,7 @@ public class StrategyManager {
 
 		if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 1) {
 
+
 			
 			if(myPlayer.gas() > 350)
 			{
@@ -1687,7 +1700,12 @@ public class StrategyManager {
 		else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 2) {
 
 
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Spire)>0 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk)<12)
+			if(myPlayer.minerals() > 1000)
+			{
+				nextUnitTypeToTrain = myZergling;
+			}
+			
+			else if(myPlayer.completedUnitCount(UnitType.Zerg_Spire)>0 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk)<12)
 			{
 				nextUnitTypeToTrain = myMutalisk;
 			}
@@ -1699,8 +1717,11 @@ public class StrategyManager {
 			
 		} else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 3) {
 
-			
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern)>0 && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk)<6) {
+			if(myPlayer.minerals() > 1000)
+			{
+				nextUnitTypeToTrain = myZergling;
+			}
+			else if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern)>0 && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk)<6) {
 				nextUnitTypeToTrain = myUltralisk;
 			}
 			else if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk)<15)
@@ -2111,12 +2132,44 @@ public class StrategyManager {
 			return;
 		}
 		ArrayList<Unit> unitList = getUnitList(unit);
+		
+		
+		if(unit.getType().equals(UnitType.Zerg_Zergling)==true)
+		{
+			for(Unit zergling : myPlayer.getUnits())
+			{
+				if(zergling.getType().equals(UnitType.Zerg_Zergling)==true)
+				{
+					if (unitList != null && unitList.contains(zergling)==false) // 포함되지 않은 저글링만 주워담는다
+					{ 
+						unitList.add(zergling);
+						if(isCombatUnit(zergling)) {
+							myAllCombatUnitList.add(zergling);
+							
+						}
+					}
+				}
+			}			
+		}
+		else
+		{
+			if (unitList != null) {
+				unitList.add(unit);
+				if(isCombatUnit(unit)) {
+					myAllCombatUnitList.add(unit);
+				}
+			}
+		}
+		
+		/*
 		if (unitList != null) {
 			unitList.add(unit);
 			if(isCombatUnit(unit)) {
 				myAllCombatUnitList.add(unit);
 			}
 		}
+		*/
+
 		ArrayList<Unit> bfUnitList = getBfUnitList(unit);
 		if(bfUnitList!=null) {
 			boolean check = deleteUnitInList(unit, bfUnitList);

@@ -12,6 +12,7 @@ public class UnitControl_MASTER {
 	UnitControl_Hydralisk Hydralisk;
 	UnitControl_Overlord Overlord;
 	UnitControl_Lurker Lurker;
+	UnitControl_Zergling Zergling;
 	
 	public void update() {
 		
@@ -27,6 +28,9 @@ public class UnitControl_MASTER {
 			
 			Lurker = new UnitControl_Lurker();
 			Lurker.update();
+			
+			Zergling = new UnitControl_Zergling();
+			Zergling.update();
 			
 			
 		}
