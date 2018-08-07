@@ -2127,6 +2127,15 @@ public class StrategyManager {
 		}
 	}
 
+	public void onUnitCreate(Unit unit) {
+		if (unit.getType().isNeutral()) {
+			return;
+		}
+		if(unit.getType()==UnitType.Zerg_Zergling) {
+			myZerglingList.add(unit);
+		}
+	}
+	
 	public void onUnitMorph(Unit unit) {
 		if (unit.getType().isNeutral()) {
 			return;
@@ -2134,30 +2143,10 @@ public class StrategyManager {
 		ArrayList<Unit> unitList = getUnitList(unit);
 		
 		
-		if(unit.getType().equals(UnitType.Zerg_Zergling)==true)
-		{
-			for(Unit zergling : myPlayer.getUnits())
-			{
-				if(zergling.getType().equals(UnitType.Zerg_Zergling)==true)
-				{
-					if (unitList != null && unitList.contains(zergling)==false) // 포함되지 않은 저글링만 주워담는다
-					{ 
-						unitList.add(zergling);
-						if(isCombatUnit(zergling)) {
-							myAllCombatUnitList.add(zergling);
-							
-						}
-					}
-				}
-			}			
-		}
-		else
-		{
-			if (unitList != null) {
-				unitList.add(unit);
-				if(isCombatUnit(unit)) {
-					myAllCombatUnitList.add(unit);
-				}
+		if (unitList != null) {
+			unitList.add(unit);
+			if(isCombatUnit(unit)) {
+				myAllCombatUnitList.add(unit);
 			}
 		}
 		
