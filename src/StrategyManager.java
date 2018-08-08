@@ -153,12 +153,8 @@ public class StrategyManager {
 		attackEnemyFirstChokepoint, attackEnemyMainBaseLocation, // 적진 본진까지 공격
 		eliminateEnemy // 적 Eliminate
 	};
-
 	public CombatState combatState; /// 전투 상황
 
-	public boolean moveToFirstChokePoint = false;
-	public boolean moveToEnemyBaseLocation = false;
-	public boolean buildKey;
 
 	public StrategyManager() {
 
@@ -297,7 +293,12 @@ public class StrategyManager {
 		BuildOrder_Last.Instance().lastBuildOrder();
 		
 
-
+		if(MyBotModule.Broodwar.getFrameCount() % (24*10) == 0)
+		{		
+	   		MyBotModule.Broodwar.sendText("APM : " + MyBotModule.Broodwar.getAPM());
+		}
+		
+		 
 
 
 		UnitControl_MASTER.update();
@@ -377,36 +378,20 @@ public class StrategyManager {
 	boolean isTimeToStartAttack() {
 
 		MyBotModule.Broodwar.drawTextScreen(100, 240, "Wave Count : " + attack_cnt);
-		// 유닛 종류별로 최소 숫자 이상 있으면
+			
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) > 10
+				|| myPlayer.completedUnitCount(UnitType.Zerg_Lurker) > 4) {
 
-		/*
-		if (attack_cnt == 0) {
-			if (myZerglingList.size() >= necessaryNumberOfZergling
-					&& myMutaliskList.size() >= necessaryNumberOfMutalisk) {
-				attack_cnt = attack_cnt + 1;
-				return true; // first wave
-			}
-		}
-		else if
-		*/
-			
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) > 10 || myPlayer.completedUnitCount(UnitType.Zerg_Lurker)>4) {
-			
-			
-			
-			
-			if(myHydraliskList.size()>18)
-			{
+			if (myHydraliskList.size() > 18) {
 				attack_cnt = attack_cnt + 1;
 				return true;
 			}
-			
+
 		}
 		
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Zergling) > 30) {
-
-				attack_cnt = attack_cnt + 1;
-				return true;		
+			attack_cnt = attack_cnt + 1;
+			return true;
 		}
 		
 		
@@ -414,7 +399,7 @@ public class StrategyManager {
 		return false;
 	}
 
-	/// 방어 모드로 전환할 때인지 여부를 리턴합니다
+	// 방어 모드로 전환할 때인지 여부를 리턴합니다
 	boolean isTimeToStartDefense() {
 
 		
@@ -438,31 +423,28 @@ public class StrategyManager {
 		if (enemyUnitCountAroundMyMainBaseLocation > 3) {
 			return true;
 		}
+		
+		
+		if (myHydraliskList.size() < 12) {
+			return true;
+		}
+		
+		
+		
+		
+		
 
 		return false;
 	}
 
+	
+	
+	
+	
+	
+
 	/// 적군을 Eliminate 시키는 모드로 전환할지 여부를 리턴합니다
 	boolean isTimeToStartElimination() {
-		/* 스코어도 안되고 사망자도 안된다. 0701 그래도 이건 살려서 써볼만한 가치가 있다
-		int myScore =0;
-		int enemyScore =0;
-		
-		myScore = myPlayer.getBuildingScore() + myPlayer.getKillScore() + myPlayer.getRazingScore() + myPlayer.getUnitScore();
-		enemyScore = enemyPlayer.getBuildingScore() + enemyPlayer.getKillScore() + enemyPlayer.getRazingScore() + enemyPlayer.getUnitScore();
-		
-		System.out.println("myPlayer.getBuildingScore() : " + myPlayer.getBuildingScore() + "/ enemyPlayer.getBuildingScore() : " + enemyPlayer.getBuildingScore());
-		System.out.println("myPlayer.getKillScore() : " + myPlayer.getKillScore() + "/ enemyPlayer.getKillScore() : " + enemyPlayer.getKillScore());
-		System.out.println("myPlayer.getRazingScore() : " + myPlayer.getRazingScore() + "/ enemyPlayer.getRazingScore() : " + enemyPlayer.getRazingScore());
-		System.out.println("myPlayer.getUnitScore() : " + myPlayer.getUnitScore() + "/ enemyPlayer.getUnitScore() : " + enemyPlayer.getUnitScore());
-		System.out.println("myPlayer.deadUnitCount() : " + myPlayer.deadUnitCount() + "/ enemyPlayer.deadUnitCount() : " + enemyPlayer.deadUnitCount());	
-		
-		if(enemyPlayer.deadUnitCount() > 2 * myPlayer.deadUnitCount())
-		{
-			System.out.println("eli case 3");
-			return true;
-		}
-		*/
 		
 		if(enemyMainBaseLocation==null)
 		{
@@ -501,13 +483,6 @@ public class StrategyManager {
 
 		// 아군 방어 건물이 세워져있는 위치
 		Position myDefenseBuildingPosition = null;
-		// 공격받는 건물의 위치가 저장될 변수 - 노승호 170807
-		Position myAttackedBuildingPosition = null; 
-
-		
-		
-		
-		
 		
 		// seedPositionStrategyOfMyDefenseBuildingType 이것이 정하는 위치가 곧 집결지가 된다
 		// 아래 사전 정의된 경우를 제외하고서는 specified를 쓰면 된다
@@ -535,389 +510,22 @@ public class StrategyManager {
 			break;
 		}
 		
-		
-		if (isInitialBuildOrderFinished == true) {
-			myDefenseBuildingPosition = setTargetPositionTwo(myFirstExpansionLocation.getPosition(), mySecondChokePoint.getCenter(), 32);
-		}
-		else
-		{
-			myDefenseBuildingPosition = setTargetPositionTwo(myFirstExpansionLocation.getPosition(), myFirstChokePoint.getCenter(), 32);
-		}
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 
-		// 아군 공격유닛을 방어 건물이 세워져있는 위치로 배치시킵니다
-		// 아군 공격유닛을 아군 방어 건물 뒤쪽에 배치시켰다가 적들이 방어 건물을 공격하기 시작했을 때 다함께 싸우게하면 더 좋을 것입니다
 		for (Unit unit : myAllCombatUnitList) {
 			if (unit == null || unit.exists() == false)
 				continue;
 
-			// 0704 각 타입별 유닛 컨트롤 기능을 구현하면 굳이 현재 메서드에서 모든 유닛을 제어하지 않아도 된다
-			// 이 부분에서 방어할 지역이나 콕 집어 공격할 유닛만 리턴해주고, 그걸 개별 유닛컨트롤 클래스에서 알아서 적절히 대응을 하는 방법도 고려
-			if(unit.getType() == UnitType.Zerg_Mutalisk 
-					|| unit.getType() == UnitType.Zerg_Hydralisk 
-					|| unit.getType() == UnitType.Zerg_Lurker
-					|| unit.getType().equals(UnitType.Zerg_Zergling)) // 0627 뮤탈코드 테스트를 위한 건너뛰기 조치
+			if(unit.getType().equals(UnitType.Zerg_Ultralisk)) // 0627 뮤탈코드 테스트를 위한 건너뛰기 조치
 			{
-				continue;
+				commandUtil.attackMove(unit, myDefenseBuildingPosition);
 			}
 			
-			// 이건 기본코드에 있는데 도대체 어느짝에 써먹는지를 모르겠다
-			boolean hasCommanded = false;
-
-			for (Unit building : MyBotModule.Broodwar.self().getUnits()) {
-				if ((building.getType().isBuilding() && building.isUnderAttack())
-						|| (building.getType() == UnitType.Zerg_Drone && building.isUnderAttack()))																								
-				{
-					myAttackedBuildingPosition = building.getPosition();
-					myAttackedBuildingPosition = setTargetPositionOne(myAttackedBuildingPosition, 80);
-
-					List<Unit> nearbyunits = building.getUnitsInRadius(1000);
-
-					ArrayList<Unit> nearbyenemy = new ArrayList<Unit>(); // 0622 여기서 초기화 안하면 에러남
-
-					for (Unit unit222 : nearbyunits) {
-						if (unit222.getPlayer() == enemyPlayer && unit222 != null && unit222.exists()) {
-							nearbyenemy.add(unit222);
-						}
-					}
-
-					double minDistance = 1000000000;
-					double tempDistance = 0;
-					Unit myAttackTarget = null;
-					for (Unit targetENEMY : nearbyenemy) {
-
-						if (targetENEMY == null || targetENEMY.exists() == false) {
-							continue;
-						}
-
-						tempDistance = unit.getDistance(targetENEMY.getPosition());
-						if (minDistance > tempDistance) {
-							minDistance = tempDistance;
-							myAttackTarget = targetENEMY;
-						}
-
-					}
-
-					if (unit.canAttack() && myAttackTarget != null) {
-						// commandUtil.attackMove(unit, myAttackedBuildingPosition);
-						// commandUtil.attackUnit(unit, building);
-						unit.attack(myAttackTarget);
-					} else {
-						commandUtil.attackMove(unit, myAttackedBuildingPosition);
-					}
-
-					// System.out.println("건물님 지키러 갑니다");
-					hasCommanded = true;
-				}
-			} // 건물이 데미지를 입었으면 그쪽으로 이동한다 - 노승호 170807
-
-			if (unit.getType() == UnitType.Zerg_Lurker) {
-			//	hasCommanded = controlLurkerUnitType(unit);
-			}
-			if (unit.getType() == mySpecialUnitType1) {
-				hasCommanded = controlSpecialUnitType1(unit);
-			}
-			if (unit.getType() == mySpecialUnitType2) {
-				hasCommanded = controlSpecialUnitType2(unit);
-			}
-
-			// 따로 명령 내린 적이 없으면, 방어 건물 주위로 이동시킨다
-			if (hasCommanded == false) {
-
-				if (unit.isIdle()) {
-
-					if (unit.canAttack()) {
-						commandUtil.attackMove(unit, myDefenseBuildingPosition);
-					} else {
-						commandUtil.move(unit, myDefenseBuildingPosition);
-					}
-				}
-			}
+			
 		}
 
 	}
 
 
-
-	/// 첫번째 특수 유닛 타입의 유닛에 대해 컨트롤 명령을 입력합니다
-	boolean controlSpecialUnitType1(Unit unit) {
-
-		///////////////////////////////////////////////////////////////////
-		///////////////////////// 아래의 코드를 수정해보세요 ///////////////////////
-		//
-		// TODO 1. 아군 옵저버/사이언스베슬/오버로드를 공격 유닛들과 함께 이동하게 하는 로직 (예상 개발시간 10분)
-		//
-		// 목표 : 첫번째 특수유닛 타입은 적군 투명 유닛 탐지 능력이 있고 시야가 넓은 옵저버/사이언스베슬/오버로드 입니다.
-		//
-		// 현재는 아군 옵저버/사이언스베슬/오버로드에게 따로 컨트롤 명령을 입력하지 않으면
-		// 다른 공격유닛들과 동일하게 적군 본진을 향해 이동하도록 되어있습니다.
-		//
-		// 그러나 이렇게하면 적군 유닛들이 있는데도 무시하고 계속 이동하다가 사망하게 됩니다
-		//
-		// 아군 공격 유닛들의 목록 myCombatUnitType1List, myCombatUnitType2List,
-		/////////////////////////////////////////////////////////////////// myCombatUnitType3List
-		// 을 사용해서, 다른 아군 공격 유닛들과 함께 다니도록 해보세요
-		//
-		// return false = 유닛에게 따로 컨트롤 명령을 입력하지 않음 -> 다른 공격유닛과 동일하게 이동하도록 합니다
-		// return true = 유닛에게 따로 컨트롤 명령을 입력했음
-		//
-		// Hint : myCombatUnitType1List 에서 랜덤하게 한 유닛을 선택해서 그 유닛을 따라다니게 하면 어떨까요?
-		//
-		///////////////////////////////////////////////////////////////////
-
-		boolean hasCommanded = false;
-		if (unit.getType() == UnitType.Protoss_Observer) {
-
-			Position targetPosition = null;
-
-			// targetPosition 을 적절히 정해서 이동시켜보세요
-
-		} else if (unit.getType() == UnitType.Terran_Science_Vessel) {
-
-			Position targetPosition = null;
-
-			// targetPosition 을 적절히 정해서 이동시켜보세요
-
-			if (unit.getEnergy() >= TechType.Defensive_Matrix.energyCost()) {
-
-				Unit targetMyUnit = null;
-
-				// targetMyUnit 을 적절히 정해보세요
-
-				if (targetMyUnit != null) {
-					unit.useTech(TechType.Defensive_Matrix, targetMyUnit);
-					hasCommanded = true;
-				}
-			}
-
-			if (unit.getEnergy() >= TechType.Irradiate.energyCost() && myPlayer.hasResearched(TechType.Irradiate)) {
-
-				Unit targetEnemyUnit = null;
-
-				// targetEnemyUnit 을 적절히 정해보세요
-
-				if (targetEnemyUnit != null) {
-					unit.useTech(TechType.Irradiate, targetEnemyUnit);
-					hasCommanded = true;
-				}
-			}
-
-		} else if (unit.getType() == UnitType.Zerg_Overlord) {
-
-			Position targetPosition = null;
-
-			// targetPosition 을 적절히 정해서 이동시켜보세요
-		}
-
-		return hasCommanded;
-	}
-
-	/// 두번째 특수 유닛 타입의 유닛에 대해 컨트롤 명령을 내립니다
-	boolean controlSpecialUnitType2(Unit unit) {
-
-		///////////////////////////////////////////////////////////////////
-		///////////////////////// 아래의 코드를 수정해보세요 ///////////////////////
-		//
-		// TODO 2. 아군 하이템플러/배틀크루저/디파일러가 특수 기술을 사용하게 하는 로직 (예상 개발시간 20분)
-		//
-		// 목표 : 두번째 특수유닛 타입은 특수 기술을 갖고있는 하이템플러/배틀크루저/디파일러 입니다.
-		//
-		// 현재는 특수기술 사용 대상을 정하는 로직이 구현 안되어있습니다.
-		//
-		// 적군 유닛들의 목록 MyBotModule.Broodwar.enemy().getUnits() 을 사용하여
-		// 특수 기술 사용 대상을 적절히 정하도록 해보세요
-		//
-		// return false = 유닛에게 따로 컨트롤 명령을 입력하지 않음 -> 다른 공격유닛과 동일하게 이동하도록 합니다
-		// return true = 유닛에게 따로 컨트롤 명령을 입력했음
-		//
-		// 추가 : 테란 종족 첫번째 특수유닛 타입 사이언스베슬에 대해서도 특수 기술을 사용하게 하려면
-		// controlSpecialUnitType1 함수를 수정하시면 됩니다
-		//
-		///////////////////////////////////////////////////////////////////
-
-		boolean hasCommanded = false;
-
-		// 프로토스 종족 하이템플러의 경우
-		if (unit.getType() == UnitType.Protoss_High_Templar) {
-
-			if (unit.getEnergy() >= TechType.Psionic_Storm.energyCost()
-					&& myPlayer.hasResearched(TechType.Psionic_Storm)) {
-
-				Position targetPosition = null;
-
-				// targetPosition 을 적절히 정해보세요
-
-				if (targetPosition != null) {
-					unit.useTech(TechType.Psionic_Storm, targetPosition);
-					hasCommanded = true;
-				}
-			}
-		} else if (unit.getType() == UnitType.Terran_Battlecruiser) {
-
-			if (unit.getEnergy() >= TechType.Yamato_Gun.energyCost() && myPlayer.hasResearched(TechType.Yamato_Gun)) {
-
-				Unit targetEnemyUnit = null;
-
-				// targetEnemyUnit 을 적절히 정해보세요
-
-				if (targetEnemyUnit != null) {
-					unit.useTech(TechType.Yamato_Gun, targetEnemyUnit);
-					hasCommanded = true;
-				}
-			}
-		} else if (unit.getType() == UnitType.Zerg_Defiler) {
-
-			if (unit.getEnergy() < 200 && myPlayer.hasResearched(TechType.Consume)) {
-
-				Unit targetMyUnit = null;
-
-				// 가장 가까운 저글링을 컨슘 한다
-				double minDistance = 1000000000;
-				double tempDistance = 0;
-				for (Unit zerglingUnit : myZerglingList) {
-					tempDistance = unit.getDistance(zerglingUnit.getPosition());
-					if (minDistance > tempDistance) {
-						minDistance = tempDistance;
-						targetMyUnit = zerglingUnit;
-					}
-				}
-
-				if (targetMyUnit != null) {
-					unit.useTech(TechType.Consume, targetMyUnit);
-					hasCommanded = true;
-				}
-			}
-
-			if (unit.getEnergy() >= TechType.Plague.energyCost() && myPlayer.hasResearched(TechType.Plague)) {
-
-				Unit targetEnemyUnit = null;
-
-				// targetEnemyUnit 을 적절히 정해보세요
-
-				if (targetEnemyUnit != null) {
-					unit.useTech(TechType.Plague, targetEnemyUnit);
-					hasCommanded = true;
-				}
-			} else if (unit.getEnergy() >= TechType.Dark_Swarm.energyCost()) {
-
-				Position targetPosition = null;
-
-				// targetPosition 을 적절히 정해보세요
-
-				if (targetPosition != null) {
-					unit.useTech(TechType.Dark_Swarm, targetPosition);
-					hasCommanded = true;
-				}
-			}
-		}
-
-		return hasCommanded;
-	}
-
-	Position setTargetPositionOne(Position A, int C) {
-		Random random = new Random();
-
-		int x;
-		int y;
-
-		Position targetPosition;
-
-		x = random.nextInt(C);
-		x = x + random.nextInt(C * 2) * (-1);
-
-		y = random.nextInt(C);
-		y = y + random.nextInt(C * 2) * (-1);
-
-		/*
-		 * while(true) { x = random.nextInt(C); x = x + random.nextInt(C*2)*(-1);
-		 * 
-		 * y = random.nextInt(C); y = y + random.nextInt(C*2)*(-1);
-		 * 
-		 * break; }
-		 */
-
-		targetPosition = new Position(A.getX() + x, A.getY() + y);
-		// System.out.println(7);
-		return targetPosition;
-	}
-
-	Position setTargetPositionTwo(Position A, Position B, int C) {
-		Random random = new Random();
-
-		int x;
-		int y;
-
-		Position targetPosition;
-
-		x = random.nextInt(C);
-		x = x + random.nextInt(C * 2) * (-1);
-
-		y = random.nextInt(C);
-		y = y + random.nextInt(C * 2) * (-1);
-
-		/*
-		 * while(true) { x = random.nextInt(C); x = x + random.nextInt(C*2)*(-1);
-		 * 
-		 * y = random.nextInt(C); y = y + random.nextInt(C*2)*(-1);
-		 * 
-		 * break; }
-		 */
-
-		targetPosition = new Position((A.getX() + B.getX()) / 2 + x, (A.getY() + B.getY()) / 2 + y);
-		// System.out.println(6);
-		return targetPosition;
-	}
-
-	int countEnemyAround(Position A, int B) {
-		int enemyNum = 0;
-
-		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(A.getPoint(), B * Config.TILE_SIZE)) {
-			if (unit.getPlayer() == enemyPlayer) {
-				enemyNum = enemyNum + 1;
-			}
-		}
-
-		// System.out.println("enemyNum :"+ enemyNum);
-
-		return enemyNum;
-	}
-
-	int countMyAttackUnitAround(Position A, int B) {
-		int myNum = 0;
-
-		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(A.getPoint(), B * Config.TILE_SIZE)) {
-			if (unit.getPlayer() == myPlayer && unit.canAttack()) {
-				myNum = myNum + 1;
-			}
-		}
-
-		// System.out.println("enemyNum :"+ enemyNum);
-		return myNum;
-	}
-
-	int countMyAttackUnitAll() {
-		int myNum = 0;
-
-		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-			if (unit.canAttack()) {
-				if (unit.getType().isBuilding() == false && unit.getType() != UnitType.Zerg_Drone
-						&& unit.getType() != UnitType.Zerg_Larva && unit.getType() != UnitType.Zerg_Overlord) {
-					myNum = myNum + 1;
-				}
-			}
-		}
-
-		return myNum;
-	}
 
 	/// 아군 공격 유닛들에게 공격을 지시합니다
 	public void commandMyCombatUnitToAttack() {
@@ -928,10 +536,7 @@ public class StrategyManager {
 			{
 				commandUtil.attackMove(unit, enemyMainBaseLocation.getPosition());
 			}
-
-
 		}
-
 	}
 
 	
@@ -1115,7 +720,7 @@ public class StrategyManager {
 							// 빌드큐에 일꾼 생산이 1개는 있도록 한다
 							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Drone, null) == 0) {
 
-								BuildManager.Instance().buildQueue.queueAsLowestPriority(
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(
 										new MetaType(InformationManager.Instance().getWorkerType()), false);
 							}
 						}
@@ -1351,6 +956,7 @@ public class StrategyManager {
 				}
 			}
 		}
+		/*
 		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding == 3 && nextExpansion!=null) 
 		{
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) ==0 
@@ -1371,6 +977,7 @@ public class StrategyManager {
 
 			}
 		}
+		*/
 		/*
 		else if (BuildManager.Instance().getAvailableMinerals() > 300 && numberOfMyCombatUnitTrainingBuilding == 5) 
 		{
@@ -1385,6 +992,7 @@ public class StrategyManager {
 			}
 		}
 		*/
+		/*
 		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding >= 5 && nextExpansion!=null) 
 		{
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 
@@ -1404,21 +1012,26 @@ public class StrategyManager {
 				}
 			}
 
-		} 
-		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding < 13 && nextExpansion!=null) 
+		}
+		*/
+		else if (BuildManager.Instance().getAvailableMinerals() > 650 && numberOfMyCombatUnitTrainingBuilding < 13 && nextExpansion!=null) 
 		{
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) ==0 
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) ==0) 
 			{
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
-						nextExpansion.getTilePosition(), false); /// 해처리 추가 확장 0622
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				
+				
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
+						nextExpansion.getTilePosition(), true); /// 해처리 추가 확장 0622
 
 				System.out.println("7");
 
 				if (nextExpansion.getGeysers().size()>0) 
 				{
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
-							nextExpansion.getTilePosition(), false); /// 해처리 추가 확장 0622
+							nextExpansion.getTilePosition(), true); /// 해처리 추가 확장 0622
 
 					System.out.println("8");
 				}
@@ -1699,13 +1312,25 @@ public class StrategyManager {
 
 		else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 2) {
 
-
-			if(myPlayer.minerals() > 1000)
+			if(myZerglingList.size()<15)
 			{
 				nextUnitTypeToTrain = myZergling;
+				
+			}
+			else if(myPlayer.minerals() > 1000)
+			{
+				if(myZerglingList.size()<45)
+				{
+					nextUnitTypeToTrain = myZergling;
+					
+				}
+				else
+				{
+					nextUnitTypeToTrain = myHydralisk;
+				}
 			}
 			
-			else if(myPlayer.completedUnitCount(UnitType.Zerg_Spire)>0 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk)<12)
+			else if(myPlayer.completedUnitCount(UnitType.Zerg_Spire)>0 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk)<15)
 			{
 				nextUnitTypeToTrain = myMutalisk;
 			}
@@ -1719,7 +1344,15 @@ public class StrategyManager {
 
 			if(myPlayer.minerals() > 1000)
 			{
-				nextUnitTypeToTrain = myZergling;
+				if(myZerglingList.size()<45)
+				{
+					nextUnitTypeToTrain = myZergling;
+					
+				}
+				else
+				{
+					nextUnitTypeToTrain = myHydralisk;
+				}
 			}
 			else if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern)>0 && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk)<6) {
 				nextUnitTypeToTrain = myUltralisk;
@@ -1746,7 +1379,15 @@ public class StrategyManager {
 
 			if(myPlayer.minerals() > 1000)
 			{
-				nextUnitTypeToTrain = myZergling;
+				if(myZerglingList.size()<45)
+				{
+					nextUnitTypeToTrain = myZergling;
+					
+				}
+				else
+				{
+					nextUnitTypeToTrain = myHydralisk;
+				}
 			}
 			else
 			{

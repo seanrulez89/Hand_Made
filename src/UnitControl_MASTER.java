@@ -18,7 +18,7 @@ public class UnitControl_MASTER {
 		
 		if(StrategyManager.Instance().enemyMainBaseLocation!=null 
 				&& StrategyManager.Instance().combatState != StrategyManager.CombatState.eliminateEnemy
-				&& MyBotModule.Broodwar.getFrameCount() % 2 == 0)
+				)//&& MyBotModule.Broodwar.getFrameCount() % 2 == 0)
 		{
 			Mutalisk = new UnitControl_Mutalisk();
 			Mutalisk.update();	

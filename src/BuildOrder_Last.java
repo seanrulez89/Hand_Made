@@ -32,20 +32,36 @@ public class BuildOrder_Last {
 				+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spire)
 				+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spire, null);
 		
+		int chamberNumber = myPlayer.allUnitCount(UnitType.Zerg_Evolution_Chamber)
+				+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Evolution_Chamber)
+				+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Evolution_Chamber,	null);
+
+		
 		if(myPlayer.hasResearched(TechType.Lurker_Aspect)==true && spireNumber == 0)
 		{
 			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spire,
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);			
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			
+			if (chamberNumber == 0) {
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Evolution_Chamber,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
+			}
+		}
+		
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) >= 1) {
+			if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) < 3
+					&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
+					&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0) {
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Carapace, true);
+			}
 		}
 		
 
 		if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) >= 1)
 		{
 
-			int chamberNumber = myPlayer.allUnitCount(UnitType.Zerg_Evolution_Chamber)
-					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Evolution_Chamber)
-					+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Evolution_Chamber,	null);
-	
+			
 			int queensNestNumber = myPlayer.allUnitCount(UnitType.Zerg_Queens_Nest)
 					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Queens_Nest)
 					+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Queens_Nest, null);
@@ -63,20 +79,10 @@ public class BuildOrder_Last {
 					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Ultralisk_Cavern)
 					+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Ultralisk_Cavern, null);
 			
-			if (chamberNumber == 0) {
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Evolution_Chamber,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 
-			}
 
 			
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) >= 1) {
-				if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) < 3
-						&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
-						&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0) {
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Carapace, true);
-				}
-			}
+			
 			
 			
 			if (queensNestNumber == 0 && BuildManager.Instance().getAvailableMinerals() > UnitType.Zerg_Queens_Nest.mineralPrice()) {

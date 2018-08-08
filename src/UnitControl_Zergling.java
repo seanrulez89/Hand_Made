@@ -29,7 +29,7 @@ public class UnitControl_Zergling {
 
 
 
-	StrategyManager.CombatState CombatStateNow = SM.combatState;
+	StrategyManager.CombatState CombatState = SM.combatState;
 	ArrayList<Unit> Zerglings = SM.myZerglingList;
 
 	public static boolean moveToEndPoint = false;
@@ -355,7 +355,7 @@ public class UnitControl_Zergling {
 		
 		
 		defenseSite.add(SM.mySecondChokePoint.getPoint());	
-		
+		defenseSite.add(bwta.BWTA.getNearestChokepoint(BuildOrder_Expansion.expansion().getPosition()).getCenter());
 		
 		
 		int num = defenseSite.size();
@@ -384,30 +384,50 @@ public class UnitControl_Zergling {
 		setStartGatherEndPoint();
 
 		
-		//System.out.println("HYDRA : " + SM.myZerglingList.size());
+		boolean endGame = enoughGathered(UnitType.Zerg_Zergling, gatherPoint, 3, 0.3);
+		Position invader = null;
+		Unit nextTarget = null;
 		
-		
-		
-		
-		
-		
-		//Position averagePosition = getAveragePosition(SM.myZerglingList);
-		boolean endGame = enoughGathered(UnitType.Zerg_Zergling, gatherPoint, 3, 0.5);
-		//Position invader = weAreUnderAttack(averagePosition);
-		//Position nextPlace = getNextPlaceToGo();
-		//Unit nextTarget = getNextTargetOf(UnitType.Zerg_Zergling, averagePosition);
-
-		
-
-		
-		
-		
-		
+		int i = 0;
 
 
-		for (Unit Zergling : SM.myZerglingList) {
+		//System.out.println("SM.myZerglingList.size() : " + SM.myZerglingList.size());
+		
+		for(i=0 ; i<SM.myZerglingList.size() ; i++)
+		{
 			
-			//System.out.println(Zergling.getID());
+			Unit Zergling = SM.myZerglingList.get(i);
+			
+			if(i % (SM.myZerglingList.size()/3+1) == 0)
+			{
+				invader = weAreUnderAttack(Zergling.getPosition());				
+				
+				if (invader != null && Zergling.isAttacking()==false)
+				{	
+					nextTarget = getNextTargetOf(UnitType.Zerg_Zergling, invader);
+				}
+				else
+				{
+					nextTarget = getNextTargetOf(UnitType.Zerg_Zergling, Zergling.getPosition());
+				}
+				
+			}
+			else
+			{
+				if(nextTarget!=null && Zergling.getDistance(nextTarget.getPosition()) > UnitType.Zerg_Zergling.sightRange())
+				{
+					invader = weAreUnderAttack(Zergling.getPosition());				
+					
+					if (invader != null && Zergling.isAttacking()==false)
+					{	
+						nextTarget = getNextTargetOf(UnitType.Zerg_Zergling, invader);
+					}
+					else
+					{
+						nextTarget = getNextTargetOf(UnitType.Zerg_Zergling, Zergling.getPosition());
+					}
+				}
+			}
 			
 			if(Zergling.isIrradiated())
 			{
@@ -421,25 +441,6 @@ public class UnitControl_Zergling {
 				continue;
 			}
 			
-			//Position averagePosition = getAveragePosition(SM.myZerglingList);
-			//boolean endGame = enoughGathered(UnitType.Zerg_Zergling, gatherPoint, 3, 0.5);
-			Position invader = weAreUnderAttack(Zergling.getPosition());
-			//Position nextPlace = getNextPlaceToGo();
-			Unit nextTarget = getNextTargetOf(UnitType.Zerg_Zergling, Zergling.getPosition());
-			
-			
-			
-			
-
-			
-			if (invader != null && Zergling.isAttacking()==false)
-			{
-				
-				
-				nextTarget = getNextTargetOf(UnitType.Zerg_Zergling, invader);
-				
-			
-			}
 	
 			
 			
@@ -458,8 +459,8 @@ public class UnitControl_Zergling {
 				//System.out.println(3);
 				commandUtil.attackMove(Zergling, startPoint);
 			}
-			else if(SM.isTimeToStartAttack() == true)// 공격나가는 시점		
-			{
+			else if(CombatState == StrategyManager.CombatState.attackStarted)// 공격나가는 시점		
+				{
 
 				if (endGame == false) 
 				{

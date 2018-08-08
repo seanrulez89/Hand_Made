@@ -17,6 +17,8 @@ public class UnitControl_Lurker {
 	Race myRace = SM.myRace;
 	Race enemyRace = SM.enemyRace;
 	
+	StrategyManager.CombatState CombatState = SM.combatState;
+	
 	public void update()
 	{
 		if(SM.myHydraliskList.size() == 0 || myPlayer.hasResearched(TechType.Lurker_Aspect) == false)
@@ -37,8 +39,7 @@ public class UnitControl_Lurker {
 		
 		if(SM.myLurkerList.size() > 0)
 		{
-			//if(myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) > 10 || myPlayer.completedUnitCount(UnitType.Zerg_Lurker)>4) // 공격나가는 시점
-			if(SM.isTimeToStartAttack() == true) // 공격나가는 시점
+			if(CombatState == StrategyManager.CombatState.attackStarted)// 공격나가는 시점		
 			{
 				for(Unit unit : SM.myLurkerList)
 				{

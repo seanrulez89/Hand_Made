@@ -174,7 +174,7 @@ public class UnitControl_Overlord {
 		
 		explorationSite.add(SM.myFirstChokePoint.getPoint());
 		explorationSite.add(SM.mySecondChokePoint.getPoint());		
-		explorationSite.add(new Position(63*32, 63*32));
+		//explorationSite.add(new Position(63*32, 63*32));
 		
 		if(MyBotModule.Broodwar.mapFileName().equals("(4)CircuitBreaker.scx"))
 		{

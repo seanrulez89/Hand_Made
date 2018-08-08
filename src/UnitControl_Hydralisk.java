@@ -28,7 +28,7 @@ public class UnitControl_Hydralisk {
 
 
 
-	StrategyManager.CombatState CombatStateNow = SM.combatState;
+	StrategyManager.CombatState CombatState = SM.combatState;
 	ArrayList<Unit> Hydralisks = SM.myHydraliskList;
 
 	public static boolean moveToEndPoint = false;
@@ -302,7 +302,7 @@ public class UnitControl_Hydralisk {
 		// 기지 주변에 악당이 등장하는 경우. 꼭 맞고 있지는 않을 수도 있다
 		for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(myPlayer)) {
 
-			for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getPosition(), 8 * Config.TILE_SIZE)) {
+			for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getPosition(), 12 * Config.TILE_SIZE)) {
 
 				if (unit.getPlayer() == enemyPlayer) {
 
@@ -522,7 +522,7 @@ public class UnitControl_Hydralisk {
 		
 		
 		defenseSite.add(SM.mySecondChokePoint.getPoint());	
-		
+		defenseSite.add(bwta.BWTA.getNearestChokepoint(BuildOrder_Expansion.expansion().getPosition()).getCenter());
 		
 		
 		int num = defenseSite.size();
@@ -551,28 +551,66 @@ public class UnitControl_Hydralisk {
 		setStartGatherEndPoint();
 
 		
-		//System.out.println("HYDRA : " + SM.myHydraliskList.size());
 		
 		
-		
-		
-		
-		
-		Position averagePosition = getAveragePosition(SM.myHydraliskList);
 		boolean endGame = enoughGathered(UnitType.Zerg_Hydralisk, gatherPoint, 3, 0.5);
-		Position invader = weAreUnderAttack(averagePosition);
-		//Position nextPlace = getNextPlaceToGo();
-		Unit nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, averagePosition);
-
+		Position invader = null;
+		Unit nextTarget = null;
 		
-
-		
-		
-		
-		
+		int i = 0;
 
 
-		for (Unit Hydralisk : SM.myHydraliskList) {
+		
+		
+		for(i=0 ; i<SM.myHydraliskList.size() ; i++)
+		{
+			Unit Hydralisk = SM.myHydraliskList.get(i);
+			
+			if(i % (SM.myHydraliskList.size()/6+1) == 0)
+			{
+				invader = weAreUnderAttack(Hydralisk.getPosition());			
+				
+				if (invader != null && Hydralisk.isAttacking()==false)
+				{	
+					underAttack = true;
+					moveToEndPoint = false;
+					nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, invader);
+				}
+				else
+				{
+					underAttack = false;
+					nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, Hydralisk.getPosition());
+				}
+				
+			}
+			else
+			{
+				if(nextTarget!=null && Hydralisk.getDistance(nextTarget.getPosition()) > UnitType.Zerg_Hydralisk.sightRange())
+				{
+					invader = weAreUnderAttack(Hydralisk.getPosition());				
+					
+					if (invader != null && Hydralisk.isAttacking()==false)
+					{	
+						underAttack = true;
+						moveToEndPoint = false;
+						nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, invader);
+					}
+					else
+					{
+						underAttack = false;
+						nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, Hydralisk.getPosition());
+					}
+				}
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			
 			if(Hydralisk.isIrradiated())
 			{
@@ -587,63 +625,13 @@ public class UnitControl_Hydralisk {
 			}
 			
 			
-			/*
-			if(nextTarget != null && nextTarget.isStimmed())
-			{
-				int medic = 0;
-				for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(nextTarget.getPosition(), 32*2))
-				{
-					if(unit.getType().equals(UnitType.Terran_Medic))
-					{
-						medic++;
-					}
-				}
-				
-				if(medic!=0)
-				{
-					Hydralisk.move(SM.myMainBaseLocation.getPosition());
-			//		System.out.println("STP01");
-					continue;
-				}
-				
-
-			}
-			*/
 			
-			/*
-			if(invader != null && getNextTargetOf(UnitType.Zerg_Hydralisk, invader).isStimmed())
-			{
-				Hydral.move(SM.myMainBaseLocation.getPosition());
-				System.out.println("STP02");
-				continue;				
-			}
-			*/
-			
-			
-
-			
-			
-
-			/*
-			if (SM.myHydraliskList.size() <= 12) 
-			{
-				if (MyBotModule.Broodwar.getUnitsInRadius(startPoint, 4 * Config.TILE_SIZE)
-						.contains(Hydralisk) == false) {
-					Hydralisk.move(startPoint);
-					System.out.println(0);
-					continue;
-				}
-			}
-			*/
 			
 			
 			
 
 			
-			if (invader != null && Hydralisk.isAttacking()==false)
-			{	
-				nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, invader);
-			}
+
 	
 			
 			
@@ -679,8 +667,7 @@ public class UnitControl_Hydralisk {
 			
 
 			
-			//else if(myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) > 10 || myPlayer.completedUnitCount(UnitType.Zerg_Lurker)>4)// 공격나가는 시점
-			else if(SM.isTimeToStartAttack() == true)// 공격나가는 시점		
+			else if(CombatState == StrategyManager.CombatState.attackStarted)// 공격나가는 시점		
 			{
 
 				if (endGame == false) 
@@ -716,6 +703,9 @@ public class UnitControl_Hydralisk {
 			}
 		}
 	}
+
+
+
 	
 	/*
 	private static Hydralisk instance = new Hydralisk();
@@ -723,63 +713,6 @@ public class UnitControl_Hydralisk {
 	/ static singleton 객체를 리턴합니다
 	public static Hydralisk Instance() {
 		return instance;
-	}
-	*/
-	
-	
-	
-
-	/*
-	public Position rPoint(Position enemyUnit, Position myUnit)
-	{
-		Position rPoint = null;
-		
-		int enemyUnitX = enemyUnit.getX()/32;
-		int enemyUnitY = enemyUnit.getY()/32;
-		int myUnitX = myUnit.getX()/32;
-		int myUnitY = myUnit.getY()/32;
-		
-
-		int a = 0;
-		
-		a = (enemyUnit.getY() - myUnit.getY() + 1) / (enemyUnit.getX() -  myUnit.getX() + 1);
-		
-		int dimension = 0;
-		
-		int deltaX = myUnit.getX() - enemyUnit.getX();
-		int deltaY = myUnit.getY() - enemyUnit.getY();
-		
-		if(deltaX > 0 && deltaY > 0)
-		{
-			dimension = 1;
-		}
-		else if(deltaX < 0 && deltaY > 0)
-		{
-			dimension = 2;
-		}
-		else if (deltaX < 0 && deltaY < 0)
-		{
-			dimension = 3;
-		}
-		else
-		{
-			dimension = 4;
-		}
-		
-		if(dimension == 1 || dimension == 4)
-		{
-			rPoint = new Position(myUnitX+3, a*(myUnitX+3));
-		}
-		else
-		{
-			rPoint = new Position(myUnitX-3, a*(myUnitX-3));
-		}
-
-		System.out.println(a);
-		System.out.println(myUnitX);
-		System.out.println(myUnitX+3 + " + " + (int)a*(myUnitX+3));
-		
-		return rPoint;
 	}
 	*/
 	
