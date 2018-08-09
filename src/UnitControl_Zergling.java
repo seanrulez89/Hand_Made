@@ -355,7 +355,13 @@ public class UnitControl_Zergling {
 		
 		
 		defenseSite.add(SM.mySecondChokePoint.getPoint());	
-		defenseSite.add(bwta.BWTA.getNearestChokepoint(BuildOrder_Expansion.expansion().getPosition()).getCenter());
+		
+		if(BuildOrder_Expansion.expansion()!=null)
+		{
+			defenseSite.add(bwta.BWTA.getNearestChokepoint(BuildOrder_Expansion.expansion().getPosition()).getCenter());
+		}
+		
+		
 		
 		
 		int num = defenseSite.size();
@@ -449,8 +455,9 @@ public class UnitControl_Zergling {
 			if (nextTarget != null) 
 			{
 				//System.out.println(1);
-					Zergling.attack(nextTarget);
-					continue; // 컨티뉴를 하면 무조건 이 타겟을 치고 안하면 근처를 친다 왜냐하면 어택땅이 기본 상태라서 근접유닛은 안하는게 낫겠다 자꾸 병목현상되니까
+				commandUtil.attackUnit(Zergling, nextTarget);
+				//Zergling.attack(nextTarget);
+				continue; // 컨티뉴를 하면 무조건 이 타겟을 치고 안하면 근처를 친다 왜냐하면 어택땅이 기본 상태라서 근접유닛은 안하는게 낫겠다 자꾸 병목현상되니까
 			}
 			
 			
@@ -478,7 +485,10 @@ public class UnitControl_Zergling {
 			else if (SM.myZerglingList.size() >12) 
 			{
 				//System.out.println(9);
-				defenseBalance(Zergling);
+				if(Zergling!=null)
+				{
+					defenseBalance(Zergling);					
+				}
 			}
 			else
 			{	

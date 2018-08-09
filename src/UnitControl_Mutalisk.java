@@ -815,7 +815,8 @@ public class UnitControl_Mutalisk {
 					
 					
 					//System.out.println(1);
-					Mutalisk.attack(nextTarget);
+					commandUtil.attackUnit(Mutalisk, nextTarget);
+					//Mutalisk.attack(nextTarget);
 					continue; //컨티뉴를 하면 무조건 이 타겟을 치고 안하면 근처를 친다 왜냐하면 어택땅이 기본 상태라서 근접유닛은 안하는게 낫겠다 자꾸 병목현상되니까
 				} 
 				else
@@ -825,7 +826,8 @@ public class UnitControl_Mutalisk {
 					
 					
 					//Mutalisk.move(SM.myMainBaseLocation.getPosition());
-					Mutalisk.move(setFleePoint(Mutalisk));
+					commandUtil.move(Mutalisk, setFleePoint(Mutalisk));
+					//Mutalisk.move(setFleePoint(Mutalisk));
 					
 					continue;
 				}
@@ -836,7 +838,8 @@ public class UnitControl_Mutalisk {
 			{
 				//System.out.println(3);
 				//commandUtil.attackMove(Mutalisk, startPoint);
-				Mutalisk.move(startPoint);
+				commandUtil.move(Mutalisk, startPoint);
+				//Mutalisk.move(startPoint);
 			}
 			else if (SM.myMutaliskList.size() <= 6) 
 			{
@@ -846,7 +849,8 @@ public class UnitControl_Mutalisk {
 						.contains(Mutalisk) == false) {
 					//Mutalisk.move(startPoint);
 					//commandUtil.attackMove(Mutalisk, startPoint);
-					Mutalisk.move(startPoint);
+					commandUtil.move(Mutalisk, startPoint);
+					//Mutalisk.move(startPoint);
 					//System.out.println(4);
 					continue;
 				}
@@ -854,7 +858,8 @@ public class UnitControl_Mutalisk {
 				{
 					//System.out.println(5);
 					//commandUtil.attackMove(Mutalisk, startPoint);
-					Mutalisk.move(startPoint);
+					commandUtil.move(Mutalisk, startPoint);
+					//Mutalisk.move(startPoint);
 				}
 				
 			}
@@ -865,14 +870,16 @@ public class UnitControl_Mutalisk {
 				{
 					//System.out.println(7);
 					//commandUtil.attackMove(Mutalisk, gatherPoint);
-					Mutalisk.move(gatherPoint);
+					commandUtil.move(Mutalisk, gatherPoint);
+					//Mutalisk.move(gatherPoint);
 					moveToEndPoint = false;
 				}
 				else 
 				{
 					//System.out.println(6);
 					//commandUtil.attackMove(Mutalisk, endPoint);
-					Mutalisk.move(endPoint);
+					commandUtil.move(Mutalisk, endPoint);
+					//Mutalisk.move(endPoint);
 				}
 
 			}

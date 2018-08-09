@@ -45,7 +45,7 @@ public class UnitControl_Lurker {
 				{
 					Unit tempEnemy = null;
 					
-					for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 6*Config.TILE_SIZE))
+					for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 5*Config.TILE_SIZE))
 					{
 						if(enemy.isFlying()==true)
 						{
@@ -73,7 +73,8 @@ public class UnitControl_Lurker {
 							unit.unburrow();
 						}
 						
-						unit.move(SM.enemyMainBaseLocation.getPosition());
+						commandUtil.move(unit, SM.enemyMainBaseLocation.getPosition());
+						//unit.move(SM.enemyMainBaseLocation.getPosition());
 					}
 					
 					
@@ -101,7 +102,8 @@ public class UnitControl_Lurker {
 						{
 							unit.unburrow();	
 						}
-						unit.move(SM.mySecondChokePoint.getCenter());
+						commandUtil.move(unit, SM.mySecondChokePoint.getCenter());
+						//unit.move(SM.mySecondChokePoint.getCenter());
 					}
 					else
 					{

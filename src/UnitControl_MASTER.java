@@ -13,6 +13,7 @@ public class UnitControl_MASTER {
 	UnitControl_Overlord Overlord;
 	UnitControl_Lurker Lurker;
 	UnitControl_Zergling Zergling;
+	UnitControl_Defiler Defiler;
 	
 	public void update() {
 		
@@ -31,6 +32,9 @@ public class UnitControl_MASTER {
 			
 			Zergling = new UnitControl_Zergling();
 			Zergling.update();
+			
+			Defiler = new UnitControl_Defiler();
+			Defiler.update();
 			
 			
 		}

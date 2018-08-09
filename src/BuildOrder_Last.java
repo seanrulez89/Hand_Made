@@ -58,7 +58,8 @@ public class BuildOrder_Last {
 		}
 		
 
-		if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) >= 1)
+		//if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) >= 1)
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Spire) == 1)
 		{
 
 			
@@ -78,6 +79,10 @@ public class BuildOrder_Last {
 			int ultraliskCavernNumber = myPlayer.allUnitCount(UnitType.Zerg_Ultralisk_Cavern)
 					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Ultralisk_Cavern)
 					+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Ultralisk_Cavern, null);
+			
+			int defilerMoundNumber = myPlayer.allUnitCount(UnitType.Zerg_Defiler_Mound)
+					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Defiler_Mound)
+					+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Defiler_Mound, null);
 			
 
 
@@ -124,6 +129,15 @@ public class BuildOrder_Last {
 			}
 			
 			
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) == 1 && defilerMoundNumber == 0)
+			{
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Defiler_Mound,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			}
+			
+			
+			
+			
 			if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) == 1 && ultraliskCavernNumber == 0)
 			{
 			
@@ -131,6 +145,18 @@ public class BuildOrder_Last {
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 				
 			}
+			
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Defiler_Mound) == 1)
+			{
+				if (myPlayer.hasResearched(TechType.Dark_Swarm)==false
+						&& myPlayer.isResearching(TechType.Dark_Swarm) == false
+						&& BuildManager.Instance().buildQueue.getItemCount(TechType.Dark_Swarm) == 0) {
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(TechType.Dark_Swarm, true);
+				}
+			}
+				
+			
+			
 				
 			if (myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) == 1)
 			{

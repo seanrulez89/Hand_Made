@@ -240,30 +240,35 @@ public class UnitControl_Overlord {
 				
 				if(overlord.isUnderAttack())
 				{
-					overlord.move(SM.myMainBaseLocation.getPosition());
+					commandUtil.move(overlord, SM.myMainBaseLocation.getPosition());
+					//overlord.move(SM.myMainBaseLocation.getPosition());
 					continue;
 				}
 				
 				if(i<4)
-				{
-					overlord.move(getFollowSite(overlord, UnitType.Zerg_Hydralisk));
-				}
-				else if(i<6)
-				{
-					if(SM.myMutaliskList.size()>0)
-					{	
-						overlord.move(getFollowSite(overlord, UnitType.Zerg_Mutalisk));	
-					}
-					else
-					{
-						overlord.move(getExplorationSite(overlord));
-					}
-					
-				}
-				else
-				{
-					overlord.move(getExplorationSite(overlord));
-				}
+	            {
+					commandUtil.move(overlord, getFollowSite(overlord, UnitType.Zerg_Hydralisk));
+					//overlord.move(getFollowSite(overlord, UnitType.Zerg_Hydralisk));
+	            }
+	            else if(i<6)
+	            {
+	               if(SM.myMutaliskList.size()>0)
+	               {
+	            	   commandUtil.move(overlord, getFollowSite(overlord, UnitType.Zerg_Mutalisk));
+	            	   //overlord.move(getFollowSite(overlord, UnitType.Zerg_Mutalisk));   
+	               }
+	               else
+	               {
+	            	   commandUtil.move(overlord, getExplorationSite(overlord));
+	                   //overlord.move(getExplorationSite(overlord));
+	               }
+	               
+	            }
+	            else
+	            {
+	            	commandUtil.move(overlord, getExplorationSite(overlord));
+	                //overlord.move(getExplorationSite(overlord));
+	            }
 					
 					
 				

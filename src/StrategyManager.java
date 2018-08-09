@@ -58,6 +58,7 @@ public class StrategyManager {
 	public UnitType myUltralisk; /// #미정
 	public UnitType myHydralisk; /// #미정
 	public UnitType myLurker; /// #미정
+	public UnitType myDefiler;
 
 	// 아군 특수 유닛 첫번째, 두번째 타입
 	public UnitType mySpecialUnitType1; /// 옵저버 사이언스베쓸 오버로드
@@ -75,12 +76,14 @@ public class StrategyManager {
 	public int myKilledUltralisks;
 	public int myKilledHydralisks;
 	public int myKilledLurkers;
+	public int myKilledDefilers;
 
 	public int numberOfCompletedZerglings; /// 첫번째 유닛 타입의 현재 유닛 숫자
 	public int numberOfCompletedMutalisks; /// 두번째 유닛 타입의 현재 유닛 숫자
 	public int numberOfCompletedUltralisks; /// 세번째 유닛 타입의 현재 유닛 숫자
 	public int numberOfCompletedHydralisks; /// 네번째 유닛 타입의 현재 유닛 숫자
 	public int numberOfCompletedLurkers;
+	public int numberOfCompletedDefilers;
 
 
 	// 아군 공격 유닛 목록
@@ -90,6 +93,8 @@ public class StrategyManager {
 	public ArrayList<Unit> myUltraliskList = new ArrayList<Unit>(); // 울트라리스크
 	public ArrayList<Unit> myHydraliskList = new ArrayList<Unit>(); // #미정
 	public ArrayList<Unit> myLurkerList = new ArrayList<Unit>(); // #미정
+	public ArrayList<Unit> myDefilerList = new ArrayList<Unit>(); // #미정
+	
 
 	// 아군 방어 건물 첫번째 타입
 	public UnitType myCreepColony; /// 파일런 벙커 크립콜로니
@@ -219,6 +224,7 @@ public class StrategyManager {
 			myUltralisk = UnitType.Zerg_Ultralisk;
 			myHydralisk = UnitType.Zerg_Hydralisk;
 			myLurker = UnitType.Zerg_Lurker;
+			myDefiler = UnitType.Zerg_Defiler;
 
 			// 특수 유닛 종류 설정
 			mySpecialUnitType1 = UnitType.Zerg_Overlord;
@@ -234,7 +240,7 @@ public class StrategyManager {
 			// MaxNumberOfCombatUnitType4 = 4 ;
 
 			// 공격 유닛 생산 순서 설정
-			buildOrderArrayOfMyCombatUnitType = new int[] {2,3,4}; // 마린 마린 마린 메딕 시즈 베슬
+			buildOrderArrayOfMyCombatUnitType = new int[] {1,2,3,4}; // 마린 마린 마린 메딕 시즈 베슬
 			nextTargetIndexOfBuildOrderArray = 0; // 다음 생산 순서 index
 
 			// 방어 건물 종류 및 건설 갯수 설정
@@ -390,8 +396,10 @@ public class StrategyManager {
 		}
 		
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Zergling) > 30) {
-			attack_cnt = attack_cnt + 1;
-			return true;
+			if (myHydraliskList.size() > 18) {
+				attack_cnt = attack_cnt + 1;
+				return true;
+			}
 		}
 		
 		
@@ -1091,7 +1099,8 @@ public class StrategyManager {
 				isTimeToStartResearchTech1 = true;
 			}
 			// 컨슘은 최우선으로 리서치한다
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Defiler_Mound) > 0) {
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Defiler_Mound) > 0
+					&& myPlayer.hasResearched(TechType.Dark_Swarm) == true) {
 				isTimeToStartResearchTech2 = true;
 			}
 			// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 컨슘 리서치 후 리서치한다
@@ -1295,15 +1304,22 @@ public class StrategyManager {
 
 		if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 1) {
 
+			int defilerNumber = myPlayer.allUnitCount(UnitType.Zerg_Defiler)
+					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Defiler)
+					+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Defiler, null);
+
 
 			
-			if(myPlayer.gas() > 350)
-			{
-				nextUnitTypeToTrain = myMutalisk;
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Defiler_Mound)>0 &&  defilerNumber<3) {
+				nextUnitTypeToTrain = myDefiler;
 			}
-			else
+			else if (myZerglingList.size() < myHydraliskList.size()) 
 			{
 				nextUnitTypeToTrain = myZergling;
+			} 
+			else 
+			{
+				nextUnitTypeToTrain = myHydralisk;
 			}
 			
 				
@@ -1751,10 +1767,19 @@ public class StrategyManager {
 				myKilledMutalisks++;
 			} else if (unit.getType() == myUltralisk) {
 				myKilledUltralisks++;
-			} else if (myUltralisk == UnitType.Terran_Siege_Tank_Tank_Mode
-					&& unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
-				myKilledUltralisks++;
-			}
+			} else if (unit.getType() == myLurker) {
+				myKilledLurkers++;
+			} else if (unit.getType() == myHydralisk) {
+				myKilledHydralisks++;
+			} else if (unit.getType() == myDefiler) {
+				myKilledDefilers++;
+			}			
+			
+			
+			
+			
+			
+			
 		} else if (unit.getPlayer() == enemyPlayer) {
 
 			/// 적군 공격 유닛타입의 사망 유닛 숫자 누적값
@@ -1850,7 +1875,9 @@ public class StrategyManager {
 			return myHydraliskList;
 		} else if (unit.getType() == myLurker || unit.getType() == UnitType.Zerg_Lurker_Egg) {
 			return myLurkerList;
-		} else if (unit.getType() == UnitType.Zerg_Overlord) {
+		}		else if (unit.getType() == myDefiler) {
+			return myDefilerList;
+		}else if (unit.getType() == UnitType.Zerg_Overlord) {
 			return null;
 		} else if (unit.getType() == myCreepColony) {
 			return myCreepColonyList;
@@ -1872,7 +1899,9 @@ public class StrategyManager {
 			return true;
 		} else if (unit.getType() == myLurker || unit.getType() == UnitType.Zerg_Lurker_Egg) {
 			return true;
-		} else if (unit.getType() == UnitType.Zerg_Overlord) {
+		} else if (unit.getType() == myDefiler) {
+			return true;
+		}else if (unit.getType() == UnitType.Zerg_Overlord) {
 			return true;
 		} else if (unit.getType() == myCreepColony) {
 			return false;
