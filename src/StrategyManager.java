@@ -257,7 +257,7 @@ public class StrategyManager {
 
 			// 업그레이드 및 리서치 대상 설정
 			necessaryUpgradeType1 = UpgradeType.Metabolic_Boost;
-			necessaryUpgradeType2 = UpgradeType.Pneumatized_Carapace;
+			necessaryUpgradeType2 = UpgradeType.Ventral_Sacs; //UpgradeType.Pneumatized_Carapace;
 			necessaryUpgradeType3 = UpgradeType.Zerg_Flyer_Attacks; // 공중공업
 			necessaryUpgradeType4 = UpgradeType.Zerg_Flyer_Carapace; // 공중방업
 
@@ -1150,8 +1150,9 @@ public class StrategyManager {
 		if (isTimeToStartResearchTech3) {
 			if (myPlayer.isResearching(necessaryTechType3) == false
 					&& myPlayer.hasResearched(necessaryTechType3) == false
-					&& BuildManager.Instance().buildQueue.getItemCount(necessaryTechType3) == 0) {
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryTechType3, true);
+					&& BuildManager.Instance().buildQueue.getItemCount(necessaryTechType3) == 0) 
+			{
+			//	BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryTechType3, true);
 			}
 		}
 
@@ -1246,8 +1247,8 @@ public class StrategyManager {
 			
 			
 			
-			
-			if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Pneumatized_Carapace) > 0) {
+			//UpgradeType.Pneumatized_Carapace
+			if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Ventral_Sacs) > 0) {
 				if (numberOfLair == 0) 
 				{
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Lair, true);
@@ -1285,7 +1286,7 @@ public class StrategyManager {
 
 							if(nextUnitTypeToTrain == UnitType.Zerg_Mutalisk)
 							{
-								BuildManager.Instance().buildQueue.queueAsHighestPriority(nextUnitTypeToTrain, true);
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(nextUnitTypeToTrain, false);
 							}
 							else
 							{
@@ -1337,10 +1338,9 @@ public class StrategyManager {
 
 		else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 2) {
 
-			if(myZerglingList.size()<15)
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Spire)>0 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk)<15)
 			{
-				nextUnitTypeToTrain = myZergling;
-				
+				nextUnitTypeToTrain = myMutalisk;				
 			}
 			else if(myPlayer.minerals() > 1000)
 			{
@@ -1353,11 +1353,10 @@ public class StrategyManager {
 				{
 					nextUnitTypeToTrain = myHydralisk;
 				}
-			}
-			
-			else if(myPlayer.completedUnitCount(UnitType.Zerg_Spire)>0 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk)<12)
+			}	
+			else if(myZerglingList.size()<15)
 			{
-				nextUnitTypeToTrain = myMutalisk;
+				nextUnitTypeToTrain = myZergling;
 			}
 			else
 			{
@@ -1367,7 +1366,12 @@ public class StrategyManager {
 			
 		} else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 3) {
 
-			if(myPlayer.minerals() > 1000)
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern)>0 && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk)<4)
+			{
+				nextUnitTypeToTrain = myUltralisk;
+
+			}
+			else if(myPlayer.minerals() > 1000)  
 			{
 				if(myZerglingList.size()<45)
 				{
@@ -1378,9 +1382,7 @@ public class StrategyManager {
 				{
 					nextUnitTypeToTrain = myHydralisk;
 				}
-			}
-			else if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern)>0 && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk)<6) {
-				nextUnitTypeToTrain = myUltralisk;
+
 			}
 			else if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk)<15)
 			{

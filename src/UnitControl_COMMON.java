@@ -30,6 +30,17 @@ public class UnitControl_COMMON {
 		}
 
 
+		MyBotModule.Broodwar.drawCircleMap(StrategyManager.Instance().mySecondChokePoint.getCenter(), 13 * Config.TILE_SIZE, Color.Blue);
+		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(StrategyManager.Instance().mySecondChokePoint.getCenter(), 13 * Config.TILE_SIZE)) 
+		{
+			if (unit.getPlayer().equals(InformationManager.Instance().enemyPlayer)) 
+			{ 
+				defenseSite = unit.getPosition();
+				return; 
+			}			
+		}
+		
+		
 
 		// 기지 주변에 악당이 등장하는 경우
 		for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(MyBotModule.Broodwar.self())) 
@@ -39,7 +50,6 @@ public class UnitControl_COMMON {
 				if (unit.getPlayer().equals(InformationManager.Instance().enemyPlayer)) 
 				{ 
 					defenseSite = unit.getPosition();
-					System.out.println("기지 주변 악당을 찾았다");
 					return; 
 				}			
 			}

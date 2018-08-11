@@ -565,11 +565,35 @@ public class UnitControl_Hydralisk {
 		int i = 0;
 
 
+		List <Unit> goUP = MyBotModule.Broodwar.getUnitsInRadius(SM.enemyFirstChokePoint.getCenter(), 3*Config.TILE_SIZE);
+		MyBotModule.Broodwar.drawCircleMap(SM.enemyFirstChokePoint.getCenter(), 3*Config.TILE_SIZE, Color.Orange);
+
 		
 		
 		for(i=0 ; i<SM.myHydraliskList.size() ; i++)
 		{
 			Unit Hydralisk = SM.myHydraliskList.get(i);
+			
+			boolean shouldGoUP = false;
+			
+			for(Unit tempUnit : goUP)
+			{
+				if(Hydralisk.getID() == tempUnit.getID())
+				{
+					commandUtil.move(Hydralisk, endPoint);
+					System.out.println("길막이라 올라갑니다.");
+					shouldGoUP = true;
+					break;
+				}
+			}
+			
+			if(shouldGoUP==true)
+			{
+				continue;
+			}
+			
+			
+			
 			
 			if(i % (SM.myHydraliskList.size()/6+1) == 0)
 			{

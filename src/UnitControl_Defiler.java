@@ -76,7 +76,7 @@ public class UnitControl_Defiler {
 				{
 					if(Defiler.getEnergy() > TechType.Dark_Swarm.energyCost())
 					{
-						System.out.println("1");
+						//System.out.println("1");
 						Defiler.useTech(TechType.Dark_Swarm, position);
 					}
 					else if(myPlayer.hasResearched(TechType.Consume))
@@ -87,7 +87,7 @@ public class UnitControl_Defiler {
 							{
 								if(unit.getType().equals(UnitType.Zerg_Zergling))
 								{
-									System.out.println("2");
+									//System.out.println("2");
 									Defiler.useTech(TechType.Consume, unit);
 									break;
 								}
@@ -99,7 +99,7 @@ public class UnitControl_Defiler {
 					}
 					else
 					{
-						System.out.println("3");
+						//System.out.println("3");
 						commandUtil.move(Defiler, SM.mySecondChokePoint.getCenter());
 					}
 					
@@ -108,12 +108,12 @@ public class UnitControl_Defiler {
 				{
 					if(CombatState == StrategyManager.CombatState.attackStarted)
 					{
-						System.out.println("4-1");
+						//System.out.println("4-1");
 						commandUtil.move(Defiler, SM.enemyMainBaseLocation.getPosition());
 					}
 					else
 					{
-						System.out.println("4-2");						
+						//System.out.println("4-2");						
 						commandUtil.move(Defiler, SM.mySecondChokePoint.getCenter());
 					}
 		
@@ -121,7 +121,7 @@ public class UnitControl_Defiler {
 			}
 			else
 			{
-				System.out.println("5");
+				//System.out.println("5");
 				commandUtil.move(Defiler, SM.mySecondChokePoint.getCenter());
 			}
 			

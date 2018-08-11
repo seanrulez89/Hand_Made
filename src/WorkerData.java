@@ -472,7 +472,6 @@ public class WorkerData {
 
 		int assignedWorkers = getNumAssignedWorkers(depot);
 		int mineralsNearDepot = getMineralsNearDepot(depot);
-
 		// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
 		
 		// 충분한 수의 미네랄 일꾼 수를 얼마로 정할 것인가 : 

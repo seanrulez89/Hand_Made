@@ -1,4 +1,5 @@
 
+import java.util.Arrays;
 import java.util.List;
 
 import bwapi.*;
@@ -419,7 +420,8 @@ public class WorkerManager {
 		// 완성된, 공중에 떠있지 않고 땅에 정착해있는, ResourceDepot 혹은 Lair 나 Hive로 변형중인 Hatchery 중에서
 		// 첫째로 미네랄 일꾼수가 꽉 차지않은 곳
 		// 둘째로 가까운 곳을 찾는다
-		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+//		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
+		for (Unit unit : workerData.getDepots()) {
 			if (unit == null)
 				continue;
 
@@ -839,41 +841,30 @@ public class WorkerManager {
 			List<Unit> depotList = workerData.getDepots();
 			
 			
-			// 단순 유닛생산용 해처리들은 depot에 할당하지 못하도록 수정 shsh0823.lee 2018.08.05
+			// 단순 유닛생산용 해처리들은 depot에 할당하지 못하도록 수정 shsh0823.lee 2018.08.11
 			List<BaseLocation> baseLocationList = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
 			int baseLocationSize = baseLocationList.size();
-
-			// baseLocation에 기존 depot 존재 시 마킹
-			boolean[] occupied = new boolean[baseLocationSize];
-			for(int i = 0; i<baseLocationSize; i++) {
-				for(Unit depot : depotList) {
-					double distance = baseLocationList.get(i).getPosition().getDistance(depot.getPosition());
-//					System.out.println("baseLocation : " + baseLocationList.get(i).getPosition());
-//					System.out.println("depot : " + depot.getPosition());
-//					System.out.println("distance : " + distance);
-					if(distance<10) {
-						occupied[i] = true;
-						break;
-					}
+			
+			// 각 점령지에서 가장 가까운 해처리의 거리 계산
+			double[] minDistances = new double[baseLocationSize]; 
+			Arrays.fill(minDistances, 987654321);
+			for(int i = 0; i< baseLocationSize; i++) {
+				for(int j = 0; j<depotList.size(); j++) {
+					double distance = baseLocationList.get(i).getPosition().getDistance(depotList.get(j).getPosition());
+					minDistances[i] = Math.min(minDistances[i], distance);
 				}
 			}
 			
-			// 지금 완성된 해처리 근처에 마킹되지 않은 baseLocation 있을 시 depot에 추가
+			// 현재 지어진 해처리가 기존 점령지의 최소 거리보다 더 가깝다면, 현재 해처리로 인해 점령된 지역이므로 추가
 			for(int i = 0; i<baseLocationSize; i++) {
-				if(occupied[i]) {
-					continue;
-				}
 				double distance = baseLocationList.get(i).getPosition().getDistance(unit.getPosition());
-				if(distance<10) {
-//					System.out.println("baseLocation : " + baseLocationList.get(i).getPosition());
-//					System.out.println("depot : " + unit.getPosition());
-//					System.out.println("distance : " + distance);
+				if(distance<minDistances[i]) {
 					workerData.addDepot(unit);
 					rebalanceWorkers();
 					break;
 				}
 			}
-//			System.out.println("depotList : " + depotList);
+			//System.out.println("depotList : " + depotList);
 		}
 
 		// 일꾼이 신규 생성되면, 자료구조 추가 처리를 한다.
@@ -895,7 +886,7 @@ public class WorkerManager {
 			}
 
 			Unit depot = workerData.getWorkerDepot(worker);
-
+			
 			if (depot != null && workerData.depotHasEnoughMineralWorkers(depot)) {
 				workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit) null);
 			} else if (depot == null) {

@@ -3,18 +3,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Vector;
 
+import bwapi.Color;
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
-import bwapi.Unitset;
 import bwapi.WeaponType;
 import bwta.BWTA;
 import bwta.BaseLocation;
@@ -25,6 +27,7 @@ import bwta.Region;
 /// 현재 게임 상황정보는 BWAPI::Broodwar 를 조회하여 파악할 수 있지만, 과거 게임 상황정보는 BWAPI::Broodwar 를 통해 조회가 불가능하기 때문에 InformationManager에서 별도 관리하도록 합니다<br>
 /// 또한, BWAPI::Broodwar 나 BWTA 등을 통해 조회할 수 있는 정보이지만 전처리 / 별도 관리하는 것이 유용한 것도 InformationManager에서 별도 관리하도록 합니다
 public class InformationManager {
+	static Position[][] bfPositions = new Position[128][128];
 	private static InformationManager instance = new InformationManager();
 
 	public Player selfPlayer;		///< 아군 Player		
@@ -103,6 +106,10 @@ public class InformationManager {
 
 	/// Unit 및 BaseLocation, ChokePoint 등에 대한 정보를 업데이트합니다
 	public void update() {
+		if(mainBaseLocations.get(enemyPlayer) != null) {
+//			System.out.println("적기지 찾음 ");
+//			tmptmptmptmp();
+		}
 		updateUnitsInfo();
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
 		if (MyBotModule.Broodwar.getFrameCount() % 120 == 0) {
@@ -253,6 +260,8 @@ public class InformationManager {
 						enemyStartLocationFound = true;
 						mainBaseLocations.put(enemyPlayer, startLocation);
 						mainBaseLocationChanged.put(enemyPlayer, new Boolean(true));
+						System.out.println("getPath호출합니다.");
+						getPath(startLocation.getPosition());
 					}
 				}
 
@@ -276,6 +285,8 @@ public class InformationManager {
 					occupiedBaseLocations.put(enemyPlayer, new ArrayList<BaseLocation>()); 
 				}
 				occupiedBaseLocations.get(enemyPlayer).add(unexplored);
+				getPath(unexplored.getPosition());
+
 			}
 		}
 
@@ -746,5 +757,72 @@ public class InformationManager {
 		} else {
 			return UnitType.None;
 		}
+	}
+	
+	private static void getPath(Position enemyPosition) {
+		Position[][] bfPositions = new Position[128][128];
+		boolean[][] visited = new boolean[128][128];
+		Queue<Position> queue = new LinkedList<Position>();
+		Position myPosition = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getPosition();
+		System.out.println("enemyPosition : (" + enemyPosition.getX() + "," + enemyPosition.getY() + ")");
+		System.out.println("myPosition : (" + myPosition.getX() + "," + myPosition.getY() + ")");
+		System.out.println("equals가 맞나요? : " + new Position(myPosition.getX(), myPosition.getY()).equals(myPosition));
+		
+		MyBotModule.Broodwar.drawCircleMap(enemyPosition, 5 * Config.TILE_SIZE, Color.Black);
+		MyBotModule.Broodwar.drawCircleMap(myPosition, 5 * Config.TILE_SIZE, Color.Green);
+
+		queue.add(enemyPosition);
+		visited[enemyPosition.getX()/32][enemyPosition.getY()/32] = true;
+		while(!queue.isEmpty()) {
+			Position position = queue.poll();
+			System.out.println("queueSize : " + queue.size() + " position : (" + position.getX() + "," + position.getY()+")");
+			if(position.equals(myPosition)){
+				System.out.println("내기지까지 도착");
+				break;
+			}
+			int x = position.getX()-32;
+			int y = position.getY();
+			Position nextPosition = new Position(x, y);
+			if(x>=0 && visited[x/32][y/32] == false) {
+				queue.add(nextPosition);
+				bfPositions[x/32][y/32] = position;
+				visited[x/32][y/32] = true;
+			}
+			x = position.getX()+32;
+			y = position.getY();
+			nextPosition = new Position(x, y);
+			if(x<128*32 && visited[x/32][y/32] == false) {
+				queue.add(nextPosition);
+				bfPositions[x/32][y/32] = position;
+				visited[x/32][y/32] = true;
+			}
+			x = position.getX();
+			y = position.getY()-32;
+			nextPosition = new Position(x, y);
+			if(y>=0  && visited[x/32][y/32] == false) {
+				queue.add(nextPosition);
+				bfPositions[x/32][y/32] = position;
+				visited[x/32][y/32] = true;
+			}
+			x = position.getX();
+			y = position.getY()+32;
+			nextPosition = new Position(x, y);
+			if(y<128*32 && visited[x/32][y/32] == false) {
+				queue.add(nextPosition);
+				bfPositions[x/32][y/32] = position;
+				visited[x/32][y/32] = true;
+			}
+		}
+		
+	}
+	
+	public static void tmptmptmptmp(){
+		Position nowPosition = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getPosition();
+		Position targetPosition = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy()).getPosition();
+		while(nowPosition.equals(targetPosition) == false) {
+			MyBotModule.Broodwar.drawCircleMap(bfPositions[nowPosition.getX()/32][nowPosition.getY()/32], 5 * Config.TILE_SIZE, Color.Red);
+			nowPosition = bfPositions[nowPosition.getX()/32][nowPosition.getY()/32];
+		}
+		
 	}
 }

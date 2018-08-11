@@ -67,7 +67,7 @@ public class BuildOrder_Initial {
 		
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
-				BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		
 
 		 

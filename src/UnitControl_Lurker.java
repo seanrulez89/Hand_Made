@@ -39,10 +39,36 @@ public class UnitControl_Lurker {
 		
 		if(SM.myLurkerList.size() > 0)
 		{
-			if(CombatState == StrategyManager.CombatState.attackStarted)// 공격나가는 시점		
+			if(CombatState == StrategyManager.CombatState.attackStarted && myPlayer.getUpgradeLevel(UpgradeType.Ventral_Sacs)>0)// 공격나가는 시점		
 			{
 				for(Unit unit : SM.myLurkerList)
 				{
+					
+					/*
+					UnitControl_Overlord a = new UnitControl_Overlord();
+					ArrayList<Unit> myOverLords = a.getOverLords();
+					
+					if(unit.isBurrowed())
+					{
+						unit.unburrow();
+					}
+					
+					if(unit.isLoaded()== false && myOverLords.size()>5)
+					{
+						
+							unit.load(myOverLords.get(6), true);					
+						
+					}
+					else if(unit.isLoaded())
+					{
+						myOverLords.get(6).unloadAll(new Position(63*32, 63*32));
+					}
+					*/
+					
+					
+					
+					
+					
 					Unit tempEnemy = null;
 					
 					for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 5*Config.TILE_SIZE))

@@ -677,20 +677,31 @@ public class UnitControl_Mutalisk {
 			{
 				Position tempPosition = new Position(unit.getX()+4*Config.TILE_SIZE*i+16*i, unit.getY()+4*Config.TILE_SIZE*j+16*j);
 				
-			//	MyBotModule.Broodwar.drawCircleMap(tempPosition, 3 * Config.TILE_SIZE, Color.Red);
+				MyBotModule.Broodwar.drawCircleMap(tempPosition, 3 * Config.TILE_SIZE, Color.Red);
 
 				currentEnemy = 0;
 				for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(tempPosition, 3 * Config.TILE_SIZE))				
 				{
 					if(enemy.getPlayer() == enemyPlayer) // 벙커와 터렛과 기타등등 모두 포함해야함 canattack이 좀 이상한거 같아
 					{
-						currentEnemy++;
+						if(isAttackUnit(enemy))
+						{
+							//System.out.println(enemy.getType().toString());
+							
+							currentEnemy = currentEnemy + enemy.getHitPoints() + enemy.getShields();
+							
+							//currentEnemy++;
+						}
 					}
 				}
 				
 				//System.out.println("currentEnemy : " + currentEnemy);
 				
-				if(currentEnemy<=minEnemy)
+				int x = tempPosition.getX()/32;
+				int y = tempPosition.getY()/32;
+				
+				
+				if(currentEnemy<minEnemy && x > 0 && x < 128 && y > 0  && y < 128)
 				{
 					minEnemy = currentEnemy;
 					position = tempPosition;
@@ -712,6 +723,43 @@ public class UnitControl_Mutalisk {
 	}
 	
 
+	public boolean isAttackUnit(Unit enemy)
+	{
+		boolean isAttackUnit = false;
+		
+		if(enemy.getType().equals(UnitType.Terran_Valkyrie)
+				|| enemy.getType().equals(UnitType.Terran_Wraith)
+				|| enemy.getType().equals(UnitType.Terran_Battlecruiser)
+				|| enemy.getType().equals(UnitType.Zerg_Mutalisk)
+				|| enemy.getType().equals(UnitType.Zerg_Devourer)
+				|| enemy.getType().equals(UnitType.Zerg_Scourge)
+				|| enemy.getType().equals(UnitType.Protoss_Scout)
+				|| enemy.getType().equals(UnitType.Protoss_Corsair)
+				|| enemy.getType().equals(UnitType.Protoss_Carrier)
+				|| enemy.getType().equals(UnitType.Protoss_Interceptor)
+				|| enemy.getType().equals(UnitType.Terran_Ghost) // 공중방어 건물도 지대공으로 넣어봤다 180718
+				|| enemy.getType().equals(UnitType.Terran_Goliath)
+				|| enemy.getType().equals(UnitType.Terran_Marine)
+				|| enemy.getType().equals(UnitType.Zerg_Hydralisk)
+				|| enemy.getType().equals(UnitType.Protoss_Dragoon)
+				|| enemy.getType().equals(UnitType.Protoss_Archon)
+				|| enemy.getType().equals(UnitType.Terran_Missile_Turret)
+				|| enemy.getType().equals(UnitType.Zerg_Spore_Colony)
+				|| enemy.getType().equals(UnitType.Protoss_Photon_Cannon)
+				|| enemy.getType().equals(UnitType.Terran_Bunker)
+				|| enemy.getType().equals(UnitType.Protoss_High_Templar))
+		{
+			isAttackUnit = true;
+			return isAttackUnit;
+		}
+		
+		
+		
+		
+		
+		return isAttackUnit;
+	}
+	
 	
 	
 	
@@ -752,6 +800,21 @@ public class UnitControl_Mutalisk {
 		{
 			Unit Mutalisk = SM.myMutaliskList.get(i);
 			
+			invader = UnitControl_COMMON.defenseSite;
+			if (invader != null && Mutalisk.isAttacking()==false)
+			{	
+				underAttack = true;
+				moveToEndPoint = false;
+				nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, invader);
+			}
+			else
+			{
+				underAttack = false;
+				nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, SM.myMutaliskList.get(0).getPosition());
+			}
+			
+			
+			/*
 			if(i % (SM.myMutaliskList.size()/6+1) == 0)
 			{
 				invader = UnitControl_COMMON.defenseSite;			
@@ -788,6 +851,9 @@ public class UnitControl_Mutalisk {
 					}
 				}
 			}
+			*/
+			
+			
 			
 			/*
 			for(int i = -1 ; i < 2 ; i++)
@@ -865,8 +931,11 @@ public class UnitControl_Mutalisk {
 			
 			if (nextTarget != null) 
 			{
-				if (Mutalisk.getAirWeaponCooldown() == 0) 
+				//평균쿨타임으로 합시다.
+				if (SM.myMutaliskList.get(0).getAirWeaponCooldown() == 0) 
 				{
+					
+					
 					/* 홀드컨트롤 구현완료
 					if(Mutalisk.getDistance(nextTarget.getPosition()) > 3*Config.TILE_SIZE)
 					{
@@ -893,7 +962,7 @@ public class UnitControl_Mutalisk {
 					
 					
 					//Mutalisk.move(SM.myMainBaseLocation.getPosition());
-					commandUtil.move(Mutalisk, setFleePoint(Mutalisk));
+					commandUtil.move(Mutalisk, setFleePoint(SM.myMutaliskList.get(0)));
 					//Mutalisk.move(setFleePoint(Mutalisk));
 					
 					continue;
