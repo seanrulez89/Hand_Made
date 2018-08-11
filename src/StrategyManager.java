@@ -299,11 +299,12 @@ public class StrategyManager {
 		BuildOrder_Last.Instance().lastBuildOrder();
 		
 
+		/*
 		if(MyBotModule.Broodwar.getFrameCount() % (24*10) == 0)
 		{		
 	   		MyBotModule.Broodwar.sendText("APM : " + MyBotModule.Broodwar.getAPM());
 		}
-		
+		*/
 		 
 
 
@@ -412,6 +413,7 @@ public class StrategyManager {
 
 		
 
+		/*
 		int enemyUnitCountAroundMyMainBaseLocation = 0;
 
 		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(myMainBaseLocation.getPosition(),
@@ -431,6 +433,13 @@ public class StrategyManager {
 		if (enemyUnitCountAroundMyMainBaseLocation > 3) {
 			return true;
 		}
+		*/
+		
+		if(UnitControl_COMMON.defenseSite!=null)
+		{
+			return true;
+		}
+		
 		
 		
 		if (myHydraliskList.size() < 12) {
@@ -1346,7 +1355,7 @@ public class StrategyManager {
 				}
 			}
 			
-			else if(myPlayer.completedUnitCount(UnitType.Zerg_Spire)>0 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk)<15)
+			else if(myPlayer.completedUnitCount(UnitType.Zerg_Spire)>0 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk)<12)
 			{
 				nextUnitTypeToTrain = myMutalisk;
 			}

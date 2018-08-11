@@ -29,7 +29,7 @@ public class UnitControl_Lurker {
 		//System.out.println("LURKER : " + SM.myLurkerList.size());
 		
 		
-		if(SM.myLurkerList.size() < 6)
+		if(SM.myLurkerList.size() < 5)
 		{
 			if(myPlayer.gas()>200)
 			{

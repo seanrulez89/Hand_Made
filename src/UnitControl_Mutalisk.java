@@ -46,6 +46,11 @@ public class UnitControl_Mutalisk {
 		double targetHP = 10000;
 		double tempHP = 0;
 		
+		double targetDistance = 100000000;
+		double tempDistance = 0;
+		
+		
+		
 		int inRange = 0;
 		
 		if(myUnitType == UnitType.Zerg_Mutalisk)
@@ -69,7 +74,7 @@ public class UnitControl_Mutalisk {
 		ArrayList <Unit> elseUnit = new ArrayList<Unit>();
 		 
 		 																			
-		for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(averagePosition, inRange)) { // 저글링 같은 근접공격유닛은 10배 해봐야 무의미한가?
+		for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(averagePosition, myUnitType.sightRange())) { // 저글링 같은 근접공격유닛은 10배 해봐야 무의미한가?
 
 			if (enemy.getPlayer() == enemyPlayer) {
 				
@@ -148,8 +153,8 @@ public class UnitControl_Mutalisk {
 				}
 				else if(enemy.getType().equals(UnitType.Terran_Missile_Turret)
 						|| enemy.getType().equals(UnitType.Zerg_Spore_Colony)
-						|| enemy.getType().equals(UnitType.Protoss_Photon_Cannon))
-//						|| enemy.getType().equals(UnitType.Terran_Bunker))
+						|| enemy.getType().equals(UnitType.Protoss_Photon_Cannon)
+						|| enemy.getType().equals(UnitType.Terran_Bunker))
 				{
 					defenseBuilding.add(enemy);
 					
@@ -192,9 +197,9 @@ public class UnitControl_Mutalisk {
 		
 		for(Unit enemy : airToAir)
 		{
-			tempHP = enemy.getHitPoints();
-			if (targetHP > tempHP) {
-				targetHP = tempHP;
+			tempDistance = averagePosition.getDistance(enemy.getPosition());
+			if (targetDistance > tempDistance) {
+				targetDistance = tempDistance;
 				nextTarget = enemy;
 			}
 		}
@@ -204,9 +209,9 @@ public class UnitControl_Mutalisk {
 		
 		for(Unit enemy : groundToAir)
 		{
-			tempHP = enemy.getHitPoints();
-			if (targetHP > tempHP) {
-				targetHP = tempHP;
+			tempDistance = averagePosition.getDistance(enemy.getPosition());
+			if (targetDistance > tempDistance) {
+				targetDistance = tempDistance;
 				nextTarget = enemy;
 			}
 		}
@@ -216,9 +221,9 @@ public class UnitControl_Mutalisk {
 		
 		for(Unit enemy : defenseBuilding)
 		{
-			tempHP = enemy.getHitPoints();
-			if (targetHP > tempHP) {
-				targetHP = tempHP;
+			tempDistance = averagePosition.getDistance(enemy.getPosition());
+			if (targetDistance > tempDistance) {
+				targetDistance = tempDistance;
 				nextTarget = enemy;
 			}
 		}
@@ -229,9 +234,9 @@ public class UnitControl_Mutalisk {
 		
 		for(Unit enemy : enemyWorker)
 		{
-			tempHP = enemy.getHitPoints();
-			if (targetHP > tempHP) {
-				targetHP = tempHP;
+			tempDistance = averagePosition.getDistance(enemy.getPosition());
+			if (targetDistance > tempDistance) {
+				targetDistance = tempDistance;
 				nextTarget = enemy;
 			}
 		}
@@ -242,9 +247,9 @@ public class UnitControl_Mutalisk {
 		
 		for(Unit enemy : airToGround)
 		{
-			tempHP = enemy.getHitPoints();
-			if (targetHP > tempHP) {
-				targetHP = tempHP;
+			tempDistance = averagePosition.getDistance(enemy.getPosition());
+			if (targetDistance > tempDistance) {
+				targetDistance = tempDistance;
 				nextTarget = enemy;
 			}
 		}
@@ -254,9 +259,9 @@ public class UnitControl_Mutalisk {
 		
 		for(Unit enemy : groundToGround)
 		{
-			tempHP = enemy.getHitPoints();
-			if (targetHP > tempHP) {
-				targetHP = tempHP;
+			tempDistance = averagePosition.getDistance(enemy.getPosition());
+			if (targetDistance > tempDistance) {
+				targetDistance = tempDistance;
 				nextTarget = enemy;
 			}
 		}
@@ -266,9 +271,9 @@ public class UnitControl_Mutalisk {
 		
 		for(Unit enemy : specialUnit)
 		{
-			tempHP = enemy.getHitPoints();
-			if (targetHP > tempHP) {
-				targetHP = tempHP;
+			tempDistance = averagePosition.getDistance(enemy.getPosition());
+			if (targetDistance > tempDistance) {
+				targetDistance = tempDistance;
 				nextTarget = enemy;
 			}
 		}
@@ -284,9 +289,9 @@ public class UnitControl_Mutalisk {
 		
 		for(Unit enemy : supply)
 		{
-			tempHP = enemy.getHitPoints();
-			if (targetHP > tempHP) {
-				targetHP = tempHP;
+			tempDistance = averagePosition.getDistance(enemy.getPosition());
+			if (targetDistance > tempDistance) {
+				targetDistance = tempDistance;
 				nextTarget = enemy;
 			}
 		}
@@ -300,9 +305,9 @@ public class UnitControl_Mutalisk {
 		
 		for(Unit enemy : normalBuilding)
 		{
-			tempHP = enemy.getHitPoints();
-			if (targetHP > tempHP) {
-				targetHP = tempHP;
+			tempDistance = averagePosition.getDistance(enemy.getPosition());
+			if (targetDistance > tempDistance) {
+				targetDistance = tempDistance;
 				nextTarget = enemy;
 			}
 		}
@@ -312,9 +317,9 @@ public class UnitControl_Mutalisk {
 		
 		for(Unit enemy : elseUnit)
 		{
-			tempHP = enemy.getHitPoints();
-			if (targetHP > tempHP) {
-				targetHP = tempHP;
+			tempDistance = averagePosition.getDistance(enemy.getPosition());
+			if (targetDistance > tempDistance) {
+				targetDistance = tempDistance;
 				nextTarget = enemy;
 			}
 		}
@@ -664,32 +669,32 @@ public class UnitControl_Mutalisk {
 		
 		int currentEnemy = 0;
 		int minEnemy = 100000;
+
 		
 		for(int i = -1 ; i < 2 ; i++)
 		{
 			for(int j = -1 ; j < 2 ; j++)
 			{
-				Position tempPosition = new Position(unit.getX()+3*Config.TILE_SIZE*i, unit.getY()+3*Config.TILE_SIZE*j);
+				Position tempPosition = new Position(unit.getX()+4*Config.TILE_SIZE*i+16*i, unit.getY()+4*Config.TILE_SIZE*j+16*j);
 				
+			//	MyBotModule.Broodwar.drawCircleMap(tempPosition, 3 * Config.TILE_SIZE, Color.Red);
+
 				currentEnemy = 0;
-				for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(tempPosition, 48))
+				for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(tempPosition, 3 * Config.TILE_SIZE))				
 				{
-					if(enemy.getPlayer() == enemyPlayer && enemy.canAttack()) // 벙커와 터렛과 기타등등 모두 포함해야함 canattack이 좀 이상한거 같아
+					if(enemy.getPlayer() == enemyPlayer) // 벙커와 터렛과 기타등등 모두 포함해야함 canattack이 좀 이상한거 같아
 					{
 						currentEnemy++;
 					}
 				}
 				
-				if(currentEnemy<minEnemy)
+				//System.out.println("currentEnemy : " + currentEnemy);
+				
+				if(currentEnemy<=minEnemy)
 				{
 					minEnemy = currentEnemy;
 					position = tempPosition;
-				}
-				
-				
-				
-				
-						
+				}			
 			}
 		}
 		
@@ -725,20 +730,81 @@ public class UnitControl_Mutalisk {
 		
 		
 		
-		Position averagePosition = getAveragePosition(SM.myMutaliskList);
-		boolean endGame = enoughGathered(UnitType.Zerg_Mutalisk, gatherPoint, 5, 0.5);
-		Position invader = weAreUnderAttack(averagePosition);
+		//Position averagePosition = getAveragePosition(SM.myMutaliskList);
+		//boolean endGame = enoughGathered(UnitType.Zerg_Mutalisk, gatherPoint, 5, 0.5);
+		//Position invader = weAreUnderAttack(averagePosition);
+		//Position invader = UnitControl_COMMON.defenseSite;
 		//Position nextPlace = getNextPlaceToGo();
-		Unit nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, averagePosition);
+		//Unit nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, averagePosition);
+
+		
+		boolean endGame = enoughGathered(UnitType.Zerg_Mutalisk, gatherPoint, 3, 0.5);
+		Position invader = null;
+		Unit nextTarget = null;
+		
+		int i = 0;
 
 		
 
 	
 
-		for (Unit Mutalisk : SM.myMutaliskList) 
+		for(i=0 ; i<SM.myMutaliskList.size() ; i++)
 		{
+			Unit Mutalisk = SM.myMutaliskList.get(i);
 			
-
+			if(i % (SM.myMutaliskList.size()/6+1) == 0)
+			{
+				invader = UnitControl_COMMON.defenseSite;			
+				
+				if (invader != null && Mutalisk.isAttacking()==false)
+				{	
+					underAttack = true;
+					moveToEndPoint = false;
+					nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, invader);
+				}
+				else
+				{
+					underAttack = false;
+					nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, Mutalisk.getPosition());
+				}
+				
+			}
+			else
+			{
+				if(nextTarget!=null && Mutalisk.getDistance(nextTarget.getPosition()) > UnitType.Zerg_Mutalisk.sightRange())
+				{
+					invader = UnitControl_COMMON.defenseSite;				
+					
+					if (invader != null && Mutalisk.isAttacking()==false)
+					{	
+						underAttack = true;
+						moveToEndPoint = false;
+						nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, invader);
+					}
+					else
+					{
+						underAttack = false;
+						nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, Mutalisk.getPosition());
+					}
+				}
+			}
+			
+			/*
+			for(int i = -1 ; i < 2 ; i++)
+			{
+				for(int j = -1 ; j < 2 ; j++)
+				{
+					Position tempPosition = new Position(Mutalisk.getX()+4*Config.TILE_SIZE*i+16*i, Mutalisk.getY()+4*Config.TILE_SIZE*j+16*j);
+					MyBotModule.Broodwar.drawCircleMap(tempPosition, 3 * Config.TILE_SIZE, Color.Yellow);				
+				}				
+			}
+			*/
+			
+			
+			
+			
+			
+			
 			
 			
 			if(Mutalisk.isIrradiated())
@@ -786,11 +852,12 @@ public class UnitControl_Mutalisk {
 			
 
 
+			/*
 			if (invader != null && Mutalisk.isAttacking()==false) 
 			{	
 				nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, invader);
 			}
-	
+			*/	
 			
 		
 			

@@ -14,8 +14,13 @@ public class UnitControl_MASTER {
 	UnitControl_Lurker Lurker;
 	UnitControl_Zergling Zergling;
 	UnitControl_Defiler Defiler;
+	UnitControl_COMMON COMMON;
 	
 	public void update() {
+		
+		COMMON.Instance().getDefenseSite();
+		
+		
 		
 		if(StrategyManager.Instance().enemyMainBaseLocation!=null 
 				&& StrategyManager.Instance().combatState != StrategyManager.CombatState.eliminateEnemy

@@ -39,13 +39,13 @@ public class UnitControl_Defiler {
 			
 			for (int i = -1; i < 2; i++) {
 				for (int j = -1; j < 2; j++) {
-					Position tempPosition = new Position(Defiler.getX() + 6 * Config.TILE_SIZE * i,
-							Defiler.getY() + 6 * Config.TILE_SIZE * j);
+					Position tempPosition = new Position(Defiler.getX() + 8 * Config.TILE_SIZE * i,
+							Defiler.getY() + 8 * Config.TILE_SIZE * j);
 
-					MyBotModule.Broodwar.drawCircleMap(tempPosition, 3 * Config.TILE_SIZE, Color.Red);
+					MyBotModule.Broodwar.drawCircleMap(tempPosition, 4 * Config.TILE_SIZE, Color.Red);
 					
 					currentEnemy = 0;
-					for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(tempPosition, 3 * Config.TILE_SIZE)) {
+					for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(tempPosition, 4 * Config.TILE_SIZE)) {
 						if (enemy.getPlayer() == enemyPlayer) // 건물은 제외하고
 						{
 							if(enemy.isUnderDarkSwarm()==true)
@@ -60,9 +60,9 @@ public class UnitControl_Defiler {
 						}
 					}
 					
-					System.out.println("currentEnemy : " + currentEnemy);
+					//System.out.println("currentEnemy : " + currentEnemy);
 
-					if (currentEnemy > maxEnemy) {
+					if (currentEnemy > maxEnemy && currentEnemy > 4) {
 						maxEnemy = currentEnemy;
 						position = tempPosition;
 					}
@@ -70,7 +70,7 @@ public class UnitControl_Defiler {
 				}
 			}
 			
-			if(myPlayer.hasResearched(TechType.Dark_Swarm) && CombatState == StrategyManager.CombatState.attackStarted)
+			if(myPlayer.hasResearched(TechType.Dark_Swarm))// && CombatState == StrategyManager.CombatState.attackStarted)
 			{
 				if(position!=null)
 				{
@@ -85,7 +85,7 @@ public class UnitControl_Defiler {
 						{
 							if(unit.getPlayer()==myPlayer)
 							{
-								if(unit.getType().equals(UnitType.Zerg_Zergling) || unit.getType().equals(UnitType.Zerg_Hydralisk))
+								if(unit.getType().equals(UnitType.Zerg_Zergling))
 								{
 									System.out.println("2");
 									Defiler.useTech(TechType.Consume, unit);
@@ -106,11 +106,17 @@ public class UnitControl_Defiler {
 				}
 				else
 				{
-					System.out.println("4");
-					
-					commandUtil.move(Defiler, SM.enemyMainBaseLocation.getPosition());
-					
-					
+					if(CombatState == StrategyManager.CombatState.attackStarted)
+					{
+						System.out.println("4-1");
+						commandUtil.move(Defiler, SM.enemyMainBaseLocation.getPosition());
+					}
+					else
+					{
+						System.out.println("4-2");						
+						commandUtil.move(Defiler, SM.mySecondChokePoint.getCenter());
+					}
+		
 				}
 			}
 			else

@@ -53,7 +53,7 @@ public class UnitControl_Zergling {
 		
 		ArrayList <Unit> mustKillFirst = new ArrayList<Unit>();		 
 		 																			
-		for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(averagePosition, inRange)) {
+		for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(averagePosition, myUnitType.sightRange())) {
 
 			if (enemy.getPlayer() == enemyPlayer) {
 				
@@ -134,7 +134,7 @@ public class UnitControl_Zergling {
 		// 기지 주변에 악당이 등장하는 경우. 꼭 맞고 있지는 않을 수도 있다
 		for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(myPlayer)) {
 
-			for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getPosition(), 8 * Config.TILE_SIZE)) {
+			for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getPosition(), 13 * Config.TILE_SIZE)) {
 
 				if (unit.getPlayer() == enemyPlayer) {
 
@@ -404,9 +404,9 @@ public class UnitControl_Zergling {
 			
 			Unit Zergling = SM.myZerglingList.get(i);
 			
-			if(i % (SM.myZerglingList.size()/3+1) == 0)
+			if(i % (SM.myZerglingList.size()/6+1) == 0)
 			{
-				invader = weAreUnderAttack(Zergling.getPosition());				
+				invader = UnitControl_COMMON.defenseSite;			
 				
 				if (invader != null && Zergling.isAttacking()==false)
 				{	
@@ -422,7 +422,7 @@ public class UnitControl_Zergling {
 			{
 				if(nextTarget!=null && Zergling.getDistance(nextTarget.getPosition()) > UnitType.Zerg_Zergling.sightRange())
 				{
-					invader = weAreUnderAttack(Zergling.getPosition());				
+					invader = UnitControl_COMMON.defenseSite;			
 					
 					if (invader != null && Zergling.isAttacking()==false)
 					{	

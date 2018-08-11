@@ -65,7 +65,7 @@ public class UnitControl_Hydralisk {
 		ArrayList <Unit> distantUnit = new ArrayList<Unit>();
 		 
 		 																			
-		for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(averagePosition, inRange)) { // 저글링 같은 근접공격유닛은 10배 해봐야 무의미한가?
+		for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(averagePosition, myUnitType.sightRange())) { // 저글링 같은 근접공격유닛은 10배 해봐야 무의미한가?
 
 			if (enemy.getPlayer() == enemyPlayer) {
 				
@@ -302,7 +302,7 @@ public class UnitControl_Hydralisk {
 		// 기지 주변에 악당이 등장하는 경우. 꼭 맞고 있지는 않을 수도 있다
 		for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(myPlayer)) {
 
-			for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getPosition(), 12 * Config.TILE_SIZE)) {
+			for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getPosition(), 13 * Config.TILE_SIZE)) {
 
 				if (unit.getPlayer() == enemyPlayer) {
 
@@ -573,7 +573,7 @@ public class UnitControl_Hydralisk {
 			
 			if(i % (SM.myHydraliskList.size()/6+1) == 0)
 			{
-				invader = weAreUnderAttack(Hydralisk.getPosition());			
+				invader = UnitControl_COMMON.defenseSite;			
 				
 				if (invader != null && Hydralisk.isAttacking()==false)
 				{	
@@ -592,7 +592,7 @@ public class UnitControl_Hydralisk {
 			{
 				if(nextTarget!=null && Hydralisk.getDistance(nextTarget.getPosition()) > UnitType.Zerg_Hydralisk.sightRange())
 				{
-					invader = weAreUnderAttack(Hydralisk.getPosition());				
+					invader = UnitControl_COMMON.defenseSite;				
 					
 					if (invader != null && Hydralisk.isAttacking()==false)
 					{	
