@@ -1,5 +1,7 @@
 
+import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,13 +23,23 @@ import bwapi.WeaponType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
+import bwta.Polygon;
 import bwta.Region;
 
 /// 게임 상황정보 중 일부를 자체 자료구조 및 변수들에 저장하고 업데이트하는 class<br>
 /// 현재 게임 상황정보는 BWAPI::Broodwar 를 조회하여 파악할 수 있지만, 과거 게임 상황정보는 BWAPI::Broodwar 를 통해 조회가 불가능하기 때문에 InformationManager에서 별도 관리하도록 합니다<br>
 /// 또한, BWAPI::Broodwar 나 BWTA 등을 통해 조회할 수 있는 정보이지만 전처리 / 별도 관리하는 것이 유용한 것도 InformationManager에서 별도 관리하도록 합니다
 public class InformationManager {
-	static Position[][] bfPositions = new Position[128][128];
+	static class ShortestPath{
+		List<Position> positionList;
+		public ShortestPath() {
+			super();
+			this.positionList = new ArrayList<Position>();
+		}
+	}
+	
+	static ShortestPath shortestPath;
+
 	private static InformationManager instance = new InformationManager();
 
 	public Player selfPlayer;		///< 아군 Player		
@@ -107,8 +119,7 @@ public class InformationManager {
 	/// Unit 및 BaseLocation, ChokePoint 등에 대한 정보를 업데이트합니다
 	public void update() {
 		if(mainBaseLocations.get(enemyPlayer) != null) {
-//			System.out.println("적기지 찾음 ");
-//			tmptmptmptmp();
+			tmptmptmptmp();
 		}
 		updateUnitsInfo();
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
@@ -260,7 +271,6 @@ public class InformationManager {
 						enemyStartLocationFound = true;
 						mainBaseLocations.put(enemyPlayer, startLocation);
 						mainBaseLocationChanged.put(enemyPlayer, new Boolean(true));
-						System.out.println("getPath호출합니다.");
 						getPath(startLocation.getPosition());
 					}
 				}
@@ -760,22 +770,17 @@ public class InformationManager {
 	}
 	
 	private static void getPath(Position enemyPosition) {
-		Position[][] bfPositions = new Position[128][128];
-		boolean[][] visited = new boolean[128][128];
+		Position[][] bfPositions = new Position[128*32][128*32];
+		boolean[][] visited = new boolean[128*32][128*32];
 		Queue<Position> queue = new LinkedList<Position>();
 		Position myPosition = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getPosition();
-		System.out.println("enemyPosition : (" + enemyPosition.getX() + "," + enemyPosition.getY() + ")");
-		System.out.println("myPosition : (" + myPosition.getX() + "," + myPosition.getY() + ")");
-		System.out.println("equals가 맞나요? : " + new Position(myPosition.getX(), myPosition.getY()).equals(myPosition));
-		
 		MyBotModule.Broodwar.drawCircleMap(enemyPosition, 5 * Config.TILE_SIZE, Color.Black);
 		MyBotModule.Broodwar.drawCircleMap(myPosition, 5 * Config.TILE_SIZE, Color.Green);
 
 		queue.add(enemyPosition);
-		visited[enemyPosition.getX()/32][enemyPosition.getY()/32] = true;
+		visited[enemyPosition.getX()][enemyPosition.getY()] = true;
 		while(!queue.isEmpty()) {
 			Position position = queue.poll();
-			System.out.println("queueSize : " + queue.size() + " position : (" + position.getX() + "," + position.getY()+")");
 			if(position.equals(myPosition)){
 				System.out.println("내기지까지 도착");
 				break;
@@ -783,46 +788,63 @@ public class InformationManager {
 			int x = position.getX()-32;
 			int y = position.getY();
 			Position nextPosition = new Position(x, y);
-			if(x>=0 && visited[x/32][y/32] == false) {
+			if(x>=0 && visited[x][y] == false && nextPosition.isValid()) {
 				queue.add(nextPosition);
-				bfPositions[x/32][y/32] = position;
-				visited[x/32][y/32] = true;
+				bfPositions[x][y] = position;
+				visited[x][y] = true;
 			}
 			x = position.getX()+32;
 			y = position.getY();
 			nextPosition = new Position(x, y);
-			if(x<128*32 && visited[x/32][y/32] == false) {
+			if(x<128*32 && visited[x][y] == false && nextPosition.isValid()) {
 				queue.add(nextPosition);
-				bfPositions[x/32][y/32] = position;
-				visited[x/32][y/32] = true;
+				bfPositions[x][y] = position;
+				visited[x][y] = true;
 			}
 			x = position.getX();
 			y = position.getY()-32;
 			nextPosition = new Position(x, y);
-			if(y>=0  && visited[x/32][y/32] == false) {
+			if(y>=0  && visited[x][y] == false && nextPosition.isValid()) {
 				queue.add(nextPosition);
-				bfPositions[x/32][y/32] = position;
-				visited[x/32][y/32] = true;
+				bfPositions[x][y] = position;
+				visited[x][y] = true;
 			}
 			x = position.getX();
 			y = position.getY()+32;
 			nextPosition = new Position(x, y);
-			if(y<128*32 && visited[x/32][y/32] == false) {
+			if(y<128*32 && visited[x][y] == false && nextPosition.isValid()) {
 				queue.add(nextPosition);
-				bfPositions[x/32][y/32] = position;
-				visited[x/32][y/32] = true;
+				bfPositions[x][y] = position;
+				visited[x][y] = true;
 			}
 		}
-		
+		shortestPath = new ShortestPath();
+		Position nowPosition = myPosition;
+		shortestPath.positionList.add(myPosition);
+		while(nowPosition.equals(enemyPosition) == false) {
+			MyBotModule.Broodwar.drawCircleMap(bfPositions[nowPosition.getX()][nowPosition.getY()], 5 * Config.TILE_SIZE, Color.Red);
+			nowPosition = bfPositions[nowPosition.getX()][nowPosition.getY()];
+			shortestPath.positionList.add(nowPosition);
+		}
 	}
 	
 	public static void tmptmptmptmp(){
-		Position nowPosition = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getPosition();
-		Position targetPosition = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy()).getPosition();
-		while(nowPosition.equals(targetPosition) == false) {
-			MyBotModule.Broodwar.drawCircleMap(bfPositions[nowPosition.getX()/32][nowPosition.getY()/32], 5 * Config.TILE_SIZE, Color.Red);
-			nowPosition = bfPositions[nowPosition.getX()/32][nowPosition.getY()/32];
+		List<Position> positionList = getAssemblyPlaceList(10);
+		for(int i = 0 ; i < positionList.size(); i++) {
+			MyBotModule.Broodwar.drawCircleMap(positionList.get(i), 5 * Config.TILE_SIZE, Color.Red);
 		}
-		
+	}
+	
+	public static List<Position> getAssemblyPlaceList(int number){
+		if(shortestPath==null || shortestPath.positionList==null) {
+			return new ArrayList<Position>();
+		}
+		int size = shortestPath.positionList.size();
+		int length = size/number;
+		List<Position> retList = new ArrayList<Position>();
+		for(int i = 0; i<size; i = i+length) {
+			retList.add(shortestPath.positionList.get(i));
+		}
+		return retList;
 	}
 }
