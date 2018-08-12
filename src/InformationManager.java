@@ -31,10 +31,10 @@ import bwta.Region;
 /// 또한, BWAPI::Broodwar 나 BWTA 등을 통해 조회할 수 있는 정보이지만 전처리 / 별도 관리하는 것이 유용한 것도 InformationManager에서 별도 관리하도록 합니다
 public class InformationManager {
 	static class ShortestPath{
-		List<Position> positionList;
+		List<TilePosition> positionList;
 		public ShortestPath() {
 			super();
-			this.positionList = new ArrayList<Position>();
+			this.positionList = new ArrayList<TilePosition>();
 		}
 	}
 	
@@ -770,62 +770,9 @@ public class InformationManager {
 	}
 	
 	private static void getPath(Position enemyPosition) {
-		Position[][] bfPositions = new Position[128*32][128*32];
-		boolean[][] visited = new boolean[128*32][128*32];
-		Queue<Position> queue = new LinkedList<Position>();
-		Position myPosition = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getPosition();
-		MyBotModule.Broodwar.drawCircleMap(enemyPosition, 5 * Config.TILE_SIZE, Color.Black);
-		MyBotModule.Broodwar.drawCircleMap(myPosition, 5 * Config.TILE_SIZE, Color.Green);
-
-		queue.add(enemyPosition);
-		visited[enemyPosition.getX()][enemyPosition.getY()] = true;
-		while(!queue.isEmpty()) {
-			Position position = queue.poll();
-			if(position.equals(myPosition)){
-				System.out.println("내기지까지 도착");
-				break;
-			}
-			int x = position.getX()-32;
-			int y = position.getY();
-			Position nextPosition = new Position(x, y);
-			if(x>=0 && visited[x][y] == false && nextPosition.isValid()) {
-				queue.add(nextPosition);
-				bfPositions[x][y] = position;
-				visited[x][y] = true;
-			}
-			x = position.getX()+32;
-			y = position.getY();
-			nextPosition = new Position(x, y);
-			if(x<128*32 && visited[x][y] == false && nextPosition.isValid()) {
-				queue.add(nextPosition);
-				bfPositions[x][y] = position;
-				visited[x][y] = true;
-			}
-			x = position.getX();
-			y = position.getY()-32;
-			nextPosition = new Position(x, y);
-			if(y>=0  && visited[x][y] == false && nextPosition.isValid()) {
-				queue.add(nextPosition);
-				bfPositions[x][y] = position;
-				visited[x][y] = true;
-			}
-			x = position.getX();
-			y = position.getY()+32;
-			nextPosition = new Position(x, y);
-			if(y<128*32 && visited[x][y] == false && nextPosition.isValid()) {
-				queue.add(nextPosition);
-				bfPositions[x][y] = position;
-				visited[x][y] = true;
-			}
-		}
 		shortestPath = new ShortestPath();
-		Position nowPosition = myPosition;
-		shortestPath.positionList.add(myPosition);
-		while(nowPosition.equals(enemyPosition) == false) {
-			MyBotModule.Broodwar.drawCircleMap(bfPositions[nowPosition.getX()][nowPosition.getY()], 5 * Config.TILE_SIZE, Color.Red);
-			nowPosition = bfPositions[nowPosition.getX()][nowPosition.getY()];
-			shortestPath.positionList.add(nowPosition);
-		}
+		Position myPosition = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getPosition();
+		shortestPath.positionList = BWTA.getShortestPath(myPosition.toTilePosition(), enemyPosition.toTilePosition());
 	}
 	
 	public static void tmptmptmptmp(){
@@ -843,7 +790,7 @@ public class InformationManager {
 		int length = size/number;
 		List<Position> retList = new ArrayList<Position>();
 		for(int i = 0; i<size; i = i+length) {
-			retList.add(shortestPath.positionList.get(i));
+			retList.add(shortestPath.positionList.get(i).toPosition());
 		}
 		return retList;
 	}
