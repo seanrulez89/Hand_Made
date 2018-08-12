@@ -26,6 +26,7 @@ public class UnitControl_Zergling {
 	static Position endPoint = null;
 	
 	int balanceIndex = 0;
+	static int gatherIndex = UnitControl_COMMON.moveIndex - 1;
 
 
 
@@ -382,6 +383,126 @@ public class UnitControl_Zergling {
 	
 	public void update() {
 		
+
+		if(SM.myZerglingList.size() == 0)
+		{
+			return;
+		}
+		
+		//setStartGatherEndPoint();
+		
+		if(UnitControl_COMMON.moveIndex == UnitControl_COMMON.BASIC_MOVE_INDEX)
+		{
+			gatherIndex=UnitControl_COMMON.moveIndex - 1;
+		}
+		
+		if(UnitControl_COMMON.enoughGathered(UnitType.Zerg_Hydralisk, UnitControl_COMMON.movePosition, 5, 0.5) == true && gatherIndex<UnitControl_COMMON.moveIndex )
+		{
+			gatherIndex++;
+			if(gatherIndex>(UnitControl_COMMON.positionList.size()-1))
+			{
+				gatherIndex=(UnitControl_COMMON.positionList.size()-1);
+			}
+		}
+		
+		//System.out.println("Zergling gatherIndex : " + gatherIndex);
+		
+		
+
+		Position defenseSite = UnitControl_COMMON.defenseSite;
+		Position movePosition = UnitControl_COMMON.movePosition;
+		Unit nextTarget = null;
+		int i = 0;
+
+
+		List <Unit> goUp = MyBotModule.Broodwar.getUnitsInRadius(SM.enemyFirstChokePoint.getCenter(), 3*Config.TILE_SIZE);
+		MyBotModule.Broodwar.drawCircleMap(SM.enemyFirstChokePoint.getCenter(), 3*Config.TILE_SIZE, Color.Orange);
+
+		
+		
+		for(i=0 ; i<SM.myZerglingList.size() ; i++)
+		{
+			Unit Zergling = SM.myZerglingList.get(i);
+			
+			/*boolean shouldGoUp = false;
+			for(Unit tempUnit : goUp)
+			{
+				if(Zergling.getID() == tempUnit.getID())
+				{
+					//System.out.println("길막이라 올라갑니다.");
+					commandUtil.move(Zergling, enemyMainBaseLocation.getPosition());
+					shouldGoUp = true;
+					break;
+				}
+			}
+			
+			if(shouldGoUp==true)
+			{
+				continue;
+			}*/
+			
+			if(Zergling.isIrradiated())
+			{
+				commandUtil.move(Zergling, enemyMainBaseLocation.getPosition());
+				continue;
+			}
+			
+			if(Zergling.isUnderStorm())
+			{
+				commandUtil.move(Zergling, myMainBaseLocation.getPosition());
+				continue;
+			}
+			
+			
+			
+			if(i % 10 == 0)
+			{
+				nextTarget = getNextTargetOf(UnitType.Zerg_Zergling, Zergling.getPosition());			
+			}
+			
+			if (nextTarget != null) 
+			{
+				commandUtil.attackUnit(Zergling, nextTarget);
+				continue;
+			}
+			
+			
+			
+			
+			if (defenseSite != null && Zergling.isAttacking()==false)
+			{
+				commandUtil.attackMove(Zergling, defenseSite);				
+			}
+			else if(CombatState == StrategyManager.CombatState.attackStarted)
+			{
+				commandUtil.attackMove(Zergling, movePosition);				
+			}
+			else if (SM.myZerglingList.size() > 12) 
+			{			
+				if(Zergling!=null)
+				{
+					defenseBalance(Zergling);
+				}
+			}		
+			else
+			{
+				commandUtil.attackMove(Zergling, movePosition);
+			}
+		
+		
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		/*
+		
 		if(SM.myZerglingList.size() == 0)
 		{
 			return;
@@ -495,6 +616,6 @@ public class UnitControl_Zergling {
 				//System.out.println(10);
 				commandUtil.attackMove(Zergling, startPoint);
 			}
-		}
+		}*/
 	}	
 }

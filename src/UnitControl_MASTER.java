@@ -19,13 +19,16 @@ public class UnitControl_MASTER {
 	public void update() {
 		
 		COMMON.Instance().getDefenseSite();
-		
+		COMMON.Instance().getMovePosition();
 		
 		
 		if(StrategyManager.Instance().enemyMainBaseLocation!=null 
 				&& StrategyManager.Instance().combatState != StrategyManager.CombatState.eliminateEnemy
 				)//&& MyBotModule.Broodwar.getFrameCount() % 2 == 0)
 		{
+			
+			
+			
 			Mutalisk = new UnitControl_Mutalisk();
 			Mutalisk.update();	
 			
@@ -43,6 +46,20 @@ public class UnitControl_MASTER {
 			
 			
 		}
+		
+		if(StrategyManager.Instance().enemyMainBaseLocation!=null 
+				&& StrategyManager.Instance().combatState != StrategyManager.CombatState.eliminateEnemy
+				&& MyBotModule.Broodwar.getFrameCount() % 24 == 0)
+		{			
+			Defiler = new UnitControl_Defiler();
+			Defiler.update();	
+		}
+		
+		
+		
+		
+		
+		
 		
 		if(StrategyManager.Instance().combatState != StrategyManager.CombatState.eliminateEnemy)
 		{

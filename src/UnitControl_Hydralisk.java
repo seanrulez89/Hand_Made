@@ -25,6 +25,7 @@ public class UnitControl_Hydralisk {
 	static Position endPoint = null;
 	
 	int balanceIndex = 0;
+	static int gatherIndex = UnitControl_COMMON.moveIndex - 1;
 
 
 
@@ -339,11 +340,11 @@ public class UnitControl_Hydralisk {
 			return false;
 		}
 
-		
+		/*
 		if (moveToEndPoint == true) {
 			return moveToEndPoint;
 		}
-		
+		*/
 		
 		if (myUnitType == SM.myZergling) {
 			numberOfTotal = SM.myZerglingList.size();
@@ -469,12 +470,47 @@ public class UnitControl_Hydralisk {
 			startPoint = SM.myFirstChokePoint.getPoint();
 			gatherPoint = SM.mySecondChokePoint.getPoint();
 			endPoint = SM.mySecondChokePoint.getPoint();
+			gatherIndex = 5;
+		}
+		else if(CombatState == StrategyManager.CombatState.attackStarted)
+		{
+			startPoint = SM.mySecondChokePoint.getPoint();
+			//gatherPoint = SM.enemySecondChokePoint.getPoint();
+			endPoint = SM.enemyMainBaseLocation.getPoint();
+			
+			List<Position> positionList = InformationManager.Instance().getAssemblyPlaceList(10);
+			
+			gatherPoint = positionList.get(gatherIndex);
+
+			System.out.println("gatherIndex : " + gatherIndex);
+			
+			
+			if(enoughGathered(UnitType.Zerg_Hydralisk, gatherPoint, 3, 0.5) == true)
+			{
+				gatherIndex++;
+				if(gatherIndex>9)
+				{
+					gatherIndex=9;
+				}
+				//gatherPoint = positionList.get(gatherIndex);
+			}
+			
+
+			
+			
+			
+			
+		}
+		else if (SM.myHydraliskList.size() < 13) 
+		{
+			startPoint = SM.mySecondChokePoint.getPoint();
+			gatherPoint = SM.mySecondChokePoint.getPoint();
+			endPoint = SM.mySecondChokePoint.getPoint();
+			gatherIndex = 5;
 		}
 		else
 		{
-			startPoint = SM.mySecondChokePoint.getPoint();
-			gatherPoint = SM.enemySecondChokePoint.getPoint();
-			endPoint = SM.enemyMainBaseLocation.getPoint();
+			
 		}
 		
 		
@@ -553,19 +589,32 @@ public class UnitControl_Hydralisk {
 			return;
 		}
 		
-		setStartGatherEndPoint();
+		//setStartGatherEndPoint();
+		
+		if(UnitControl_COMMON.moveIndex == UnitControl_COMMON.BASIC_MOVE_INDEX)
+		{
+			gatherIndex=UnitControl_COMMON.moveIndex - 1;
+		}
+		
+		if(UnitControl_COMMON.enoughGathered(UnitType.Zerg_Hydralisk, UnitControl_COMMON.movePosition, 5, 0.5) == true && gatherIndex<UnitControl_COMMON.moveIndex )
+		{
+			gatherIndex++;
+			if(gatherIndex>(UnitControl_COMMON.positionList.size()-1))
+			{
+				gatherIndex=(UnitControl_COMMON.positionList.size()-1);
+			}
+		}
+		
+		//System.out.println("Hydralisk gatherIndex : " + gatherIndex);
+		//System.out.println("UnitControl_COMMON.moveIndex : " + UnitControl_COMMON.moveIndex);
 
-		
-		
-		
-		boolean endGame = enoughGathered(UnitType.Zerg_Hydralisk, gatherPoint, 3, 0.5);
-		Position invader = null;
+		Position defenseSite = UnitControl_COMMON.defenseSite;
+		Position movePosition = UnitControl_COMMON.movePosition;
 		Unit nextTarget = null;
-		
 		int i = 0;
 
 
-		List <Unit> goUP = MyBotModule.Broodwar.getUnitsInRadius(SM.enemyFirstChokePoint.getCenter(), 3*Config.TILE_SIZE);
+		List <Unit> goUp = MyBotModule.Broodwar.getUnitsInRadius(SM.enemyFirstChokePoint.getCenter(), 3*Config.TILE_SIZE);
 		MyBotModule.Broodwar.drawCircleMap(SM.enemyFirstChokePoint.getCenter(), 3*Config.TILE_SIZE, Color.Orange);
 
 		
@@ -574,32 +623,131 @@ public class UnitControl_Hydralisk {
 		{
 			Unit Hydralisk = SM.myHydraliskList.get(i);
 			
-			boolean shouldGoUP = false;
-			
-			for(Unit tempUnit : goUP)
+			/*boolean shouldGoUp = false;
+			for(Unit tempUnit : goUp)
 			{
 				if(Hydralisk.getID() == tempUnit.getID())
 				{
-					commandUtil.move(Hydralisk, endPoint);
-					System.out.println("길막이라 올라갑니다.");
-					shouldGoUP = true;
+					//System.out.println("길막이라 올라갑니다.");
+					commandUtil.move(Hydralisk, enemyMainBaseLocation.getPosition());
+					shouldGoUp = true;
 					break;
 				}
 			}
 			
-			if(shouldGoUP==true)
+			if(shouldGoUp==true)
 			{
+				continue;
+			}*/
+			
+			if(Hydralisk.isIrradiated())
+			{
+				commandUtil.move(Hydralisk, enemyMainBaseLocation.getPosition());
+				continue;
+			}
+			
+			if(Hydralisk.isUnderStorm())
+			{
+				commandUtil.move(Hydralisk, myMainBaseLocation.getPosition());
 				continue;
 			}
 			
 			
 			
 			
-			if(i % (SM.myHydraliskList.size()/6+1) == 0)
+			
+			
+/*			if(i == 0)
 			{
-				invader = UnitControl_COMMON.defenseSite;			
+				nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, Hydralisk.getPosition());
+			}
+			
+			if (nextTarget != null && nextTarget.getDistance(Hydralisk) < Hydralisk.getType().groundWeapon().maxRange()) 
+			{
+				if (Hydralisk.getGroundWeaponCooldown() == 0) 
+				{
+					commandUtil.attackUnit(Hydralisk, nextTarget);
+				} 
+				else if(Hydralisk.isUnderAttack())
+				{
+					commandUtil.move(Hydralisk, SM.myMainBaseLocation.getPosition());
+					continue;
+				}
+			}*/
+			
+			
+			if(i == 0)
+			{
+				nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, Hydralisk.getPosition());
+			}
+			
+			if (nextTarget != null && nextTarget.getDistance(Hydralisk) < Hydralisk.getType().groundWeapon().maxRange()) 
+			{
 				
-				if (invader != null && Hydralisk.isAttacking()==false)
+				if (Hydralisk.getGroundWeaponCooldown() == 0) 
+				{
+					System.out.println("사정거리 이내 / 쿨타임 0");
+					commandUtil.attackUnit(Hydralisk, nextTarget);
+					continue;
+				} 
+				else if(Hydralisk.isUnderAttack())
+				{
+					System.out.println("사정거리 이내 / 쿨타임 0 아님 / 공격받는중");
+					commandUtil.move(Hydralisk, SM.myMainBaseLocation.getPosition());
+					continue;
+				}				
+				
+			}
+			else if (nextTarget != null) // 적은 있는데  멀다
+			{
+				if (Hydralisk.getGroundWeaponCooldown() == 0) 
+				{
+					System.out.println("목표적은 멀지만 일단 쿨이 돌아와서 공격한다 어택땅");
+					commandUtil.attackMove(Hydralisk, nextTarget.getPosition());
+					continue;
+				} 
+				else if(Hydralisk.isUnderAttack())
+				{
+					commandUtil.move(Hydralisk, SM.myMainBaseLocation.getPosition());
+					continue;
+				}
+				
+				
+			}
+			
+			
+			
+			
+			
+			
+			if (defenseSite != null && Hydralisk.isAttacking()==false)
+			{
+				commandUtil.attackMove(Hydralisk, defenseSite);				
+			}
+			else if(CombatState == StrategyManager.CombatState.attackStarted)
+			{
+				commandUtil.attackMove(Hydralisk, movePosition);				
+			}
+			else if (SM.myHydraliskList.size() > 12) 
+			{			
+				if(Hydralisk!=null)
+				{
+					defenseBalance(Hydralisk);
+				}
+			}		
+			else
+			{
+				commandUtil.attackMove(Hydralisk, movePosition);
+			}
+			
+			
+			
+			
+/*			if(i % (SM.myHydraliskList.size()/6+1) == 0)
+			{
+				defenseSite = UnitControl_COMMON.defenseSite;			
+				
+				if (defenseSite != null && Hydralisk.isAttacking()==false)
 				{	
 					underAttack = true;
 					moveToEndPoint = false;
@@ -641,17 +789,7 @@ public class UnitControl_Hydralisk {
 			
 			
 			
-			if(Hydralisk.isIrradiated())
-			{
-				Hydralisk.move(SM.enemyMainBaseLocation.getPosition());
-				continue;
-			}
-			
-			if(Hydralisk.isUnderStorm())
-			{
-				Hydralisk.move(SM.myMainBaseLocation.getPosition());
-				continue;
-			}
+
 			
 			
 			
@@ -688,7 +826,8 @@ public class UnitControl_Hydralisk {
 			if(SM.enemyMainBaseLocation == null)
 			{
 				//System.out.println(3);
-				commandUtil.attackMove(Hydralisk, startPoint);
+				//commandUtil.attackMove(Hydralisk, startPoint);
+				commandUtil.attackMove(Hydralisk, UnitControl_COMMON.movePosition);
 			}
 			
 			
@@ -701,6 +840,11 @@ public class UnitControl_Hydralisk {
 			else if(CombatState == StrategyManager.CombatState.attackStarted)// 공격나가는 시점		
 			{
 
+				
+				//commandUtil.attackMove(Hydralisk, gatherPoint);
+				commandUtil.attackMove(Hydralisk, UnitControl_COMMON.movePosition);
+
+				
 				if (endGame == false) 
 				{
 					//System.out.println(7);
@@ -712,6 +856,7 @@ public class UnitControl_Hydralisk {
 					//System.out.println(6);
 					commandUtil.attackMove(Hydralisk, endPoint);
 				}
+				
 
 			}
 			else if (SM.myHydraliskList.size() >12) 
@@ -733,8 +878,14 @@ public class UnitControl_Hydralisk {
 			else
 			{
 				
-				commandUtil.attackMove(Hydralisk, startPoint);
-			}
+				//commandUtil.attackMove(Hydralisk, startPoint);
+				commandUtil.attackMove(Hydralisk, UnitControl_COMMON.movePosition);
+
+			}*/
+		
+		
+		
+		
 		}
 	}
 

@@ -463,7 +463,7 @@ public class UnitControl_Mutalisk {
 		{
 			Unit tempEnemy = null;
 			
-			for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 7 * Config.TILE_SIZE)) 
+			for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), unit.getType().sightRange())) 
 			{
 				
 				
@@ -663,7 +663,7 @@ public class UnitControl_Mutalisk {
 		
 	}
 	
-	public Position setFleePoint (Unit unit)
+	public Position setFleePoint (Position averagePosition)
 	{
 		Position position = SM.myMainBaseLocation.getPosition();
 		
@@ -675,9 +675,9 @@ public class UnitControl_Mutalisk {
 		{
 			for(int j = -1 ; j < 2 ; j++)
 			{
-				Position tempPosition = new Position(unit.getX()+4*Config.TILE_SIZE*i+16*i, unit.getY()+4*Config.TILE_SIZE*j+16*j);
+				Position tempPosition = new Position(averagePosition.getX()+4*Config.TILE_SIZE*i+16*i, averagePosition.getY()+4*Config.TILE_SIZE*j+16*j);
 				
-				MyBotModule.Broodwar.drawCircleMap(tempPosition, 3 * Config.TILE_SIZE, Color.Red);
+				//MyBotModule.Broodwar.drawCircleMap(tempPosition, 3 * Config.TILE_SIZE, Color.Red);
 
 				currentEnemy = 0;
 				for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(tempPosition, 3 * Config.TILE_SIZE))				
@@ -778,7 +778,7 @@ public class UnitControl_Mutalisk {
 		
 		
 		
-		//Position averagePosition = getAveragePosition(SM.myMutaliskList);
+		Position averagePosition = getAveragePosition(SM.myMutaliskList);
 		//boolean endGame = enoughGathered(UnitType.Zerg_Mutalisk, gatherPoint, 5, 0.5);
 		//Position invader = weAreUnderAttack(averagePosition);
 		//Position invader = UnitControl_COMMON.defenseSite;
@@ -810,7 +810,7 @@ public class UnitControl_Mutalisk {
 			else
 			{
 				underAttack = false;
-				nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, SM.myMutaliskList.get(0).getPosition());
+				nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, averagePosition);
 			}
 			
 			
@@ -932,7 +932,7 @@ public class UnitControl_Mutalisk {
 			if (nextTarget != null) 
 			{
 				//평균쿨타임으로 합시다.
-				if (SM.myMutaliskList.get(0).getAirWeaponCooldown() == 0) 
+				if (Mutalisk.getAirWeaponCooldown() == 0) 
 				{
 					
 					
@@ -962,7 +962,7 @@ public class UnitControl_Mutalisk {
 					
 					
 					//Mutalisk.move(SM.myMainBaseLocation.getPosition());
-					commandUtil.move(Mutalisk, setFleePoint(SM.myMutaliskList.get(0)));
+					commandUtil.move(Mutalisk, setFleePoint(averagePosition));
 					//Mutalisk.move(setFleePoint(Mutalisk));
 					
 					continue;

@@ -30,7 +30,7 @@ public class BuildOrder_Expansion {
 		double minDistance = 1000000000;
 		double distanceFromMyLocation = 0;
 		double distanceFromEnemyLocation = 0;
-		
+		/*
 		int numberOfMyCombatUnitTrainingBuilding = 0;
 		numberOfMyCombatUnitTrainingBuilding += MyBotModule.Broodwar.self().allUnitCount(UnitType.Zerg_Hatchery);
 		numberOfMyCombatUnitTrainingBuilding += MyBotModule.Broodwar.self().allUnitCount(UnitType.Zerg_Lair);
@@ -46,7 +46,7 @@ public class BuildOrder_Expansion {
 				.getConstructionQueueItemCount(UnitType.Zerg_Lair, null);
 		numberOfMyCombatUnitTrainingBuilding += ConstructionManager.Instance()
 				.getConstructionQueueItemCount(UnitType.Zerg_Hive, null);
-		
+		*/
 
 		for (BaseLocation myBaseLocation : myBaseLocations) {
 			if (EXPLocations.contains(myBaseLocation)) {

@@ -39,7 +39,7 @@ public class UnitControl_Lurker {
 		
 		if(SM.myLurkerList.size() > 0)
 		{
-			if(CombatState == StrategyManager.CombatState.attackStarted && myPlayer.getUpgradeLevel(UpgradeType.Ventral_Sacs)>0)// 공격나가는 시점		
+			if(CombatState == StrategyManager.CombatState.attackStarted)// && myPlayer.getUpgradeLevel(UpgradeType.Ventral_Sacs)>0)// 공격나가는 시점		
 			{
 				for(Unit unit : SM.myLurkerList)
 				{

@@ -42,7 +42,7 @@ public class UnitControl_Defiler {
 					Position tempPosition = new Position(Defiler.getX() + 8 * Config.TILE_SIZE * i,
 							Defiler.getY() + 8 * Config.TILE_SIZE * j);
 
-					MyBotModule.Broodwar.drawCircleMap(tempPosition, 4 * Config.TILE_SIZE, Color.Red);
+					//MyBotModule.Broodwar.drawCircleMap(tempPosition, 4 * Config.TILE_SIZE, Color.Red);
 					
 					currentEnemy = 0;
 					for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(tempPosition, 4 * Config.TILE_SIZE)) {
@@ -109,7 +109,7 @@ public class UnitControl_Defiler {
 					if(CombatState == StrategyManager.CombatState.attackStarted)
 					{
 						//System.out.println("4-1");
-						commandUtil.move(Defiler, SM.enemyMainBaseLocation.getPosition());
+						commandUtil.move(Defiler, SM.myHydraliskList.get(0).getPosition());
 					}
 					else
 					{

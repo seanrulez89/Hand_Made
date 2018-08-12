@@ -168,36 +168,36 @@ public class BuildOrder_Initial {
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		
 		
+	/*	BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
+				BuildOrderItem.SeedPositionStrategy.SecondChokePoint);
+	*/	
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
 				BuildOrderItem.SeedPositionStrategy.SecondChokePoint);
 		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
+		
+		
+
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
+
+
+
+		
+
+		
+
+
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
+
+		/*BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony,
 				BuildOrderItem.SeedPositionStrategy.SecondChokePoint);
-		
-		
-		
-
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk,
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-
-
-
-
-		
-
-		
-
-
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk,
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk,
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-
-
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony,
-				BuildOrderItem.SeedPositionStrategy.SecondChokePoint);
-		
+		*/
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony,
 				BuildOrderItem.SeedPositionStrategy.SecondChokePoint);
 		

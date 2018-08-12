@@ -257,7 +257,7 @@ public class StrategyManager {
 
 			// 업그레이드 및 리서치 대상 설정
 			necessaryUpgradeType1 = UpgradeType.Metabolic_Boost;
-			necessaryUpgradeType2 = UpgradeType.Ventral_Sacs; //UpgradeType.Pneumatized_Carapace;
+			necessaryUpgradeType2 = UpgradeType.Pneumatized_Carapace; //UpgradeType.Ventral_Sacs;
 			necessaryUpgradeType3 = UpgradeType.Zerg_Flyer_Attacks; // 공중공업
 			necessaryUpgradeType4 = UpgradeType.Zerg_Flyer_Carapace; // 공중방업
 
@@ -442,7 +442,7 @@ public class StrategyManager {
 		
 		
 		
-		if (myHydraliskList.size() < 12) {
+		if (myHydraliskList.size() < 13) {
 			return true;
 		}
 		
@@ -911,8 +911,7 @@ public class StrategyManager {
 
 				if (BuildManager.Instance().getAvailableMinerals() >= myCreepColony.mineralPrice()) {
 
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(myCreepColony,
-							BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
+				//	BuildManager.Instance().buildQueue.queueAsLowestPriority(myCreepColony,BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
 				}
 			}
 		}
@@ -924,8 +923,7 @@ public class StrategyManager {
 
 				if (BuildManager.Instance().getAvailableMinerals() >= mySunkenColony.mineralPrice()) {
 
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(mySunkenColony,
-							BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
+				//	BuildManager.Instance().buildQueue.queueAsLowestPriority(mySunkenColony,BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
 				}
 			}
 		}
@@ -1247,8 +1245,8 @@ public class StrategyManager {
 			
 			
 			
-			//UpgradeType.Pneumatized_Carapace
-			if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Ventral_Sacs) > 0) {
+			//UpgradeType.Ventral_Sacs
+			if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Pneumatized_Carapace) > 0) {
 				if (numberOfLair == 0) 
 				{
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Lair, true);
@@ -1282,7 +1280,7 @@ public class StrategyManager {
 
 						UnitType nextUnitTypeToTrain = getNextCombatUnitTypeToTrain();
 
-						if (BuildManager.Instance().buildQueue.getItemCount(nextUnitTypeToTrain) < myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)*2) {
+						if (BuildManager.Instance().buildQueue.getItemCount(nextUnitTypeToTrain) < myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)*1) {
 
 							if(nextUnitTypeToTrain == UnitType.Zerg_Mutalisk)
 							{
