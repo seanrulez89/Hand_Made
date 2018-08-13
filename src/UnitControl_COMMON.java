@@ -9,13 +9,16 @@ import bwta.*;
 
 public class UnitControl_COMMON {
 
+	private static CommandUtil commandUtil = new CommandUtil();
 	
 	static Position defenseSite = null;
 	static Position movePosition = null;
 	
-	final static int BASIC_MOVE_INDEX = 5;
+	final static int ASSEMBLY_NUMBER = 6;
+	final static int BASIC_MOVE_INDEX = ASSEMBLY_NUMBER/2;
 	static int moveIndex = BASIC_MOVE_INDEX;
 	static List<Position> positionList = null; // 몇분할인가
+	static ArrayList <Position> localDefense = null;
 	
 	
 	public void getDefenseSite() {
@@ -25,8 +28,9 @@ public class UnitControl_COMMON {
 		{
 			if ((unit.getType().isBuilding() && unit.isUnderAttack())
 					|| (unit.getType().equals(UnitType.Zerg_Drone) && unit.isUnderAttack())
-					|| (unit.getType().equals(UnitType.Zerg_Overlord) && unit.isUnderAttack())
-					&& (unit.getType() != UnitType.Zerg_Sunken_Colony)) 
+					
+					&& (unit.getType() != UnitType.Zerg_Sunken_Colony))
+//				|| (unit.getType().equals(UnitType.Zerg_Overlord) && unit.isUnderAttack())
 			{
 				defenseSite = unit.getPosition();
 				return;
@@ -67,8 +71,8 @@ public class UnitControl_COMMON {
 	{
 		if(positionList == null || positionList.isEmpty())
 		{
-			System.out.println("positionList == null || positionList.isEmpty()");
-			positionList = InformationManager.getAssemblyPlaceList(10);
+			//System.out.println("positionList == null || positionList.isEmpty()");
+			positionList = InformationManager.getAssemblyPlaceList(ASSEMBLY_NUMBER);
 		}
 
 		
@@ -76,7 +80,7 @@ public class UnitControl_COMMON {
 
 		if(StrategyManager.Instance().enemyMainBaseLocation==null)
 		{
-			movePosition = StrategyManager.Instance().mySecondChokePoint.getPoint();
+			movePosition = StrategyManager.Instance().myFirstExpansionLocation.getPosition();
 			moveIndex = BASIC_MOVE_INDEX;
 		}
 		else if(StrategyManager.Instance().combatState == StrategyManager.CombatState.attackStarted)
@@ -98,7 +102,7 @@ public class UnitControl_COMMON {
 		}
 		else
 		{
-			movePosition = StrategyManager.Instance().mySecondChokePoint.getPoint();
+			movePosition = StrategyManager.Instance().myFirstExpansionLocation.getPosition();
 			moveIndex = BASIC_MOVE_INDEX;			
 		}
 		
@@ -145,8 +149,80 @@ public class UnitControl_COMMON {
 		}
 
 	}
+
+	
+	public void getLocalDefense()
+	{
+		List<BaseLocation> myBaseLocations = InformationManager.Instance()
+				.getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
+		
+		ArrayList<Position> defenseSite = new ArrayList<Position>();
+		
+		Iterator <BaseLocation> lir = myBaseLocations.iterator();		
+		while(lir.hasNext())
+		{
+
+			
+			Position position = lir.next().getPosition();
+			
+			defenseSite.add(position);
+			
+			Position chokePoint = bwta.BWTA.getNearestChokepoint(position).getCenter();
+			defenseSite.add(chokePoint);
+			
+		}
+		
+		
+		Iterator <Position> iter = defenseSite.iterator();	
+		while(iter.hasNext())
+		{
+			Position position = iter.next();
+			
+			if(position.equals(StrategyManager.Instance().myFirstChokePoint.getPoint()))
+			{
+				iter.remove();
+			}
+			else if(position.equals(StrategyManager.Instance().mySecondChokePoint.getPoint()))
+			{
+				iter.remove();
+			}
+		}
+
+		
+		
+		//defenseSite.add(StrategyManager.Instance().mySecondChokePoint.getPoint());
+		
+		
+		BaseLocation expansionLocation = BuildOrder_Expansion.expansion();
+		if(expansionLocation !=null)
+		{
+			defenseSite.add(bwta.BWTA.getNearestChokepoint(expansionLocation.getPosition()).getCenter());
+		}
+		
+		localDefense = defenseSite;
+		
+	}
 	
 	
+	public static int defenseBalance(Unit unit, int balanceIndex) {
+		
+
+		
+		
+		
+		int num = localDefense.size();
+		
+
+		if(balanceIndex>=num)
+		{
+			balanceIndex=0;
+		}
+		commandUtil.attackMove(unit, localDefense.get(balanceIndex));				
+		balanceIndex++;
+		
+		return balanceIndex;
+	
+	}
 	
 	
 	

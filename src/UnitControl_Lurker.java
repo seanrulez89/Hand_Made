@@ -29,7 +29,7 @@ public class UnitControl_Lurker {
 		//System.out.println("LURKER : " + SM.myLurkerList.size());
 		
 		
-		if(SM.myLurkerList.size() < 5)
+		if(SM.myLurkerList.size() < 5 && SM.myHydraliskList.size()>18)
 		{
 			if(myPlayer.gas()>200)
 			{
@@ -78,6 +78,11 @@ public class UnitControl_Lurker {
 							continue;
 						}
 						
+						if(enemy.isLifted() == true)
+						{
+							continue;
+						}
+						
 						if(enemy.getPlayer() == enemyPlayer)
 						{
 							tempEnemy = enemy;
@@ -99,7 +104,7 @@ public class UnitControl_Lurker {
 							unit.unburrow();
 						}
 						
-						commandUtil.move(unit, SM.enemyMainBaseLocation.getPosition());
+						commandUtil.move(unit, UnitControl_COMMON.movePosition);
 						//unit.move(SM.enemyMainBaseLocation.getPosition());
 					}
 					
@@ -107,13 +112,50 @@ public class UnitControl_Lurker {
 					
 				}
 			}
+			else if(UnitControl_COMMON.defenseSite != null)
+			{
+				for (Unit unit : SM.myLurkerList) {
+					Unit tempEnemy = null;
+
+					for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 5 * Config.TILE_SIZE)) {
+						if (enemy.isFlying() == true) {
+							continue;
+						}
+						
+						if(enemy.isLifted() == true)
+						{
+							continue;
+						}
+
+						if (enemy.getPlayer() == enemyPlayer) {
+							tempEnemy = enemy;
+							break;
+						}
+					}
+
+					if (tempEnemy != null) {
+						if (unit.isBurrowed() == false) {
+							unit.burrow();
+						}
+					} else {
+						if (unit.isBurrowed() == true) {
+							unit.unburrow();
+						}
+
+						commandUtil.move(unit, UnitControl_COMMON.defenseSite);
+					}
+				}
+			}
+			
+			
+			
 			else
 			{
 				for(Unit unit : SM.myLurkerList)
 				{
 					
 					boolean isNear = false;
-					for(Unit myUnit : MyBotModule.Broodwar.getUnitsInRadius(SM.mySecondChokePoint.getCenter(), 3*Config.TILE_SIZE))
+					for(Unit myUnit : MyBotModule.Broodwar.getUnitsInRadius(UnitControl_COMMON.positionList.get(UnitControl_COMMON.moveIndex), 3*Config.TILE_SIZE))
 					{
 						if(myUnit.getID() == unit.getID())
 						{
@@ -128,7 +170,7 @@ public class UnitControl_Lurker {
 						{
 							unit.unburrow();	
 						}
-						commandUtil.move(unit, SM.mySecondChokePoint.getCenter());
+						commandUtil.move(unit, UnitControl_COMMON.positionList.get(UnitControl_COMMON.moveIndex));
 						//unit.move(SM.mySecondChokePoint.getCenter());
 					}
 					else

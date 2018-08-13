@@ -63,45 +63,40 @@ public class BuildOrder_Expansion {
 
 		for (BaseLocation EXPLocation : EXPLocations) {
 			
-		/*
-			if(numberOfMyCombatUnitTrainingBuilding<=2)
-			{
-				if(EXPLocation.getGeysers().size()==1)
-				{
-					continue;
-				}
-			}
-			else if(numberOfMyCombatUnitTrainingBuilding==3)
-			{
-				return StrategyManager.Instance().myMainBaseLocation;
-			}
-			else if(EXPLocation.getGeysers().size()==0)
-			{
-				continue;
-			}
-			*/
 
-			/*
-			for (BaseLocation myBaseLocation : myBaseLocations) {
-				distanceFromMyLocation = EXPLocation.getGroundDistance(myBaseLocation);
-
-				for (BaseLocation enemyBaseLocation : enemyBaseLocations) {
-					distanceFromEnemyLocation = EXPLocation.getGroundDistance(enemyBaseLocation);
-
-					if (minDistance > distanceFromMyLocation && distanceFromMyLocation < distanceFromEnemyLocation) 
-					{
-							minDistance = distanceFromMyLocation;
-							nextEXP = EXPLocation;
-					
-					}
-				}
-			}
-			*/
 			
+			for (BaseLocation myBaseLocation : myBaseLocations)
+			{
+				distanceFromMyLocation = EXPLocation.getGroundDistance(myBaseLocation);
+				
+				if (minDistance > distanceFromMyLocation) 
+				{
+						minDistance = distanceFromMyLocation;
+						nextEXP = EXPLocation;
+				}
+				
+			}
+		}
+		
+		
+		for (BaseLocation enemyBaseLocation : enemyBaseLocations)
+		{
+			distanceFromEnemyLocation = nextEXP.getDistance(enemyBaseLocation);
+			if (minDistance > distanceFromEnemyLocation) 
+			{
+					return null;
+			
+			}
+		}
+		
+			
+		return nextEXP;
+		
+			/*
 				distanceFromMyLocation = EXPLocation.getGroundDistance(StrategyManager.Instance().myMainBaseLocation);
 
 				for (BaseLocation enemyBaseLocation : enemyBaseLocations) {
-					distanceFromEnemyLocation = EXPLocation.getGroundDistance(enemyBaseLocation);
+					distanceFromEnemyLocation = EXPLocation.getDistance(enemyBaseLocation);
 
 					if (minDistance > distanceFromMyLocation && distanceFromMyLocation < distanceFromEnemyLocation) 
 					{
@@ -109,15 +104,48 @@ public class BuildOrder_Expansion {
 							nextEXP = EXPLocation;
 					
 					}
-				}
+				}*/
 			
-			
-			
-			
-			
+		/*
+		if(numberOfMyCombatUnitTrainingBuilding<=2)
+		{
+			if(EXPLocation.getGeysers().size()==1)
+			{
+				continue;
+			}
 		}
+		else if(numberOfMyCombatUnitTrainingBuilding==3)
+		{
+			return StrategyManager.Instance().myMainBaseLocation;
+		}
+		else if(EXPLocation.getGeysers().size()==0)
+		{
+			continue;
+		}
+		*/
+
+		/*
+		for (BaseLocation myBaseLocation : myBaseLocations) {
+			distanceFromMyLocation = EXPLocation.getGroundDistance(myBaseLocation);
+
+			for (BaseLocation enemyBaseLocation : enemyBaseLocations) {
+				distanceFromEnemyLocation = EXPLocation.getGroundDistance(enemyBaseLocation);
+
+				if (minDistance > distanceFromMyLocation && distanceFromMyLocation < distanceFromEnemyLocation) 
+				{
+						minDistance = distanceFromMyLocation;
+						nextEXP = EXPLocation;
+				
+				}
+			}
+		}
+		*/
+			
+			
+			
 		
-		return nextEXP;
+		
+		
 	}
 
 	

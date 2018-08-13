@@ -332,7 +332,7 @@ public class StrategyManager {
 
 
 			/// 공격 모드로 전환할 때인지 여부를 판단합니다
-			if (isTimeToStartAttack()) {
+			if (isTimeToStartAttack() && UnitControl_COMMON.defenseSite==null) {
 				MyBotModule.Broodwar.drawTextScreen(100, y, "Attack Mode" + attack_cnt);
 				combatState = CombatState.attackStarted;
 			}
@@ -386,8 +386,7 @@ public class StrategyManager {
 
 		MyBotModule.Broodwar.drawTextScreen(100, 240, "Wave Count : " + attack_cnt);
 			
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) > 10
-				|| myPlayer.completedUnitCount(UnitType.Zerg_Lurker) > 4) {
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Lurker) > 4) {
 
 			if (myHydraliskList.size() > 18) {
 				attack_cnt = attack_cnt + 1;
@@ -413,36 +412,23 @@ public class StrategyManager {
 
 		
 
-		/*
-		int enemyUnitCountAroundMyMainBaseLocation = 0;
-
-		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(myMainBaseLocation.getPosition(),
-				8 * Config.TILE_SIZE)) {
-			if (unit.getPlayer() == enemyPlayer) {
-				enemyUnitCountAroundMyMainBaseLocation++;
-			}
-		}
-
-		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(myFirstExpansionLocation.getPosition(),
-				8 * Config.TILE_SIZE)) {
-			if (unit.getPlayer() == enemyPlayer) {
-				enemyUnitCountAroundMyMainBaseLocation++;
-			}
-		}
-
-		if (enemyUnitCountAroundMyMainBaseLocation > 3) {
-			return true;
-		}
-		*/
 		
 		if(UnitControl_COMMON.defenseSite!=null)
 		{
+			System.out.println(111);
+			return true;
+		}
+		
+		
+		if (myLurkerList.size() < 3) {
+			System.out.println(222);
 			return true;
 		}
 		
 		
 		
 		if (myHydraliskList.size() < 13) {
+			System.out.println(333);
 			return true;
 		}
 		
@@ -534,7 +520,7 @@ public class StrategyManager {
 
 			if(unit.getType().equals(UnitType.Zerg_Ultralisk)) // 0627 뮤탈코드 테스트를 위한 건너뛰기 조치
 			{
-				commandUtil.attackMove(unit, myDefenseBuildingPosition);
+				commandUtil.attackMove(unit, UnitControl_COMMON.movePosition);
 			}
 			
 			
@@ -551,7 +537,7 @@ public class StrategyManager {
 		{
 			if(unit.getType().equals(UnitType.Zerg_Ultralisk))
 			{
-				commandUtil.attackMove(unit, enemyMainBaseLocation.getPosition());
+				commandUtil.attackMove(unit, UnitControl_COMMON.movePosition);
 			}
 		}
 	}
@@ -870,7 +856,7 @@ public class StrategyManager {
 			return;
 		}
 		
-
+		/*
 		boolean isPossibleToConstructDefenseBuildingType1 = false;
 		boolean isPossibleToConstructDefenseBuildingType2 = false;
 
@@ -927,7 +913,10 @@ public class StrategyManager {
 				}
 			}
 		}
+		*/
 
+		
+		
 		// 현재 공격 유닛 생산 건물 갯수
 
 		int numberOfMyCombatUnitTrainingBuilding = 0;
@@ -1029,6 +1018,31 @@ public class StrategyManager {
 
 		}
 		*/
+		
+		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding == 3 && nextExpansion!=null) 
+		{
+			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) ==0 
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) ==0) 
+			{
+				
+				
+				
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
+						nextExpansion.getTilePosition(), true); /// 해처리 추가 확장 0622
+
+				System.out.println("7");
+
+				if (nextExpansion.getGeysers().size()>0) 
+				{
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
+							nextExpansion.getTilePosition(), true); /// 해처리 추가 확장 0622
+
+					System.out.println("8");
+				}
+			}
+		}
+		
+		
 		else if (BuildManager.Instance().getAvailableMinerals() > 650 && numberOfMyCombatUnitTrainingBuilding < 13 && nextExpansion!=null) 
 		{
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) ==0 
@@ -1268,7 +1282,34 @@ public class StrategyManager {
 			return;
 		}
 		
-		if (myPlayer.supplyUsed() <= 390) {
+		UnitType nextUnitTypeToTrain = getNextCombatUnitTypeToTrain();
+
+		if (BuildManager.Instance().buildQueue.getItemCount(nextUnitTypeToTrain) < myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)*1) 
+		{
+
+			if(nextUnitTypeToTrain == UnitType.Zerg_Mutalisk)
+			{
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(nextUnitTypeToTrain, false);
+			}
+			else
+			{
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(nextUnitTypeToTrain, false);
+			}
+			
+			
+
+			nextTargetIndexOfBuildOrderArray++;
+
+			if (nextTargetIndexOfBuildOrderArray >= buildOrderArrayOfMyCombatUnitType.length) {
+				nextTargetIndexOfBuildOrderArray = 0;
+			}
+		}
+		
+		
+		
+		/*
+		if (myPlayer.supplyUsed() <= 390) 
+		{
 
 			for (Unit unit : myPlayer.getUnits()) {
 
@@ -1280,7 +1321,8 @@ public class StrategyManager {
 
 						UnitType nextUnitTypeToTrain = getNextCombatUnitTypeToTrain();
 
-						if (BuildManager.Instance().buildQueue.getItemCount(nextUnitTypeToTrain) < myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)*1) {
+						if (BuildManager.Instance().buildQueue.getItemCount(nextUnitTypeToTrain) < myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)*1) 
+						{
 
 							if(nextUnitTypeToTrain == UnitType.Zerg_Mutalisk)
 							{
@@ -1303,6 +1345,7 @@ public class StrategyManager {
 				}
 			}
 		}
+		*/
 	}
 
 	/// 다음에 생산할 공격유닛 UnitType 을 리턴합니다
@@ -1313,9 +1356,8 @@ public class StrategyManager {
 		if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 1) {
 
 			int defilerNumber = myPlayer.allUnitCount(UnitType.Zerg_Defiler)
-					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Defiler)
-					+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Defiler, null);
-
+					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Defiler);
+					
 
 			
 			if(myPlayer.completedUnitCount(UnitType.Zerg_Defiler_Mound)>0 &&  defilerNumber<3) {
@@ -1335,8 +1377,13 @@ public class StrategyManager {
 		}
 
 		else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 2) {
+			
+			int mutaliskNumber = myPlayer.allUnitCount(UnitType.Zerg_Mutalisk)
+					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Mutalisk);
+					
+			
 
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Spire)>0 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk)<15)
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Spire)>0 && mutaliskNumber<15)
 			{
 				nextUnitTypeToTrain = myMutalisk;				
 			}
@@ -1364,7 +1411,12 @@ public class StrategyManager {
 			
 		} else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 3) {
 
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern)>0 && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk)<4)
+			int ultraliskNumber = myPlayer.allUnitCount(UnitType.Zerg_Ultralisk)
+					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Ultralisk);
+			
+			
+			
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern)>0 && ultraliskNumber<4)
 			{
 				nextUnitTypeToTrain = myUltralisk;
 

@@ -169,7 +169,21 @@ public class UnitControl_Overlord {
 			Position chokePoint = bwta.BWTA.getNearestChokepoint(baseLocation.getPosition()).getCenter();
 			explorationSite.add(chokePoint);
 		}
+		
+		for(BaseLocation EXPLocation : BWTA.getBaseLocations())
+		{
+			if(MyBotModule.Broodwar.isExplored(EXPLocation.getTilePosition())==false)
+			{
+				explorationSite.add(EXPLocation.getPosition());
+			}
+		}
+		
+		
 
+		
+		
+		
+		
 
 		
 		explorationSite.add(SM.myFirstChokePoint.getPoint());
@@ -196,6 +210,18 @@ public class UnitControl_Overlord {
 		{
 			Position position = lir.next();
 			
+			if(SM.enemyMainBaseLocation != null && SM.enemyFirstExpansionLocation !=null)
+			{
+				if(position.equals(SM.enemyMainBaseLocation.getPosition()) || position.equals(SM.enemyFirstExpansionLocation.getPosition()))
+				{
+					lir.remove();
+					continue;
+				}
+			}
+			
+			
+			
+			
 			for(Unit unit : MyBotModule.Broodwar.getUnitsInRadius(position, 1 * Config.TILE_SIZE))
 			{
 				if(unit.getPlayer()==myPlayer && unit.getType().equals(UnitType.Zerg_Overlord) 
@@ -206,6 +232,9 @@ public class UnitControl_Overlord {
 				}
 			}
 		}
+		
+		
+		
 		
 		for(Position position : explorationSite)
 		{

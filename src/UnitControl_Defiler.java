@@ -37,6 +37,10 @@ public class UnitControl_Defiler {
 			int currentEnemy = 0;
 			int maxEnemy = 0;
 			
+			int tempUnderAttack = 0;
+			int maxUnderAttack = 0;
+			
+			
 			for (int i = -1; i < 2; i++) {
 				for (int j = -1; j < 2; j++) {
 					Position tempPosition = new Position(Defiler.getX() + 8 * Config.TILE_SIZE * i,
@@ -44,6 +48,7 @@ public class UnitControl_Defiler {
 
 					//MyBotModule.Broodwar.drawCircleMap(tempPosition, 4 * Config.TILE_SIZE, Color.Red);
 					
+					/*
 					currentEnemy = 0;
 					for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(tempPosition, 4 * Config.TILE_SIZE)) {
 						if (enemy.getPlayer() == enemyPlayer) // 건물은 제외하고
@@ -66,6 +71,33 @@ public class UnitControl_Defiler {
 						maxEnemy = currentEnemy;
 						position = tempPosition;
 					}
+					*/
+					
+					tempUnderAttack = 0;
+					for (Unit myUnit : MyBotModule.Broodwar.getUnitsInRadius(tempPosition, 4 * Config.TILE_SIZE)) {
+						if (myUnit.getPlayer() == myPlayer) // 건물은 제외하고
+						{
+							if(myUnit.isUnderDarkSwarm()==true)
+							{
+								tempUnderAttack = 0;
+								break;
+							}
+							else if(myUnit.isUnderAttack()==true)
+							{
+								tempUnderAttack++;
+							}							
+						}
+					}
+					
+					//System.out.println("currentEnemy : " + currentEnemy);
+
+					if (tempUnderAttack > maxUnderAttack) {
+						maxUnderAttack = tempUnderAttack;
+						position = tempPosition;
+					}
+					
+					
+					
 
 				}
 			}
@@ -109,7 +141,7 @@ public class UnitControl_Defiler {
 					if(CombatState == StrategyManager.CombatState.attackStarted)
 					{
 						//System.out.println("4-1");
-						commandUtil.move(Defiler, SM.myHydraliskList.get(0).getPosition());
+						commandUtil.move(Defiler, UnitControl_COMMON.movePosition);
 					}
 					else
 					{

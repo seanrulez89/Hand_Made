@@ -20,36 +20,21 @@ public class UnitControl_Hydralisk {
 	BaseLocation myMainBaseLocation = SM.myMainBaseLocation;
 	BaseLocation enemyMainBaseLocation = SM.enemyMainBaseLocation;
 	
-	static Position startPoint = null;
-	static Position gatherPoint = null;
-	static Position endPoint = null;
+
 	
-	int balanceIndex = 0;
+	static int balanceIndex = 0;
 	static int gatherIndex = UnitControl_COMMON.moveIndex - 1;
 
 
 
-	StrategyManager.CombatState CombatState = SM.combatState;
-	ArrayList<Unit> Hydralisks = SM.myHydraliskList;
-
-	public static boolean moveToEndPoint = false;
-	public static boolean underAttack = true;
 
 	public Unit getNextTargetOf(UnitType myUnitType, Position averagePosition) {
 		Unit nextTarget = null;
 		
 		double targetHP = 10000;
 		double tempHP = 0;		
-		int inRange = 0;
 		
-		if(myUnitType == UnitType.Zerg_Hydralisk)
-		{
-			inRange = 5 * Config.TILE_SIZE;
-		}
-		else
-		{
-			inRange = 4 * Config.TILE_SIZE;
-		}
+
 		
 		ArrayList <Unit> airToAir = new ArrayList<Unit>();
 		ArrayList <Unit> groundToAir = new ArrayList<Unit>();
@@ -66,11 +51,16 @@ public class UnitControl_Hydralisk {
 		ArrayList <Unit> distantUnit = new ArrayList<Unit>();
 		 
 		 																			
-		for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(averagePosition, myUnitType.sightRange())) { // 저글링 같은 근접공격유닛은 10배 해봐야 무의미한가?
+		for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(averagePosition, myUnitType.groundWeapon().maxRange())) { // 저글링 같은 근접공격유닛은 10배 해봐야 무의미한가?
 
 			if (enemy.getPlayer() == enemyPlayer) {
 				
 				if(enemy.isVisible() == false)
+				{
+					continue;
+				}
+				
+				if(enemy.isDefenseMatrixed()==true)
 				{
 					continue;
 				}
@@ -114,7 +104,8 @@ public class UnitControl_Hydralisk {
 						|| enemy.getType().equals(UnitType.Zerg_Queen)
 						|| enemy.getType().equals(UnitType.Zerg_Defiler)
 						|| enemy.getType().equals(UnitType.Protoss_High_Templar)
-						|| enemy.getType().equals(UnitType.Terran_Vulture_Spider_Mine))
+						|| enemy.getType().equals(UnitType.Terran_Vulture_Spider_Mine)
+						|| enemy.getType().equals(UnitType.Terran_Medic))
 				{
 					specialUnit.add(enemy);					
 				}
@@ -272,317 +263,13 @@ public class UnitControl_Hydralisk {
 		return nextTarget;
 	}
 	
-	
-	public Position weAreUnderAttack(Position myPosition) {
-		// 이것이 결국  SM의 isTimeToDefense를 대체하면서 별도의 클래스로 만들어지던가 해야한다
-		Unit invader = null;
 
-		double positionDistance = 100000000;
-		double tempDistance = 0;
-	
-		// 건물이나 드론이 얻어맞는 경우
-		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-			if ((unit.getType().isBuilding() && unit.isUnderAttack())
-					|| (unit.getType().equals(UnitType.Zerg_Drone) && unit.isUnderAttack())
-					&& (unit.getType() != UnitType.Zerg_Sunken_Colony)) {
-				
-				tempDistance = unit.getPosition().getDistance(myPosition);
-				if (positionDistance > tempDistance) {
-					positionDistance = tempDistance;
-					invader = unit;
-				}	
-			}
-		}
-
-		if (invader != null) {
-			underAttack = true;
-			moveToEndPoint = false;
-			return invader.getPosition();
-		}
-
-		// 기지 주변에 악당이 등장하는 경우. 꼭 맞고 있지는 않을 수도 있다
-		for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(myPlayer)) {
-
-			for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getPosition(), 13 * Config.TILE_SIZE)) {
-
-				if (unit.getPlayer() == enemyPlayer) {
-
-					tempDistance = unit.getPosition().getDistance(myPosition);
-					if (positionDistance > tempDistance) {
-						positionDistance = tempDistance;
-						invader = unit;
-						  // System.out.println("기지 주변 악당을 찾았다");
-					}
-				}
-			}
-		}
-
-		if (invader != null) {
-			underAttack = true;
-			moveToEndPoint = false;
-			return invader.getPosition();
-		}
-
-		underAttack = false;
-		return null;
-	}
-	
-	
-
-	public boolean enoughGathered(UnitType myUnitType, Position targetPosition, int radius, double input_ratio) {
-
-		int numberOfGathered = 0;
-		int numberOfTotal = 0;
-		int numberOfMinimum = 12;
-
-		if (SM.enemyMainBaseLocation == null) {
-			 // System.out.println("아직 기지 못 찾음");
-			return false;
-		}
-
-		/*
-		if (moveToEndPoint == true) {
-			return moveToEndPoint;
-		}
-		*/
-		
-		if (myUnitType == SM.myZergling) {
-			numberOfTotal = SM.myZerglingList.size();
-		} else if (myUnitType == SM.myMutalisk) {
-			numberOfTotal = SM.myMutaliskList.size();
-		} else if (myUnitType == SM.myHydralisk) {
-			numberOfTotal = SM.myHydraliskList.size();
-		} else {
-
-		}
-
-		List<Unit> unitsAround = MyBotModule.Broodwar.getUnitsInRadius(targetPosition, radius * Config.TILE_SIZE);
-		
-		
-		
-		for (Unit unit : unitsAround) {
-
-			if (unit.exists() && unit != null) {
-
-				if (unit.getPlayer() == myPlayer) {
-
-					if (unit.getType() == myUnitType) {
-						numberOfGathered++;
-					}
-				}
-			}
-		}
-		
-		if (numberOfGathered > numberOfMinimum && numberOfGathered > numberOfTotal * input_ratio) {
-			moveToEndPoint = true;
-		}
-		else
-		{
-			moveToEndPoint = false;
-		}
-
-		return moveToEndPoint;
-	}
-	
-	
-	
-	public Position getAveragePosition(List <Unit> Units)
-	{
-		Position averagePosition = null;
-		
-		int x = 0;
-		int y = 0;
-		int includeCase = 0;
-		
-		for(Unit unit : Units)
-		{
-			Unit tempEnemy = null;
-			
-			for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 5 * Config.TILE_SIZE)) 
-			{
-				if (enemy.getPlayer() == enemyPlayer) {
-					tempEnemy = enemy;
-					includeCase++;
-					break;
-				}
-				
-			}
-			if(tempEnemy!=null)
-			{
-				x += unit.getX();
-				y += unit.getY();
-			}
-
-		}
-		
-		if(includeCase==0)
-		{
-			return SM.myFirstExpansionLocation.getPosition();
-		}
-		
-		
-		
-		x = x/includeCase;
-		y = y/includeCase;
-		
-		averagePosition = new Position(x,y);
-		
-		//MyBotModule.Broodwar.drawCircleMap(averagePosition, 5 * Config.TILE_SIZE, Color.Red);
-		
-		return averagePosition;
-	}
-	
-	
-	
-	
-	
-	public Position getNextPlaceToGo() {
-		
-		if(SM.enemyMainBaseLocation==null)
-		{
-			return SM.mySecondChokePoint.getPoint();
-		}
-		
-		
-		Position nextPlace = bwta.BWTA.getNearestChokepoint(SM.mySecondChokePoint.getCenter()).getCenter();
-		
-
-		if (endPoint != null && moveToEndPoint == true && underAttack == false
-				&& SM.combatState == StrategyManager.CombatState.defenseMode) {
-			nextPlace = endPoint;
-		} else if (gatherPoint != null) {
-			nextPlace = gatherPoint;
-		} else {
-			
-		}
-
-		return nextPlace;
-
-	}
-
-	
-	public void setStartGatherEndPoint ()
-	{
-		
-
-		if(SM.enemyMainBaseLocation==null)
-		{
-			startPoint = SM.myFirstChokePoint.getPoint();
-			gatherPoint = SM.mySecondChokePoint.getPoint();
-			endPoint = SM.mySecondChokePoint.getPoint();
-			gatherIndex = 5;
-		}
-		else if(CombatState == StrategyManager.CombatState.attackStarted)
-		{
-			startPoint = SM.mySecondChokePoint.getPoint();
-			//gatherPoint = SM.enemySecondChokePoint.getPoint();
-			endPoint = SM.enemyMainBaseLocation.getPoint();
-			
-			List<Position> positionList = InformationManager.Instance().getAssemblyPlaceList(10);
-			
-			gatherPoint = positionList.get(gatherIndex);
-
-			System.out.println("gatherIndex : " + gatherIndex);
-			
-			
-			if(enoughGathered(UnitType.Zerg_Hydralisk, gatherPoint, 3, 0.5) == true)
-			{
-				gatherIndex++;
-				if(gatherIndex>9)
-				{
-					gatherIndex=9;
-				}
-				//gatherPoint = positionList.get(gatherIndex);
-			}
-			
-
-			
-			
-			
-			
-		}
-		else if (SM.myHydraliskList.size() < 13) 
-		{
-			startPoint = SM.mySecondChokePoint.getPoint();
-			gatherPoint = SM.mySecondChokePoint.getPoint();
-			endPoint = SM.mySecondChokePoint.getPoint();
-			gatherIndex = 5;
-		}
-		else
-		{
-			
-		}
-		
-		
-		
-		
-	}
-	
-	public void defenseBalance(Unit unit) {
-		
-		List<BaseLocation> myBaseLocations = InformationManager.Instance()
-				.getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
-		
-		ArrayList<Position> defenseSite = new ArrayList<Position>();
-		
-		Iterator <BaseLocation> lir = myBaseLocations.iterator();		
-		while(lir.hasNext())
-		{
-
-			
-			Position position = lir.next().getPosition();
-			
-			defenseSite.add(position);
-			
-			Position chokePoint = bwta.BWTA.getNearestChokepoint(position).getCenter();
-			defenseSite.add(chokePoint);
-			
-		}
-		
-		
-		Iterator <Position> iter = defenseSite.iterator();	
-		while(iter.hasNext())
-		{
-			Position position = iter.next();
-			
-			if(position.equals(SM.myFirstChokePoint.getPoint()))
-			{
-				iter.remove();
-			}
-			else if(position.equals(SM.myFirstExpansionLocation.getPosition()))
-			{
-				iter.remove();
-			}
-		}
-
-		
-		
-		defenseSite.add(SM.mySecondChokePoint.getPoint());
-		
-		if(BuildOrder_Expansion.expansion()!=null)
-		{
-			defenseSite.add(bwta.BWTA.getNearestChokepoint(BuildOrder_Expansion.expansion().getPosition()).getCenter());
-		}
-		
-		
-		
-		int num = defenseSite.size();
-		
-
-		if(balanceIndex>=num)
-		{
-			balanceIndex=0;
-		}
-		commandUtil.attackMove(unit, defenseSite.get(balanceIndex));				
-		balanceIndex++;
-		
-	
-	}
-	
 
 	
 	
 	public void update() {
+		
+		balanceIndex = 0;
 		
 		if(SM.myHydraliskList.size() == 0)
 		{
@@ -652,47 +339,25 @@ public class UnitControl_Hydralisk {
 				continue;
 			}
 			
+
 			
 			
-			
-			
-			
-/*			if(i == 0)
-			{
-				nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, Hydralisk.getPosition());
-			}
-			
-			if (nextTarget != null && nextTarget.getDistance(Hydralisk) < Hydralisk.getType().groundWeapon().maxRange()) 
-			{
-				if (Hydralisk.getGroundWeaponCooldown() == 0) 
-				{
-					commandUtil.attackUnit(Hydralisk, nextTarget);
-				} 
-				else if(Hydralisk.isUnderAttack())
-				{
-					commandUtil.move(Hydralisk, SM.myMainBaseLocation.getPosition());
-					continue;
-				}
-			}*/
-			
-			
-			if(i == 0)
-			{
-				nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, Hydralisk.getPosition());
-			}
+			nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, Hydralisk.getPosition());
+		
+
 			
 			if (nextTarget != null && nextTarget.getDistance(Hydralisk) < Hydralisk.getType().groundWeapon().maxRange()) 
 			{
 				
 				if (Hydralisk.getGroundWeaponCooldown() == 0) 
 				{
-					System.out.println("사정거리 이내 / 쿨타임 0");
+					//System.out.println("사정거리 이내 / 쿨타임 0");
 					commandUtil.attackUnit(Hydralisk, nextTarget);
 					continue;
 				} 
 				else if(Hydralisk.isUnderAttack())
 				{
-					System.out.println("사정거리 이내 / 쿨타임 0 아님 / 공격받는중");
+					//System.out.println("사정거리 이내 / 쿨타임 0 아님 / 공격받는중");
 					commandUtil.move(Hydralisk, SM.myMainBaseLocation.getPosition());
 					continue;
 				}				
@@ -702,7 +367,7 @@ public class UnitControl_Hydralisk {
 			{
 				if (Hydralisk.getGroundWeaponCooldown() == 0) 
 				{
-					System.out.println("목표적은 멀지만 일단 쿨이 돌아와서 공격한다 어택땅");
+					//System.out.println("목표적은 멀지만 일단 쿨이 돌아와서 공격한다 어택땅");
 					commandUtil.attackMove(Hydralisk, nextTarget.getPosition());
 					continue;
 				} 
@@ -724,7 +389,7 @@ public class UnitControl_Hydralisk {
 			{
 				commandUtil.attackMove(Hydralisk, defenseSite);				
 			}
-			else if(CombatState == StrategyManager.CombatState.attackStarted)
+			else if(SM.combatState == StrategyManager.CombatState.attackStarted)
 			{
 				commandUtil.attackMove(Hydralisk, movePosition);				
 			}
@@ -732,174 +397,28 @@ public class UnitControl_Hydralisk {
 			{			
 				if(Hydralisk!=null)
 				{
-					defenseBalance(Hydralisk);
-				}
+					balanceIndex = UnitControl_COMMON.defenseBalance(Hydralisk, balanceIndex);
+				}				
 			}		
 			else
 			{
 				commandUtil.attackMove(Hydralisk, movePosition);
 			}
-			
-			
-			
-			
-/*			if(i % (SM.myHydraliskList.size()/6+1) == 0)
-			{
-				defenseSite = UnitControl_COMMON.defenseSite;			
-				
-				if (defenseSite != null && Hydralisk.isAttacking()==false)
-				{	
-					underAttack = true;
-					moveToEndPoint = false;
-					nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, invader);
-				}
-				else
-				{
-					underAttack = false;
-					nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, Hydralisk.getPosition());
-				}
-				
-			}
-			else
-			{
-				if(nextTarget!=null && Hydralisk.getDistance(nextTarget.getPosition()) > UnitType.Zerg_Hydralisk.sightRange())
-				{
-					invader = UnitControl_COMMON.defenseSite;				
-					
-					if (invader != null && Hydralisk.isAttacking()==false)
-					{	
-						underAttack = true;
-						moveToEndPoint = false;
-						nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, invader);
-					}
-					else
-					{
-						underAttack = false;
-						nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, Hydralisk.getPosition());
-					}
-				}
-			}
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
 
-			
-			
-			
-			
-			
-			
-
-			
-
-	
-			
-			
-			
-			
-			if (nextTarget != null) 
-			{
-				if (Hydralisk.getGroundWeaponCooldown() == 0) 
-				{
-					//System.out.println(1);
-					commandUtil.attackUnit(Hydralisk, nextTarget);
-					//Hydralisk.attack(nextTarget);
-					//continue; 컨티뉴를 하면 무조건 이 타겟을 치고 안하면 근처를 친다 왜냐하면 어택땅이 기본 상태라서 근접유닛은 안하는게 낫겠다 자꾸 병목현상되니까
-				} 
-				else if(Hydralisk.isUnderAttack())
-				{
-					//System.out.println(2);
-					commandUtil.move(Hydralisk, SM.myMainBaseLocation.getPosition());
-					//Hydralisk.move(SM.myMainBaseLocation.getPosition());
-					continue;
-				}
-
-			}
-			
-			if(SM.enemyMainBaseLocation == null)
-			{
-				//System.out.println(3);
-				//commandUtil.attackMove(Hydralisk, startPoint);
-				commandUtil.attackMove(Hydralisk, UnitControl_COMMON.movePosition);
-			}
-			
-			
-			
-			
-			
-			
-
-			
-			else if(CombatState == StrategyManager.CombatState.attackStarted)// 공격나가는 시점		
-			{
-
-				
-				//commandUtil.attackMove(Hydralisk, gatherPoint);
-				commandUtil.attackMove(Hydralisk, UnitControl_COMMON.movePosition);
-
-				
-				if (endGame == false) 
-				{
-					//System.out.println(7);
-					commandUtil.attackMove(Hydralisk, gatherPoint);
-					moveToEndPoint = false;
-				}
-				else 
-				{
-					//System.out.println(6);
-					commandUtil.attackMove(Hydralisk, endPoint);
-				}
-				
-
-			}
-			else if (SM.myHydraliskList.size() >12) 
-			{
-				
-				if(Hydralisk!=null)
-				{
-					defenseBalance(Hydralisk);
-				}
-				
-				
-				
-				
-			}
-			
-			
-			
-			
-			else
-			{
-				
-				//commandUtil.attackMove(Hydralisk, startPoint);
-				commandUtil.attackMove(Hydralisk, UnitControl_COMMON.movePosition);
-
-			}*/
-		
-		
-		
-		
 		}
 	}
 
 
 
 	
-	/*
-	private static Hydralisk instance = new Hydralisk();
+	
+	private static UnitControl_Hydralisk instance = new UnitControl_Hydralisk();
 
-	/ static singleton 객체를 리턴합니다
-	public static Hydralisk Instance() {
+	// static singleton 객체를 리턴합니다
+	public static UnitControl_Hydralisk Instance() {
 		return instance;
 	}
-	*/
+	
 	
 }
 

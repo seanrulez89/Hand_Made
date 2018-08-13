@@ -776,7 +776,7 @@ public class InformationManager {
 	}
 	
 	public static void tmptmptmptmp(){
-		List<Position> positionList = getAssemblyPlaceList(10);
+		List<Position> positionList = getAssemblyPlaceList(UnitControl_COMMON.ASSEMBLY_NUMBER);
 		for(int i = 0 ; i < positionList.size(); i++) {
 			MyBotModule.Broodwar.drawCircleMap(positionList.get(i), 5 * Config.TILE_SIZE, Color.Red);
 		}

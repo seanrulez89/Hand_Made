@@ -83,6 +83,11 @@ public class UnitControl_Mutalisk {
 					continue;
 				}
 				
+				if(enemy.isDefenseMatrixed()==true)
+				{
+					continue;
+				}
+				
 
 				if(enemy.getType().equals(UnitType.Terran_Valkyrie)
 						|| enemy.getType().equals(UnitType.Terran_Wraith)
@@ -1034,14 +1039,14 @@ public class UnitControl_Mutalisk {
 	
 
 	
-	/*
-	private static Mutalisk instance = new Mutalisk();
+	
+	private static UnitControl_Mutalisk instance = new UnitControl_Mutalisk();
 
-	/ static singleton 객체를 리턴합니다
-	public static Mutalisk Instance() {
+	// static singleton 객체를 리턴합니다
+	public static UnitControl_Mutalisk Instance() {
 		return instance;
 	}
-	*/
+	
 	
 
 }

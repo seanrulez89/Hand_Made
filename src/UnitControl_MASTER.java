@@ -8,19 +8,19 @@ import bwta.*;
 
 public class UnitControl_MASTER {
 
-	UnitControl_Mutalisk Mutalisk;// = new UnitControl_Mutalisk();
-	UnitControl_Hydralisk Hydralisk;
+	UnitControl_Mutalisk Mutalisk = new UnitControl_Mutalisk();
+	UnitControl_Hydralisk Hydralisk = new UnitControl_Hydralisk();
 	UnitControl_Overlord Overlord;
 	UnitControl_Lurker Lurker;
-	UnitControl_Zergling Zergling;
+	UnitControl_Zergling Zergling = new UnitControl_Zergling();
 	UnitControl_Defiler Defiler;
-	UnitControl_COMMON COMMON;
+	UnitControl_COMMON COMMON = new UnitControl_COMMON();
 	
 	public void update() {
 		
-		COMMON.Instance().getDefenseSite();
-		COMMON.Instance().getMovePosition();
-		
+		COMMON.getDefenseSite();
+		COMMON.getMovePosition();
+		COMMON.getLocalDefense();
 		
 		if(StrategyManager.Instance().enemyMainBaseLocation!=null 
 				&& StrategyManager.Instance().combatState != StrategyManager.CombatState.eliminateEnemy
@@ -29,20 +29,18 @@ public class UnitControl_MASTER {
 			
 			
 			
-			Mutalisk = new UnitControl_Mutalisk();
+			//Mutalisk = new UnitControl_Mutalisk();
 			Mutalisk.update();	
 			
-			Hydralisk = new UnitControl_Hydralisk();
+			//Hydralisk = new UnitControl_Hydralisk();
 			Hydralisk.update();	
 			
 			Lurker = new UnitControl_Lurker();
 			Lurker.update();
 			
-			Zergling = new UnitControl_Zergling();
+			//Zergling = new UnitControl_Zergling();
 			Zergling.update();
 			
-			Defiler = new UnitControl_Defiler();
-			Defiler.update();
 			
 			
 		}
