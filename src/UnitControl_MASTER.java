@@ -50,7 +50,10 @@ public class UnitControl_MASTER {
 				&& MyBotModule.Broodwar.getFrameCount() % 24 == 0)
 		{			
 			Defiler = new UnitControl_Defiler();
-			Defiler.update();	
+			Defiler.update();
+			
+			Overlord = new UnitControl_Overlord();
+			Overlord.update();
 		}
 		
 		
@@ -58,13 +61,14 @@ public class UnitControl_MASTER {
 		
 		
 		
-		
+		/*
 		if(StrategyManager.Instance().enemyMainBaseLocation!=null 
 				&& StrategyManager.Instance().combatState != StrategyManager.CombatState.eliminateEnemy)
 		{
 			Overlord = new UnitControl_Overlord();
 			Overlord.update();
 		}
+		*/
 
 	}
 	

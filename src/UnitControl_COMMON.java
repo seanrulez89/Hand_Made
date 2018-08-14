@@ -87,13 +87,24 @@ public class UnitControl_COMMON {
 		{
 			//List<Position> positionList = InformationManager.Instance().getAssemblyPlaceList(10);
 
-			movePosition = positionList.get(moveIndex);
+			if(moveIndex>=5)
+			{
+				movePosition = StrategyManager.Instance().enemyMainBaseLocation.getPosition();
+			}
+			else
+			{
+				movePosition = positionList.get(moveIndex);
+			}
+			
+			
+			
 
 			//System.out.println("moveIndex : " + moveIndex);
 			
 			if(UnitControl_Hydralisk.gatherIndex == moveIndex && UnitControl_Zergling.gatherIndex == moveIndex)
 			{
 				moveIndex++;
+				
 				if(moveIndex>(positionList.size()-1))
 				{
 					moveIndex=(positionList.size()-1);

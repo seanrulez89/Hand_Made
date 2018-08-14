@@ -77,6 +77,30 @@ public class BuildOrder_Expansion {
 				}
 			}
 		}
+		
+		// 적군 기지를 추측으로 판단하여 직접 가보지는 못 한 경우
+		if(nextEXP==null)
+		{
+			minDistance = 1000000000;
+			for (BaseLocation EXPLocation : EXPLocations)
+			{
+				distanceFromMyLocation = EXPLocation.getDistance(StrategyManager.Instance().myMainBaseLocation);
+				if (minDistance > distanceFromMyLocation) 
+				{
+						minDistance = distanceFromMyLocation;
+						nextEXP = EXPLocation;		
+				}
+			}
+			
+		}
+		
+		
+		
+		
+		
+		
+		
+		
 		return nextEXP;
 		
 		/*

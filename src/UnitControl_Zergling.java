@@ -113,7 +113,7 @@ public class UnitControl_Zergling {
 			gatherIndex=UnitControl_COMMON.moveIndex - 1;
 		}
 		
-		if(UnitControl_COMMON.enoughGathered(UnitType.Zerg_Hydralisk, UnitControl_COMMON.movePosition, 5, 0.5) == true && gatherIndex<UnitControl_COMMON.moveIndex )
+		if(UnitControl_COMMON.enoughGathered(UnitType.Zerg_Zergling, UnitControl_COMMON.movePosition, 5, 0.5) == true && gatherIndex<UnitControl_COMMON.moveIndex )
 		{
 			gatherIndex++;
 			if(gatherIndex>(UnitControl_COMMON.positionList.size()-1))

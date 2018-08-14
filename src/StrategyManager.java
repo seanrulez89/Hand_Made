@@ -945,7 +945,7 @@ public class StrategyManager {
 		
 		if(nextExpansion!=null)
 		{
-			System.out.println("numberOfMyCombatUnitTrainingBuilding : " + numberOfMyCombatUnitTrainingBuilding);
+			//System.out.println("numberOfMyCombatUnitTrainingBuilding : " + numberOfMyCombatUnitTrainingBuilding);
 			
 			
 			if(numberOfMyCombatUnitTrainingBuilding == 3
@@ -981,7 +981,7 @@ public class StrategyManager {
 			}
 			else if(numberOfMyCombatUnitTrainingBuilding == 4)
 			{
-				if(availableMinerals>300 && buildNUM < 2 && constNUM < 2)
+				if(availableMinerals>350 && buildNUM == 0 && constNUM == 0)
 				{
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
