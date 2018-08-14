@@ -35,6 +35,9 @@ public class ScoutManager {
 	private CommandUtil commandUtil = new CommandUtil();
 	private static ScoutManager instance = new ScoutManager();
 	
+	private static boolean comeBackHome = false;
+	
+	
 	/// static singleton 객체를 리턴합니다
 	public static ScoutManager Instance() {
 		return instance;
@@ -68,13 +71,23 @@ public class ScoutManager {
 	/// 정찰 유닛을 지정하고, 정찰 상태를 업데이트하고, 정찰 유닛을 이동시킵니다
 	public void update()
 	{
-		// 1초에 4번만 실행합니다
-		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) return;
-		
+		if (InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer) != null) 		
+		{
+			if(comeBackHome==false)
+			{
+				//moveScoutUnit();
+				comeBackHome=true;
+			}
+			
+			return;
+		}
+			
 		// scoutUnit 을 지정하고, scoutUnit 의 이동을 컨트롤함.
 		assignScoutIfNeeded();
 		moveScoutUnit();
 
+		//System.out.println("멈출까 말까");
+		
 		// 참고로, scoutUnit 의 이동에 의해 발견된 정보를 처리하는 것은 InformationManager.update() 에서 수행함
 	}
 
@@ -160,9 +173,13 @@ public class ScoutManager {
 		// if we know where the enemy region is
 		else {
 			
+			moveScoutUnitToMyBaseLocation();
+			return;
+			
 			
 		
-			if (isDangerousBuilding == false) {
+			/*			
+  			if (isDangerousBuilding == false) {
 
 				for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
 					// morphing hydralisk_den
@@ -253,21 +270,8 @@ public class ScoutManager {
 				}
 
 			}
-			
-			
-			
-	
-			
-			
-			
-			
-			
-			
-			
+			*/			
 		}
-
-
-
 	}
 	
 	

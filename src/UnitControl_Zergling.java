@@ -157,19 +157,27 @@ public class UnitControl_Zergling {
 			{
 				continue;
 			}*/
-			
+			/*
 			if(Zergling.isIrradiated())
 			{
-				commandUtil.move(Zergling, enemyMainBaseLocation.getPosition());
-				continue;
+				if(Zergling !=null)
+				{
+					commandUtil.move(Zergling, enemyMainBaseLocation.getPosition());
+					continue;
+				}
+				
 			}
 			
 			if(Zergling.isUnderStorm())
 			{
-				commandUtil.move(Zergling, myMainBaseLocation.getPosition());
-				continue;
+				if(Zergling != null)
+				{
+					commandUtil.move(Zergling, myMainBaseLocation.getPosition());
+					continue;
+				}
+				
 			}
-			
+			*/
 			nextTarget = getNextTargetOf(UnitType.Zerg_Zergling, Zergling.getPosition());
 			
 			/*

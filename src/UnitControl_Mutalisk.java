@@ -74,7 +74,7 @@ public class UnitControl_Mutalisk {
 		ArrayList <Unit> elseUnit = new ArrayList<Unit>();
 		 
 		 																			
-		for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(averagePosition, myUnitType.sightRange())) { // 저글링 같은 근접공격유닛은 10배 해봐야 무의미한가?
+		for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(averagePosition, myUnitType.sightRange()+48)) { // 저글링 같은 근접공격유닛은 10배 해봐야 무의미한가?
 
 			if (enemy.getPlayer() == enemyPlayer) {
 				
@@ -877,18 +877,25 @@ public class UnitControl_Mutalisk {
 			
 			
 			
-			
+			/*
 			if(Mutalisk.isIrradiated())
 			{
-				Mutalisk.move(SM.enemyMainBaseLocation.getPosition());
-				continue;
+				if(Mutalisk != null)
+				{
+					Mutalisk.move(SM.enemyMainBaseLocation.getPosition());
+					continue;				
+				}
 			}
 			
 			if(Mutalisk.isUnderStorm())
 			{
-				Mutalisk.move(SM.myMainBaseLocation.getPosition());
-				continue;
+				if(Mutalisk != null)
+				{
+					Mutalisk.move(SM.myMainBaseLocation.getPosition());
+					continue;			
+				}
 			}
+			*/
 			/*
 			if(nextTarget != null && nextTarget.isStimmed())
 			{

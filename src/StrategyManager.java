@@ -388,7 +388,7 @@ public class StrategyManager {
 			
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lurker) > 4) {
 
-			if (myHydraliskList.size() > 18) {
+			if (myHydraliskList.size() > 24) {
 				attack_cnt = attack_cnt + 1;
 				return true;
 			}
@@ -396,7 +396,7 @@ public class StrategyManager {
 		}
 		
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Zergling) > 30) {
-			if (myHydraliskList.size() > 18) {
+			if (myHydraliskList.size() > 24) {
 				attack_cnt = attack_cnt + 1;
 				return true;
 			}
@@ -679,7 +679,7 @@ public class StrategyManager {
 			
 			
 			
-			if(workerCount>60)
+			if(workerCount>65)
 			{
 				return;
 			}
@@ -939,87 +939,70 @@ public class StrategyManager {
 		
 		BaseLocation nextExpansion = null;
 		nextExpansion = BuildOrder_Expansion.expansion();
+		int buildNUM = BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery);
+		int constNUM = ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null);
+		int availableMinerals = BuildManager.Instance().getAvailableMinerals();
 		
-		
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Drone) > 19 && numberOfMyCombatUnitTrainingBuilding == 2 && nextExpansion!=null) 
+		if(nextExpansion!=null)
 		{
-			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 
-					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0) 
+			System.out.println("numberOfMyCombatUnitTrainingBuilding : " + numberOfMyCombatUnitTrainingBuilding);
+			
+			
+			if(numberOfMyCombatUnitTrainingBuilding == 3
+					|| numberOfMyCombatUnitTrainingBuilding == 5
+					|| numberOfMyCombatUnitTrainingBuilding == 7
+					|| numberOfMyCombatUnitTrainingBuilding == 9
+					|| numberOfMyCombatUnitTrainingBuilding == 11
+					|| numberOfMyCombatUnitTrainingBuilding == 13)
 			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
-						nextExpansion.getTilePosition(), true); /// 해처리 추가 확장 0622
-
-				System.out.println("1");
-
-				if (nextExpansion.getGeysers().size()>0) 
+				if (nextExpansion.getGeysers().size()>0)
 				{
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
-							nextExpansion.getTilePosition(), false); /// 해처리 추가 확장 0622
-
-					System.out.println("2");
+					if(availableMinerals>350 && buildNUM < 2 && constNUM < 2)
+					{
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
+								nextExpansion.getTilePosition(), true);
+						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
+								nextExpansion.getTilePosition(), true);
+						
+						System.out.println(1);
+					}
+				}
+				else
+				{
+					if(availableMinerals>300 && buildNUM < 2 && constNUM < 2)
+					{
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
+								nextExpansion.getTilePosition(), true);
+						System.out.println(2);
+					}
+					
+				}
+				
+			}
+			else if(numberOfMyCombatUnitTrainingBuilding == 4)
+			{
+				if(availableMinerals>300 && buildNUM < 2 && constNUM < 2)
+				{
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
+							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+					System.out.println(3);
 				}
 			}
-		}
-		/*
-		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding == 3 && nextExpansion!=null) 
-		{
-			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) ==0 
-					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) ==0) 
+			else
 			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
-						nextExpansion.getTilePosition(), true); /// 해처리 추가 확장 0622
-
-				System.out.println("3-1");
-
-				if (nextExpansion.getGeysers().size()>0) 
+				if(availableMinerals>650 && buildNUM < 2 && constNUM < 2)
 				{
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
-							nextExpansion.getTilePosition(), false); /// 해처리 추가 확장 0622
-
-					System.out.println("3-2");
-				}
-
-			}
-		}
-		*/
-		/*
-		else if (BuildManager.Instance().getAvailableMinerals() > 300 && numberOfMyCombatUnitTrainingBuilding == 5) 
-		{
-			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) <2 
-					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) <2) 
-			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
-						BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true); /// 해처리 추가 확장 0622
-
-				System.out.println("4");
-
-			}
-		}
-		*/
-		/*
-		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding >= 5 && nextExpansion!=null) 
-		{
-			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 
-					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0) 
-			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
-						nextExpansion.getTilePosition(), true); /// 해처리 추가 확장 0622
-
-				System.out.println("5");
-
-				if (nextExpansion.getGeysers().size()>0) 
-				{
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
-							nextExpansion.getTilePosition(), true); /// 해처리 추가 확장 0622
-
-					System.out.println("6");
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
+							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+					System.out.println(3);
 				}
 			}
-
+			
+			
 		}
-		*/
 		
-		else if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding == 3 && nextExpansion!=null) 
+		/*
+		if (BuildManager.Instance().getAvailableMinerals() > 350 && numberOfMyCombatUnitTrainingBuilding == 3 && nextExpansion!=null) 
 		{
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) ==0 
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) ==0) 
@@ -1041,8 +1024,6 @@ public class StrategyManager {
 				}
 			}
 		}
-		
-		
 		else if (BuildManager.Instance().getAvailableMinerals() > 650 && numberOfMyCombatUnitTrainingBuilding < 13 && nextExpansion!=null) 
 		{
 			if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) ==0 
@@ -1071,6 +1052,7 @@ public class StrategyManager {
 		{
 
 		}
+		*/
 
 	}
 
@@ -1183,6 +1165,12 @@ public class StrategyManager {
 					&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType2) == 0) {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType2, false);
 			}
+			else if(myPlayer.getUpgradeLevel(necessaryUpgradeType2) == 1)
+			{
+				necessaryUpgradeType2 = UpgradeType.Ventral_Sacs;
+			}
+			
+			
 		}
 
 		// <3 의 의미는 3레벨 업그레이드까지 계속 하라는 뜻이다. 그레이트 스파이어는 2단계 끝나고 지어주긴 해야함

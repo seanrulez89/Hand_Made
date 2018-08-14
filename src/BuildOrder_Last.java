@@ -50,16 +50,28 @@ public class BuildOrder_Last {
 		}
 		
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) >= 1) {
-			if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) < 3
+			if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) < 2
 					&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
-					&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0) {
+					&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0) 
+			{
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Carapace, true);
 			}
+			else if(myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) == 2
+					&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
+					&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0
+					&& myPlayer.completedUnitCount(UnitType.Zerg_Hive)>0)
+			{
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Carapace, true);
+			}
+			
+			
+			
+			
+			
 		}
 		
-
-		//if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) >= 1)
-		if(myPlayer.completedUnitCount(UnitType.Zerg_Spire) == 1)
+		//if(myPlayer.completedUnitCount(UnitType.Zerg_Spire) == 1)
+		if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) >= 1)
 		{
 
 			
@@ -71,10 +83,10 @@ public class BuildOrder_Last {
 					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hive)
 					+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hive, null);
 			
-			int greaterSpireNumber = myPlayer.allUnitCount(UnitType.Zerg_Greater_Spire)
+			/*int greaterSpireNumber = myPlayer.allUnitCount(UnitType.Zerg_Greater_Spire)
 					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Greater_Spire)
 					+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Greater_Spire, null);
-			
+			*/
 			
 			int ultraliskCavernNumber = myPlayer.allUnitCount(UnitType.Zerg_Ultralisk_Cavern)
 					+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Ultralisk_Cavern)

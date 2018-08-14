@@ -326,19 +326,26 @@ public class UnitControl_Hydralisk {
 			{
 				continue;
 			}*/
-			
+			/*
 			if(Hydralisk.isIrradiated())
 			{
-				commandUtil.move(Hydralisk, enemyMainBaseLocation.getPosition());
-				continue;
+				if(Hydralisk != null)
+				{
+					commandUtil.move(Hydralisk, enemyMainBaseLocation.getPosition());
+					continue;
+				}
+				
 			}
 			
 			if(Hydralisk.isUnderStorm())
 			{
-				commandUtil.move(Hydralisk, myMainBaseLocation.getPosition());
-				continue;
+				if(Hydralisk != null)
+				{
+					commandUtil.move(Hydralisk, myMainBaseLocation.getPosition());
+					continue;				
+				}
 			}
-			
+			*/
 
 			
 			
@@ -346,23 +353,27 @@ public class UnitControl_Hydralisk {
 		
 
 			
-			if (nextTarget != null && nextTarget.getDistance(Hydralisk) < Hydralisk.getType().groundWeapon().maxRange()) 
+			if (nextTarget != null) 
 			{
+				commandUtil.attackUnit(Hydralisk, nextTarget);
+				continue;
 				
+				/*
 				if (Hydralisk.getGroundWeaponCooldown() == 0) 
 				{
 					//System.out.println("사정거리 이내 / 쿨타임 0");
 					commandUtil.attackUnit(Hydralisk, nextTarget);
 					continue;
 				} 
-				else if(Hydralisk.isUnderAttack())
+				else if(Hydralisk.isUnderAttack())//(nextTarget.getDistance(Hydralisk.getPosition()) < Hydralisk.getType().groundWeapon().maxRange())
 				{
 					//System.out.println("사정거리 이내 / 쿨타임 0 아님 / 공격받는중");
 					commandUtil.move(Hydralisk, SM.myMainBaseLocation.getPosition());
 					continue;
 				}				
-				
+				*/
 			}
+			/*
 			else if (nextTarget != null) // 적은 있는데  멀다
 			{
 				if (Hydralisk.getGroundWeaponCooldown() == 0) 
@@ -379,7 +390,7 @@ public class UnitControl_Hydralisk {
 				
 				
 			}
-			
+			*/
 			
 			
 			

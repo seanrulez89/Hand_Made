@@ -37,7 +37,7 @@ public class UnitControl_COMMON {
 			}
 		}
 
-
+		/*
 		MyBotModule.Broodwar.drawCircleMap(StrategyManager.Instance().mySecondChokePoint.getCenter(), 13 * Config.TILE_SIZE, Color.Blue);
 		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(StrategyManager.Instance().mySecondChokePoint.getCenter(), 13 * Config.TILE_SIZE)) 
 		{
@@ -47,7 +47,7 @@ public class UnitControl_COMMON {
 				return; 
 			}			
 		}
-		
+		*/
 		
 
 		// 기지 주변에 악당이 등장하는 경우
@@ -196,7 +196,7 @@ public class UnitControl_COMMON {
 		BaseLocation expansionLocation = BuildOrder_Expansion.expansion();
 		if(expansionLocation !=null)
 		{
-			defenseSite.add(bwta.BWTA.getNearestChokepoint(expansionLocation.getPosition()).getCenter());
+			//defenseSite.add(bwta.BWTA.getNearestChokepoint(expansionLocation.getPosition()).getCenter());
 		}
 		
 		localDefense = defenseSite;

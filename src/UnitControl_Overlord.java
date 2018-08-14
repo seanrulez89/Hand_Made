@@ -69,16 +69,34 @@ public class UnitControl_Overlord {
 		
 		
 		// 유닛리스트 관리 알고리즘 수정 20180803 shsh0823.lee
-		for(Unit unit : myAttackUnitList) {
-			for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 6*Config.TILE_SIZE)) {
-				if(enemy.getPlayer()==enemyPlayer) {
-					explorationSite.add(unit.getPosition());
-					if(explorationSite.size()==2) {
+		// break 시점 변경
+		
+		if(myAttackUnitList.size()==0)
+		{
+			return nextExplorationSite = SM.mySecondChokePoint.getCenter();
+		}
+		else
+		{
+			for(Unit unit : myAttackUnitList) 
+			{
+				for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 6*Config.TILE_SIZE)) 
+				{
+					if(enemy.getPlayer()==enemyPlayer) 
+					{
+						explorationSite.add(unit.getPosition());
 						break;
+						
 					}
+				}
+				
+				if(explorationSite.size()==2) 
+				{
+					break;
 				}
 			}
 		}
+		
+		
 		
 /*		Iterator<Unit> ITR = myAttackUnitList.iterator();
 		
@@ -111,12 +129,12 @@ public class UnitControl_Overlord {
 			explorationSite.add(myAttackUnitList.get(1).getPosition());
 		}
  */		
-		
+		/*
 		if(myAttackUnitList.size()==1)
 		{
 			explorationSite.add(myAttackUnitList.get(0).getPosition());
 		}
-		
+		*/
 		Iterator<Position> lir = explorationSite.iterator();
 		
 		while(lir.hasNext())
@@ -170,6 +188,7 @@ public class UnitControl_Overlord {
 			explorationSite.add(chokePoint);
 		}
 		
+		// 확장기지 중에 아직 정찰이 안된 곳을 다녀봐라, 다녀보면 나중에는 다시 안감, 권순우
 		for(BaseLocation EXPLocation : BWTA.getBaseLocations())
 		{
 			if(MyBotModule.Broodwar.isExplored(EXPLocation.getTilePosition())==false)
@@ -261,9 +280,9 @@ public class UnitControl_Overlord {
 	{
 		ArrayList<Unit> myOverLords = getOverLords();
 		
-		if(myOverLords.size()>2)
+		if(myOverLords.size()>0)
 		{
-			for(int i = 2 ; i < myOverLords.size() ; i++)
+			for(int i = 0 ; i < myOverLords.size() ; i++)
 			{
 				Unit overlord = myOverLords.get(i);
 				
@@ -274,7 +293,11 @@ public class UnitControl_Overlord {
 					continue;
 				}
 				
-				if(i<4)
+				if(i<2)
+				{
+					commandUtil.move(overlord, getExplorationSite(overlord));
+				}
+				else if(i<4)
 	            {
 					commandUtil.move(overlord, getFollowSite(overlord, UnitType.Zerg_Hydralisk));
 					//overlord.move(getFollowSite(overlord, UnitType.Zerg_Hydralisk));

@@ -61,6 +61,25 @@ public class BuildOrder_Expansion {
 			}
 		}
 
+		
+		for (BaseLocation EXPLocation : EXPLocations)
+		{
+			distanceFromMyLocation = EXPLocation.getDistance(StrategyManager.Instance().myMainBaseLocation);
+
+			for (BaseLocation enemyBaseLocation : enemyBaseLocations) 
+			{
+				distanceFromEnemyLocation = EXPLocation.getDistance(enemyBaseLocation);
+
+				if (minDistance > distanceFromMyLocation && distanceFromMyLocation < distanceFromEnemyLocation) 
+				{
+						minDistance = distanceFromMyLocation;
+						nextEXP = EXPLocation;		
+				}
+			}
+		}
+		return nextEXP;
+		
+		/*
 		for (BaseLocation EXPLocation : EXPLocations) {
 			
 
@@ -88,9 +107,9 @@ public class BuildOrder_Expansion {
 			
 			}
 		}
-		
+		*/
 			
-		return nextEXP;
+		
 		
 			/*
 				distanceFromMyLocation = EXPLocation.getGroundDistance(StrategyManager.Instance().myMainBaseLocation);

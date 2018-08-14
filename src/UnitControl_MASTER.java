@@ -24,7 +24,7 @@ public class UnitControl_MASTER {
 		
 		if(StrategyManager.Instance().enemyMainBaseLocation!=null 
 				&& StrategyManager.Instance().combatState != StrategyManager.CombatState.eliminateEnemy
-				)//&& MyBotModule.Broodwar.getFrameCount() % 2 == 0)
+				&& MyBotModule.Broodwar.getFrameCount() % 2 == 0)
 		{
 			
 			
@@ -59,7 +59,8 @@ public class UnitControl_MASTER {
 		
 		
 		
-		if(StrategyManager.Instance().combatState != StrategyManager.CombatState.eliminateEnemy)
+		if(StrategyManager.Instance().enemyMainBaseLocation!=null 
+				&& StrategyManager.Instance().combatState != StrategyManager.CombatState.eliminateEnemy)
 		{
 			Overlord = new UnitControl_Overlord();
 			Overlord.update();
