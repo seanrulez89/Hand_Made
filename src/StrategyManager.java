@@ -332,7 +332,7 @@ public class StrategyManager {
 
 
 			/// 공격 모드로 전환할 때인지 여부를 판단합니다
-			if (isTimeToStartAttack() && UnitControl_COMMON.defenseSite==null) {
+			if (isTimeToStartAttack()) {
 				MyBotModule.Broodwar.drawTextScreen(100, y, "Attack Mode" + attack_cnt);
 				combatState = CombatState.attackStarted;
 			}
@@ -388,7 +388,7 @@ public class StrategyManager {
 			
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lurker) > 4) {
 
-			if (myHydraliskList.size() > 24) {
+			if (myHydraliskList.size() > 20) {
 				attack_cnt = attack_cnt + 1;
 				return true;
 			}
@@ -396,7 +396,7 @@ public class StrategyManager {
 		}
 		
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Zergling) > 30) {
-			if (myHydraliskList.size() > 24) {
+			if (myHydraliskList.size() > 20) {
 				attack_cnt = attack_cnt + 1;
 				return true;
 			}
@@ -413,7 +413,7 @@ public class StrategyManager {
 		
 
 		
-		if(UnitControl_COMMON.defenseSite!=null)
+		if(UnitControl_COMMON.defenseSite.isEmpty()==false)
 		{
 			System.out.println(111);
 			return true;
@@ -957,11 +957,11 @@ public class StrategyManager {
 			{
 				if (nextExpansion.getGeysers().size()>0)
 				{
-					if(availableMinerals>350 && buildNUM < 2 && constNUM < 2)
+					if(availableMinerals>350 && buildNUM == 0 && constNUM == 0)
 					{
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 								nextExpansion.getTilePosition(), true);
-						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor,
 								nextExpansion.getTilePosition(), true);
 						
 						System.out.println(1);
@@ -969,7 +969,7 @@ public class StrategyManager {
 				}
 				else
 				{
-					if(availableMinerals>300 && buildNUM < 2 && constNUM < 2)
+					if(availableMinerals>300 && buildNUM == 0 && constNUM == 0)
 					{
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 								nextExpansion.getTilePosition(), true);
@@ -979,6 +979,7 @@ public class StrategyManager {
 				}
 				
 			}
+			/*
 			else if(numberOfMyCombatUnitTrainingBuilding == 4)
 			{
 				if(availableMinerals>350 && buildNUM == 0 && constNUM == 0)
@@ -988,13 +989,14 @@ public class StrategyManager {
 					System.out.println(3);
 				}
 			}
+			*/
 			else
 			{
-				if(availableMinerals>650 && buildNUM < 2 && constNUM < 2)
+				if(availableMinerals>350 && buildNUM == 0 && constNUM == 0)
 				{
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-					System.out.println(3);
+					System.out.println(4);
 				}
 			}
 			
@@ -1183,7 +1185,7 @@ public class StrategyManager {
 				{
 					if(unit.getType().equals(UnitType.Zerg_Spire) && unit.isUpgrading()==false && unit.isCompleted() && unit!=null)
 					{
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, true, unit.getID());
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, false, unit.getID());
 						return;
 					}
 				}
@@ -1201,7 +1203,7 @@ public class StrategyManager {
 				{
 					if(unit.getType().equals(UnitType.Zerg_Spire) && unit.isUpgrading()==false && unit.isCompleted() && unit!=null)
 					{
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, true, unit.getID());
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, false, unit.getID());
 						return;
 					}
 				}
@@ -1348,7 +1350,7 @@ public class StrategyManager {
 					
 
 			
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Defiler_Mound)>0 &&  defilerNumber<3) {
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Defiler_Mound)>0 &&  defilerNumber<2) {
 				nextUnitTypeToTrain = myDefiler;
 			}
 			else if (myZerglingList.size() < myHydraliskList.size()) 
@@ -1377,17 +1379,9 @@ public class StrategyManager {
 			}
 			else if(myPlayer.minerals() > 1000)
 			{
-				if(myZerglingList.size()<45)
-				{
-					nextUnitTypeToTrain = myZergling;
-					
-				}
-				else
-				{
-					nextUnitTypeToTrain = myHydralisk;
-				}
+				nextUnitTypeToTrain = myZergling;				
 			}	
-			else if(myZerglingList.size()<15)
+			else if(myZerglingList.size()<18)
 			{
 				nextUnitTypeToTrain = myZergling;
 			}
@@ -1411,22 +1405,12 @@ public class StrategyManager {
 			}
 			else if(myPlayer.minerals() > 1000)  
 			{
-				if(myZerglingList.size()<45)
-				{
-					nextUnitTypeToTrain = myZergling;
-					
-				}
-				else
-				{
-					nextUnitTypeToTrain = myHydralisk;
-				}
-
+				nextUnitTypeToTrain = myZergling;
 			}
-			else if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk)<15)
+			else if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk)<18)
 			{
 				nextUnitTypeToTrain = myHydralisk;
-			}
-			
+			}			
 			else if (myZerglingList.size() < myHydraliskList.size()) 
 			{
 				nextUnitTypeToTrain = myZergling;
@@ -1444,15 +1428,7 @@ public class StrategyManager {
 
 			if(myPlayer.minerals() > 1000)
 			{
-				if(myZerglingList.size()<45)
-				{
-					nextUnitTypeToTrain = myZergling;
-					
-				}
-				else
-				{
-					nextUnitTypeToTrain = myHydralisk;
-				}
+				nextUnitTypeToTrain = myZergling;
 			}
 			else
 			{

@@ -657,10 +657,10 @@ public class UXManager {
 
 			// OccupiedBaseLocation 을 원으로 표시
 			for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer)) {
-				MyBotModule.Broodwar.drawCircleMap(baseLocation.getPosition(), 10 * Config.TILE_SIZE, Color.Blue);	
+				MyBotModule.Broodwar.drawCircleMap(baseLocation.getPosition(), 12 * Config.TILE_SIZE, Color.Blue);	
 			}
 			for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer)) {
-				MyBotModule.Broodwar.drawCircleMap(baseLocation.getPosition(), 10 * Config.TILE_SIZE, Color.Red);	
+				MyBotModule.Broodwar.drawCircleMap(baseLocation.getPosition(), 12 * Config.TILE_SIZE, Color.Red);	
 			}
 
 			// ChokePoint, BaseLocation 을 텍스트로 표시

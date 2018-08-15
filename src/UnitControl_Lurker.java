@@ -112,7 +112,7 @@ public class UnitControl_Lurker {
 					
 				}
 			}
-			else if(UnitControl_COMMON.defenseSite != null)
+			else if(UnitControl_COMMON.defenseSite.isEmpty()==false)
 			{
 				for (Unit unit : SM.myLurkerList) {
 					Unit tempEnemy = null;
@@ -142,7 +142,7 @@ public class UnitControl_Lurker {
 							unit.unburrow();
 						}
 
-						commandUtil.move(unit, UnitControl_COMMON.defenseSite);
+						commandUtil.move(unit, UnitControl_COMMON.getClosestDefenseSite(unit));
 					}
 				}
 			}
@@ -153,33 +153,66 @@ public class UnitControl_Lurker {
 			{
 				for(Unit unit : SM.myLurkerList)
 				{
-					
-					boolean isNear = false;
-					for(Unit myUnit : MyBotModule.Broodwar.getUnitsInRadius(UnitControl_COMMON.positionList.get(UnitControl_COMMON.moveIndex), 3*Config.TILE_SIZE))
-					{
-						if(myUnit.getID() == unit.getID())
+					Unit tempEnemy = null;
+
+					for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 5 * Config.TILE_SIZE)) {
+						if (enemy.isFlying() == true) {
+							continue;
+						}
+						
+						if(enemy.isLifted() == true)
 						{
-							isNear=true;
+							continue;
+						}
+
+						if (enemy.getPlayer() == enemyPlayer) {
+							tempEnemy = enemy;
 							break;
 						}
 					}
-					
-					if(isNear==false)
+
+					if (tempEnemy != null) 
 					{
-						if(unit.isBurrowed()==true)
-						{
-							unit.unburrow();	
-						}
-						commandUtil.move(unit, UnitControl_COMMON.positionList.get(UnitControl_COMMON.moveIndex));
-						//unit.move(SM.mySecondChokePoint.getCenter());
-					}
-					else
-					{
-						if(unit.isBurrowed()==false)
+						if (unit.isBurrowed() == false) 
 						{
 							unit.burrow();
 						}
+					} 
+					else 
+					{
+						boolean isNear = false;
+						for(Unit myUnit : MyBotModule.Broodwar.getUnitsInRadius(UnitControl_COMMON.positionList.get(UnitControl_COMMON.moveIndex), 3*Config.TILE_SIZE))
+						{
+							if(myUnit.getID() == unit.getID())
+							{
+								isNear=true;
+								break;
+							}
+						}
+						
+						
+						
+						
+						
+						
+						if(isNear==false)
+						{
+							if(unit.isBurrowed()==true)
+							{
+								unit.unburrow();	
+							}
+							commandUtil.move(unit, UnitControl_COMMON.positionList.get(UnitControl_COMMON.moveIndex));
+							//unit.move(SM.mySecondChokePoint.getCenter());
+						}
+						else
+						{
+							if(unit.isBurrowed()==false)
+							{
+								unit.burrow();
+							}
+						}
 					}
+
 				}
 			}
 			

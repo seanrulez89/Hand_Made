@@ -42,28 +42,84 @@ public class BuildOrder_Last {
 			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spire,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 			
-			if (chamberNumber == 0) {
+			if (chamberNumber <3) {
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Evolution_Chamber,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Evolution_Chamber,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Evolution_Chamber,
 						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 
 			}
 		}
 		
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) >= 1) {
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) >= 1) 
+		{
+			
+			Unit chamber = null;
+			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) 
+			{
+				if(unit.getType().equals(UnitType.Zerg_Evolution_Chamber) && unit.isUpgrading()==false && unit.isCompleted() && unit!=null)
+				{
+					chamber = unit;
+					break;
+				}
+			}
+			
+			// 지상유닛 방어력
 			if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) < 2
 					&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
 					&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0) 
 			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Carapace, true);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Carapace, false, chamber.getID());
+				return;
 			}
 			else if(myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) == 2
 					&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
 					&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0
 					&& myPlayer.completedUnitCount(UnitType.Zerg_Hive)>0)
 			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Carapace, true);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Carapace, false, chamber.getID());
+				return;
 			}
 			
+			// 지상유닛 근접공격력
+			if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Melee_Attacks) < 2
+					&& myPlayer.isUpgrading(UpgradeType.Zerg_Melee_Attacks) == false
+					&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == true
+					&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Melee_Attacks) == 0) 
+			{
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Melee_Attacks, false, chamber.getID());
+				return;
+			}
+			else if(myPlayer.getUpgradeLevel(UpgradeType.Zerg_Melee_Attacks) == 2
+					&& myPlayer.isUpgrading(UpgradeType.Zerg_Melee_Attacks) == false
+					&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == true
+					&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Melee_Attacks) == 0
+					&& myPlayer.completedUnitCount(UnitType.Zerg_Hive)>0)
+			{
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Melee_Attacks, false, chamber.getID());
+				return;
+			}
+
+			// 지상유닛 원거리공격력
+			if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Missile_Attacks) < 2
+					&& myPlayer.isUpgrading(UpgradeType.Zerg_Missile_Attacks) == false
+					&& myPlayer.isUpgrading(UpgradeType.Zerg_Melee_Attacks) == true
+					&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Missile_Attacks) == 0) 
+			{
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Missile_Attacks, false, chamber.getID());
+				return;
+			}
+			else if(myPlayer.getUpgradeLevel(UpgradeType.Zerg_Missile_Attacks) == 2
+					&& myPlayer.isUpgrading(UpgradeType.Zerg_Missile_Attacks) == false
+					&& myPlayer.isUpgrading(UpgradeType.Zerg_Melee_Attacks) == true
+					&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Missile_Attacks) == 0
+					&& myPlayer.completedUnitCount(UnitType.Zerg_Hive)>0)
+			{
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Missile_Attacks, false, chamber.getID());
+				return;
+			}
 			
 			
 			

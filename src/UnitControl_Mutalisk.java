@@ -792,7 +792,7 @@ public class UnitControl_Mutalisk {
 
 		
 		boolean endGame = enoughGathered(UnitType.Zerg_Mutalisk, gatherPoint, 3, 0.5);
-		Position invader = null;
+		ArrayList <Position> invader = null;
 		Unit nextTarget = null;
 		
 		int i = 0;
@@ -806,11 +806,11 @@ public class UnitControl_Mutalisk {
 			Unit Mutalisk = SM.myMutaliskList.get(i);
 			
 			invader = UnitControl_COMMON.defenseSite;
-			if (invader != null && Mutalisk.isAttacking()==false)
+			if (invader.isEmpty()==false && Mutalisk.isAttacking()==false)
 			{	
 				underAttack = true;
 				moveToEndPoint = false;
-				nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, invader);
+				nextTarget = getNextTargetOf(UnitType.Zerg_Mutalisk, UnitControl_COMMON.getClosestDefenseSite(Mutalisk));
 			}
 			else
 			{

@@ -126,7 +126,7 @@ public class UnitControl_Zergling {
 		
 		
 
-		Position defenseSite = UnitControl_COMMON.defenseSite;
+		ArrayList <Position> defenseSite = UnitControl_COMMON.defenseSite;
 		Position movePosition = UnitControl_COMMON.movePosition;
 		Unit nextTarget = null;
 		int i = 0;
@@ -196,9 +196,9 @@ public class UnitControl_Zergling {
 			
 			
 			
-			if (defenseSite != null && Zergling.isAttacking()==false)
+			if (defenseSite.isEmpty()==false && Zergling.isAttacking()==false)
 			{
-				commandUtil.attackMove(Zergling, defenseSite);				
+				commandUtil.attackMove(Zergling, UnitControl_COMMON.getClosestDefenseSite(Zergling));				
 			}
 			else if(SM.combatState == StrategyManager.CombatState.attackStarted)
 			{

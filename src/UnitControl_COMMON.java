@@ -11,7 +11,7 @@ public class UnitControl_COMMON {
 
 	private static CommandUtil commandUtil = new CommandUtil();
 	
-	static Position defenseSite = null;
+	static ArrayList <Position> defenseSite = new ArrayList<Position>();
 	static Position movePosition = null;
 	
 	final static int ASSEMBLY_NUMBER = 6;
@@ -23,6 +23,12 @@ public class UnitControl_COMMON {
 	
 	public void getDefenseSite() {
 	
+		if(defenseSite.isEmpty()==false)
+		{
+			defenseSite.clear();
+		}
+		
+		
 		// 건물이나 드론이 얻어맞는 경우
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) 
 		{
@@ -32,38 +38,37 @@ public class UnitControl_COMMON {
 					&& (unit.getType() != UnitType.Zerg_Sunken_Colony))
 //				|| (unit.getType().equals(UnitType.Zerg_Overlord) && unit.isUnderAttack())
 			{
-				defenseSite = unit.getPosition();
-				return;
+
+				defenseSite.add(unit.getPosition());
+				
 			}
 		}
 
-		/*
-		MyBotModule.Broodwar.drawCircleMap(StrategyManager.Instance().mySecondChokePoint.getCenter(), 13 * Config.TILE_SIZE, Color.Blue);
-		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(StrategyManager.Instance().mySecondChokePoint.getCenter(), 13 * Config.TILE_SIZE)) 
+		
+		MyBotModule.Broodwar.drawCircleMap(StrategyManager.Instance().mySecondChokePoint.getCenter(), 12 * Config.TILE_SIZE, Color.Blue);
+		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(StrategyManager.Instance().mySecondChokePoint.getCenter(), 12 * Config.TILE_SIZE)) 
 		{
 			if (unit.getPlayer().equals(InformationManager.Instance().enemyPlayer)) 
 			{ 
-				defenseSite = unit.getPosition();
-				return; 
+				defenseSite.add(unit.getPosition()); 
 			}			
 		}
-		*/
+		
 		
 
 		// 기지 주변에 악당이 등장하는 경우
 		for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(MyBotModule.Broodwar.self())) 
 		{
-			for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getPosition(), 13 * Config.TILE_SIZE)) 
+			for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(baseLocation.getPosition(), 12 * Config.TILE_SIZE)) 
 			{
 				if (unit.getPlayer().equals(InformationManager.Instance().enemyPlayer)) 
 				{ 
-					defenseSite = unit.getPosition();
-					return; 
+					defenseSite.add(unit.getPosition());
 				}			
 			}
 		}
 		
-		defenseSite = null;
+		
 	}
 	
 	
@@ -80,7 +85,7 @@ public class UnitControl_COMMON {
 
 		if(StrategyManager.Instance().enemyMainBaseLocation==null)
 		{
-			movePosition = StrategyManager.Instance().myFirstExpansionLocation.getPosition();
+			movePosition = StrategyManager.Instance().mySecondChokePoint.getCenter();
 			moveIndex = BASIC_MOVE_INDEX;
 		}
 		else if(StrategyManager.Instance().combatState == StrategyManager.CombatState.attackStarted)
@@ -113,7 +118,7 @@ public class UnitControl_COMMON {
 		}
 		else
 		{
-			movePosition = StrategyManager.Instance().myFirstExpansionLocation.getPosition();
+			movePosition = StrategyManager.Instance().mySecondChokePoint.getCenter();
 			moveIndex = BASIC_MOVE_INDEX;			
 		}
 		
@@ -201,12 +206,19 @@ public class UnitControl_COMMON {
 
 		
 		
-		//defenseSite.add(StrategyManager.Instance().mySecondChokePoint.getPoint());
+		defenseSite.add(StrategyManager.Instance().mySecondChokePoint.getPoint());
 		
 		
 		BaseLocation expansionLocation = BuildOrder_Expansion.expansion();
 		if(expansionLocation !=null)
 		{
+			Chokepoint tempChokePoint = bwta.BWTA.getNearestChokepoint(expansionLocation.getPosition());
+			Position middlePosition = new Position ((expansionLocation.getX()+tempChokePoint.getX())/2,
+					(expansionLocation.getY()+tempChokePoint.getY())/2);
+		
+			defenseSite.add(middlePosition);
+			
+			
 			//defenseSite.add(bwta.BWTA.getNearestChokepoint(expansionLocation.getPosition()).getCenter());
 		}
 		
@@ -236,7 +248,28 @@ public class UnitControl_COMMON {
 	}
 	
 	
+	public static Position getClosestDefenseSite(Unit unit) {
+		
+		double minDistance = 100000000;
+		double tempDistance = 0;
+		Position unitPosition = unit.getPosition();
+		Position closestDefenseSite = StrategyManager.Instance().myMainBaseLocation.getPosition();
+		
+		for(Position tempPosition : defenseSite)
+		{
+			tempDistance = tempPosition.getDistance(unitPosition);
+			if(tempDistance < minDistance)
+			{
+				minDistance = tempDistance;
+				closestDefenseSite = tempPosition;
+			}
+			
+		}
+		
+		
+		return closestDefenseSite;
 	
+	}
 	
 	
 	

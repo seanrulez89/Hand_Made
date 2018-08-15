@@ -295,7 +295,7 @@ public class UnitControl_Hydralisk {
 		//System.out.println("Hydralisk gatherIndex : " + gatherIndex);
 		//System.out.println("UnitControl_COMMON.moveIndex : " + UnitControl_COMMON.moveIndex);
 
-		Position defenseSite = UnitControl_COMMON.defenseSite;
+		ArrayList <Position> defenseSite = UnitControl_COMMON.defenseSite;
 		Position movePosition = UnitControl_COMMON.movePosition;
 		Unit nextTarget = null;
 		int i = 0;
@@ -396,13 +396,13 @@ public class UnitControl_Hydralisk {
 			
 			
 			
-			if (defenseSite != null && Hydralisk.isAttacking()==false)
+			if (defenseSite.isEmpty()==false && Hydralisk.isAttacking()==false)
 			{
-				commandUtil.attackMove(Hydralisk, defenseSite);				
+				commandUtil.attackMove(Hydralisk, UnitControl_COMMON.getClosestDefenseSite(Hydralisk));
 			}
 			else if(SM.combatState == StrategyManager.CombatState.attackStarted)
 			{
-				commandUtil.attackMove(Hydralisk, movePosition);				
+				commandUtil.attackMove(Hydralisk, movePosition);	
 			}
 			else if (SM.myHydraliskList.size() > 12) 
 			{			
