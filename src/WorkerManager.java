@@ -121,12 +121,49 @@ public class WorkerManager {
 					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit) null);
 				}
 			}
+			
+			
+			
 			if (MyBotModule.Broodwar.getFrameCount() < 7680 && MyBotModule.Broodwar.getFrameCount() > 240) {
 				
-				Unit target = getClosestEnemyUnitFromWorker(worker); //32*5 내에 있는 적을 반환한다
-				  
+				Unit target = getClosestEnemyUnitFromWorker(worker); //32*8 내에 있는 적을 반환한다
+				// 권순우 5는 적어서 8로 늘림 
+				
+				
+				// 타겟이 있냐 없냐로 일단 구분하고
+				if(target!=null)
+				{
+					if (worker.isUnderAttack()==true)
+					{
+						setMineralWorker(worker);
+						System.out.println("맞으니까 미네랄로 도망쳐");
+					}
+					else if(worker.getDistance(getClosestResourceDepotFromWorker(worker).getPosition()) < 32 * 8)
+					{
+						setCombatWorker(worker);
+						commandUtil.attackUnit(worker, target);
+						System.out.println("가까우니까 때려");
+					}
+					else
+					{
+						setMineralWorker(worker);
+						System.out.println("멀어졌어 싸우지말고 미네랄 캐");
+					}
+				}
+				else
+				{
+					if(workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat)
+					{
+						setMineralWorker(worker);
+						System.out.println("적군 없어 하던 일 해");
+					}
+				}
+				
+				
+				/*
 				if (target != null && worker.getDistance(getClosestResourceDepotFromWorker(worker).getPosition()) < 32 * 6) {
 					setCombatWorker(worker);
+					commandUtil.attackUnit(worker, target);
 					System.out.println("공격 전환");
 				}
 				//타겟이 있고, 드론이 기지와 가까이 있으면 적을 공격한다.
@@ -145,12 +182,7 @@ public class WorkerManager {
 
 					}
 				}//멀리가면 공격취소!
-				
-				if (target == null && workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat) {
-					setMineralWorker(worker);
-					System.out.println("공격취소2");
-				}
-	
+				*/
 			}
 			//초반에만 적용		
 
@@ -169,107 +201,142 @@ public class WorkerManager {
 			List<BaseLocation> myBaseLocations = InformationManager.Instance()
 					.getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
 
-			for (BaseLocation myBase : myBaseLocations) {
+			// 변수 선언 위치 조정
+			int numberOfUnitType_Zerg_Creep_Colony = 0;
+			int numberOfUnitType_Zerg_Sunken_Colony = 0;
+			int numberOfEarlyAttackUnit = 0;
+			Player myPlayer = MyBotModule.Broodwar.self();
+			
+			for (BaseLocation myBase : myBaseLocations) 
+			{
 
-				for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(myBase.getPosition(), 30 * Config.TILE_SIZE)) {
+				for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(myBase.getPosition(), 18 * Config.TILE_SIZE)) 
+				{
 			
 					if (unit.getPlayer() == StrategyManager.Instance().enemyPlayer
 							&& unit.getType() != UnitType.Terran_SCV && unit.getType() != UnitType.Protoss_Probe
-							&& unit.getType() != UnitType.Zerg_Drone && unit.getType() != UnitType.Zerg_Overlord) {
-
-						int numberOfUnitType_Zerg_Creep_Colony = 0;
-						int numberOfUnitType_Zerg_Sunken_Colony = 0;
-						
-						///////////////////////////////////////////////////////
-						int numberOfEarlyAttackUnit = 0;
-
-						Player myPlayer = MyBotModule.Broodwar.self();
-
+							&& unit.getType() != UnitType.Zerg_Drone && unit.getType() != UnitType.Zerg_Overlord) 
+					{
+						// 권순우 위에 4종류만 아니면 무조건 센다, 어차피 질럿 아니면 저글링일테니까
+						numberOfEarlyAttackUnit++;
+					}
+				}
+			}	
+						/*
 						numberOfEarlyAttackUnit += StrategyManager.Instance().enemyPlayer.allUnitCount(UnitType.Zerg_Zergling);
 						numberOfEarlyAttackUnit += StrategyManager.Instance().enemyPlayer.allUnitCount(UnitType.Terran_Marine);
-						
+						*/
+			if(StrategyManager.Instance().myPlayer.completedUnitCount(UnitType.Zerg_Zergling) <= 4 
+					   && numberOfEarlyAttackUnit >= 3
+					   && defenceFlagforEarlyAttack == 0
+					   || StrategyManager.Instance().enemyPlayer.allUnitCount(UnitType.Protoss_Zealot) != 0)
+					{
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
+									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
+									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
+									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						System.out.println("저글링 생산!");
+						defenceFlagforEarlyAttack = 1;
+					}
+													
+			
+			// 권순우 일단 뭐든 적이 있으면
+			if(numberOfEarlyAttackUnit>0)
+			{
+				///////////////////////////////////////////////////////////
+				//초반러시 유닛이 저글링 혹은 마린 3마리 이상이거나, 질럿이고
+				//현재 저글링이 3마리 이하이면 저글링을 바로 생산한다. - 0815 노승호
+				
+				
+				// 저그의 경우 크립 콜로니 갯수를 셀 때 성큰 콜로니 갯수까지 포함해서 세어야, 크립 콜로니를 지정한 숫자까지만 만든다
+				numberOfUnitType_Zerg_Creep_Colony += myPlayer.allUnitCount(UnitType.Zerg_Creep_Colony);
+				numberOfUnitType_Zerg_Creep_Colony += BuildManager.Instance().buildQueue
+						.getItemCount(UnitType.Zerg_Creep_Colony);
+				numberOfUnitType_Zerg_Creep_Colony += ConstructionManager.Instance()
+						.getConstructionQueueItemCount(UnitType.Zerg_Creep_Colony, null);
+				numberOfUnitType_Zerg_Creep_Colony += myPlayer.allUnitCount(UnitType.Zerg_Sunken_Colony);
+				numberOfUnitType_Zerg_Creep_Colony += BuildManager.Instance().buildQueue
+						.getItemCount(UnitType.Zerg_Sunken_Colony);
+				numberOfUnitType_Zerg_Sunken_Colony += myPlayer.allUnitCount(UnitType.Zerg_Sunken_Colony);
+				numberOfUnitType_Zerg_Sunken_Colony += BuildManager.Instance().buildQueue
+						.getItemCount(UnitType.Zerg_Sunken_Colony);
 
-							if(StrategyManager.Instance().myPlayer.completedUnitCount(UnitType.Zerg_Zergling) <= 4 
-									   && numberOfEarlyAttackUnit >= 3
-									   && defenceFlagforEarlyAttack == 0
-									   || StrategyManager.Instance().enemyPlayer.allUnitCount(UnitType.Protoss_Zealot) != 0)
-									{
-											BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
-													BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-											BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
-													BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-											BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
-													BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-										System.out.println("저글링 생산!");
-										defenceFlagforEarlyAttack = 1;
-									}						
+				// System.out.println("numberOfUnitType_Zerg_Creep_Colony : " +
+				// numberOfUnitType_Zerg_Creep_Colony);
+				// System.out.println("+++++");
+				// System.out.println("numberOfUnitType_Zerg_Sunken_Colony : " +
+				// numberOfUnitType_Zerg_Sunken_Colony);
 
-
-						///////////////////////////////////////////////////////////
-						//초반러시 유닛이 저글링 혹은 마린 3마리 이상이거나, 질럿이고
-						//현재 저글링이 3마리 이하이면 저글링을 바로 생산한다. - 0815 노승호
-						
-						
-						// 저그의 경우 크립 콜로니 갯수를 셀 때 성큰 콜로니 갯수까지 포함해서 세어야, 크립 콜로니를 지정한 숫자까지만 만든다
-						numberOfUnitType_Zerg_Creep_Colony += myPlayer.allUnitCount(UnitType.Zerg_Creep_Colony);
-						numberOfUnitType_Zerg_Creep_Colony += BuildManager.Instance().buildQueue
-								.getItemCount(UnitType.Zerg_Creep_Colony);
-						numberOfUnitType_Zerg_Creep_Colony += ConstructionManager.Instance()
-								.getConstructionQueueItemCount(UnitType.Zerg_Creep_Colony, null);
-						numberOfUnitType_Zerg_Creep_Colony += myPlayer.allUnitCount(UnitType.Zerg_Sunken_Colony);
-						numberOfUnitType_Zerg_Creep_Colony += BuildManager.Instance().buildQueue
-								.getItemCount(UnitType.Zerg_Sunken_Colony);
-						numberOfUnitType_Zerg_Sunken_Colony += myPlayer.allUnitCount(UnitType.Zerg_Sunken_Colony);
-						numberOfUnitType_Zerg_Sunken_Colony += BuildManager.Instance().buildQueue
-								.getItemCount(UnitType.Zerg_Sunken_Colony);
-
-						// System.out.println("numberOfUnitType_Zerg_Creep_Colony : " +
-						// numberOfUnitType_Zerg_Creep_Colony);
-						// System.out.println("+++++");
-						// System.out.println("numberOfUnitType_Zerg_Sunken_Colony : " +
-						// numberOfUnitType_Zerg_Sunken_Colony);
-
-						for (Unit building : MyBotModule.Broodwar.self().getUnits()) {
-							if (building.getType().equals(UnitType.Zerg_Hatchery) && building.canCancelMorph()) {
-								// building.cancelMorph(); 해처리를 취소하면 빌드가 다 밀려서 결국 망함
-							//	System.out.println("해처리 취소");
-
-							}
-						}
-						
-						
-						//미구현 : 오버로드1이 적을 발견 바로 크립을 깔고, 오버로드2가 적을 발견하면 성큰으로 간다. (성큰 최대 2개)
-						//현재는 기지 주위에서 적을 발견하면 까는 방식
-						
-						if (numberOfUnitType_Zerg_Creep_Colony < 1
-								&& myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0) {
-
-							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) < 1) {
-
-								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony,
-										BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
-
-							}
-						}
-
-						if (myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) > 0
-								&& numberOfUnitType_Zerg_Sunken_Colony < 1) {
-
-							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) < 1) {
-
-								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Sunken_Colony,
-										BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
-
-							}
+				for (Unit building : MyBotModule.Broodwar.self().getUnits()) 
+				{
+					if (building.getType().equals(UnitType.Zerg_Hatchery) && building.canCancelMorph()) 
+					{					
+						if(building.getHitPoints()<100) // 체력이 버티는 순간까지 최대한 버티다가 취소한다
+						{
+							building.cancelMorph();// 이걸로 크립, 성큰콜로니 지을 미네랄을 확보한다
+							BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
+									BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+							System.out.println("해처리 취소");
 						}
 					}
+				}
+				
+				
+				//미구현 : 오버로드1이 적을 발견 바로 크립을 깔고, 오버로드2가 적을 발견하면 성큰으로 간다. (성큰 최대 2개)
+				//현재는 기지 주위에서 적을 발견하면 까는 방식
+				
+				/*
+				* 권순우
+				* 여기가 까다롭다
+				* 이미 이니셜 빌드오더 후반에 크립고 성큰이 있으므로 
+				* 그들의 숫자를 감안해서 조건을 걸어야 한다
+				* 이미 정해진 빌드 뒤에 존재한다면
+				* 현재 순간으로 땡겨오는 식으로 구현하면 좋겠지만
+				* 그건 너무 어려워 ㅎㅎ
+				*/				
+				if (numberOfUnitType_Zerg_Creep_Colony < 6
+						&& myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0) {
 
+					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) < 4) {
+
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony,
+								BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony,
+								BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
+
+					}
+				}
+
+				if (myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) > 0
+						&& numberOfUnitType_Zerg_Sunken_Colony < 4) {
+
+					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) < 4) {
+
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Sunken_Colony,
+								BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Sunken_Colony,
+								BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
+					}
 				}
 			}
+
 		}
 
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public void handleGasWorkers() {
 		// for each unit we have
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
@@ -794,7 +861,7 @@ public class WorkerManager {
 		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
 			double dist = unit.getDistance(worker);
 
-			if ((dist < 32 * 5) && (closestUnit == null || (dist < closestDist))) {
+			if ((dist < 32 * 8) && (closestUnit == null || (dist < closestDist))) {
 				closestUnit = unit;
 				closestDist = dist;
 			}

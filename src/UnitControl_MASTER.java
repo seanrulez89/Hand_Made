@@ -22,6 +22,16 @@ public class UnitControl_MASTER {
 		COMMON.getMovePosition();
 		COMMON.getLocalDefense();
 		
+		
+		
+		if(StrategyManager.Instance().combatState != StrategyManager.CombatState.eliminateEnemy
+				&& MyBotModule.Broodwar.getFrameCount() % 2 == 0)
+		{
+			//Zergling = new UnitControl_Zergling();
+			Zergling.update();
+		}
+		
+		
 		if(StrategyManager.Instance().enemyMainBaseLocation!=null 
 				&& StrategyManager.Instance().combatState != StrategyManager.CombatState.eliminateEnemy
 				&& MyBotModule.Broodwar.getFrameCount() % 2 == 0)
@@ -38,8 +48,7 @@ public class UnitControl_MASTER {
 			Lurker = new UnitControl_Lurker();
 			Lurker.update();
 			
-			//Zergling = new UnitControl_Zergling();
-			Zergling.update();
+
 			
 			
 			
