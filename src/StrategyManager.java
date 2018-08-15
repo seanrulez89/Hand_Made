@@ -961,7 +961,7 @@ public class StrategyManager {
 					{
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 								nextExpansion.getTilePosition(), true);
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor,
+						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 								nextExpansion.getTilePosition(), true);
 						
 						System.out.println(1);
