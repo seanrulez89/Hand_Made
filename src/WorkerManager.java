@@ -1,4 +1,5 @@
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -7,6 +8,8 @@ import bwta.*;
 
 /// 일꾼 유닛들의 상태를 관리하고 컨트롤하는 class
 public class WorkerManager {
+	
+	static int defenceFlagforEarlyAttack=0;
 
 	/// 각 Worker 에 대한 WorkerJob 상황을 저장하는 자료구조 객체
 	private WorkerData workerData = new WorkerData();
@@ -50,11 +53,30 @@ public class WorkerManager {
 		handleGasWorkers();
 		handleIdleWorkers();
 		handleMoveWorkers();
-		// handleCombatWorkers();
+		handleCombatWorkers();			
 		handleRepairWorkers();
 		// rebalanceWorkers(); //0628 이걸 하는건 좋은데 이걸 하니까 우왕좌왕 미네랄 못캐는 애들이 생기는듯 계속 새로 할당되서
 
 	}
+	
+
+	
+	public Unit getCloestMineral(Unit depot)
+	{
+		List<Unit> mineralsNearDepot = new ArrayList<Unit>();
+
+	    int radius = 320;
+
+	    for (Unit unit : MyBotModule.Broodwar.getAllUnits())
+		{
+			if ((unit.getType() == UnitType.Resource_Mineral_Field) && unit.getDistance(depot) < radius)
+			{
+	            mineralsNearDepot.add(unit);
+			}
+		}
+	    return mineralsNearDepot.get(1);
+	}
+
 
 	public void updateWorkerStatus() {
 		// Drone 은 건설을 위해 isConstructing = true 상태로 건설장소까지 이동한 후,
@@ -66,45 +88,7 @@ public class WorkerManager {
 			if (!worker.isCompleted() || worker == null) {
 				continue;
 			}
-
-			if (worker.isUnderAttack() && workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Build) {
-
-				Unit target = getClosestEnemyUnitFromWorker(worker);
-
-				if (target != null) {
-					// commandUtil.attackUnit(worker, target);
-					setCombatWorker(worker);
-					commandUtil.attackUnit(worker, target);
-				}
-
-			}
-
-			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat) {
-				Unit depot = getClosestResourceDepotFromWorker(worker);
-
-				if (worker.getDistance(depot.getPosition()) > 32 * 6) {
-					setMineralWorker(worker);
-
-				}
-			}
-
-			/*
-			 * Unit target = getClosestEnemyUnitFromWorker(worker);
-			 * 
-			 * if (workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Build &&
-			 * workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Scout &&
-			 * workerData.getWorkerJob(worker) != WorkerData.WorkerJob.Gas) {
-			 * 
-			 * if (target != null) {
-			 * 
-			 * if (target.getType() != UnitType.Terran_SCV || target.getType() !=
-			 * UnitType.Protoss_Probe || target.getType() != UnitType.Zerg_Drone) {
-			 * 
-			 * setCombatWorker(worker); // System.out.println("드론도 공격함"); } } if (target ==
-			 * null) { stopCombat();
-			 * 
-			 * // // } }
-			 */
+			
 			// 게임상에서 worker가 isIdle 상태가 되었으면 (새로 탄생했거나, 그전 임무가 끝난 경우), WorkerData 도 Idle 로
 			// 맞춘 후, handleGasWorkers, handleIdleWorkers 등에서 새 임무를 지정한다
 			if (worker.isIdle()) {
@@ -137,27 +121,95 @@ public class WorkerManager {
 					workerData.setWorkerJob(worker, WorkerData.WorkerJob.Idle, (Unit) null);
 				}
 			}
+			if (MyBotModule.Broodwar.getFrameCount() < 7680 && MyBotModule.Broodwar.getFrameCount() > 240) {
+				
+				Unit target = getClosestEnemyUnitFromWorker(worker); //32*5 내에 있는 적을 반환한다
+				  
+				if (target != null && worker.getDistance(getClosestResourceDepotFromWorker(worker).getPosition()) < 32 * 6) {
+					setCombatWorker(worker);
+					System.out.println("공격 전환");
+				}
+				//타겟이 있고, 드론이 기지와 가까이 있으면 적을 공격한다.
+				
+				if (worker.isUnderAttack() && workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat) {
+//					setMineralWorker(worker);
+						commandUtil.rightClick(worker, getCloestMineral(worker));	
+						System.out.println("ㅌㅌㅌ");
+				}//드론이 공격을 당하면 미네랄을 캔다!
+				
+				if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat) {
+					Unit depot = getClosestResourceDepotFromWorker(worker);
+					if (worker.getDistance(depot.getPosition()) > 32 * 6) {
+						setMineralWorker(worker);
+						System.out.println("공격취소1");
+
+					}
+				}//멀리가면 공격취소!
+				
+				if (target == null && workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat) {
+					setMineralWorker(worker);
+					System.out.println("공격취소2");
+				}
+	
+			}
+			//초반에만 적용		
+
+			
+			
+			if (MyBotModule.Broodwar.getFrameCount() > 7680 && workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat) {
+				setMineralWorker(worker);				
+				System.out.println("공격해제");
+			}
 		}
 
 		//////// 초반 긴급 방어 구축
 
 		if (MyBotModule.Broodwar.getFrameCount() < 7680 && MyBotModule.Broodwar.getFrameCount() > 240) {
-
+			
 			List<BaseLocation> myBaseLocations = InformationManager.Instance()
 					.getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
 
 			for (BaseLocation myBase : myBaseLocations) {
 
 				for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(myBase.getPosition(), 30 * Config.TILE_SIZE)) {
+			
 					if (unit.getPlayer() == StrategyManager.Instance().enemyPlayer
 							&& unit.getType() != UnitType.Terran_SCV && unit.getType() != UnitType.Protoss_Probe
 							&& unit.getType() != UnitType.Zerg_Drone && unit.getType() != UnitType.Zerg_Overlord) {
 
 						int numberOfUnitType_Zerg_Creep_Colony = 0;
 						int numberOfUnitType_Zerg_Sunken_Colony = 0;
+						
+						///////////////////////////////////////////////////////
+						int numberOfEarlyAttackUnit = 0;
 
 						Player myPlayer = MyBotModule.Broodwar.self();
 
+						numberOfEarlyAttackUnit += StrategyManager.Instance().enemyPlayer.allUnitCount(UnitType.Zerg_Zergling);
+						numberOfEarlyAttackUnit += StrategyManager.Instance().enemyPlayer.allUnitCount(UnitType.Terran_Marine);
+						
+
+							if(StrategyManager.Instance().myPlayer.completedUnitCount(UnitType.Zerg_Zergling) <= 4 
+									   && numberOfEarlyAttackUnit >= 3
+									   && defenceFlagforEarlyAttack == 0
+									   || StrategyManager.Instance().enemyPlayer.allUnitCount(UnitType.Protoss_Zealot) != 0)
+									{
+											BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
+													BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+											BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
+													BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+											BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
+													BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+										System.out.println("저글링 생산!");
+										defenceFlagforEarlyAttack = 1;
+									}						
+
+
+						///////////////////////////////////////////////////////////
+						//초반러시 유닛이 저글링 혹은 마린 3마리 이상이거나, 질럿이고
+						//현재 저글링이 3마리 이하이면 저글링을 바로 생산한다. - 0815 노승호
+						
+						
 						// 저그의 경우 크립 콜로니 갯수를 셀 때 성큰 콜로니 갯수까지 포함해서 세어야, 크립 콜로니를 지정한 숫자까지만 만든다
 						numberOfUnitType_Zerg_Creep_Colony += myPlayer.allUnitCount(UnitType.Zerg_Creep_Colony);
 						numberOfUnitType_Zerg_Creep_Colony += BuildManager.Instance().buildQueue
@@ -180,11 +232,15 @@ public class WorkerManager {
 						for (Unit building : MyBotModule.Broodwar.self().getUnits()) {
 							if (building.getType().equals(UnitType.Zerg_Hatchery) && building.canCancelMorph()) {
 								// building.cancelMorph(); 해처리를 취소하면 빌드가 다 밀려서 결국 망함
-								System.out.println("해처리 취소");
+							//	System.out.println("해처리 취소");
 
 							}
 						}
-
+						
+						
+						//미구현 : 오버로드1이 적을 발견 바로 크립을 깔고, 오버로드2가 적을 발견하면 성큰으로 간다. (성큰 최대 2개)
+						//현재는 기지 주위에서 적을 발견하면 까는 방식
+						
 						if (numberOfUnitType_Zerg_Creep_Colony < 1
 								&& myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0) {
 
@@ -380,6 +436,8 @@ public class WorkerManager {
 			workerData.setWorkerJob(unit, WorkerData.WorkerJob.Minerals, depot);
 		}
 	}
+	
+	
 
 	/// target 으로부터 가장 가까운 Mineral 일꾼 유닛을 리턴합니다
 	public Unit getClosestMineralWorkerTo(Position target) {
