@@ -1798,12 +1798,11 @@ public class StrategyManager {
 				myKilledHydralisks++;
 			} else if (unit.getType() == myDefiler) {
 				myKilledDefilers++;
-			}			
+			}
 			
-			
-			
-			
-			
+			if(unit.getType()==UnitType.Zerg_Overlord) {
+				OverloadManager.Instance().removeOverload(unit);
+			}
 			
 		} else if (unit.getPlayer() == enemyPlayer) {
 
@@ -1833,28 +1832,22 @@ public class StrategyManager {
 		}
 		ArrayList<Unit> unitList = getUnitList(unit);
 		
-		
 		if (unitList != null) {
 			unitList.add(unit);
 			if(isCombatUnit(unit)) {
 				myAllCombatUnitList.add(unit);
 			}
 		}
-		
-		/*
-		if (unitList != null) {
-			unitList.add(unit);
-			if(isCombatUnit(unit)) {
-				myAllCombatUnitList.add(unit);
-			}
-		}
-		*/
 
 		ArrayList<Unit> bfUnitList = getBfUnitList(unit);
 		if(bfUnitList!=null) {
 			boolean check = deleteUnitInList(unit, bfUnitList);
 			if(!check) {
 			}
+		}
+		
+		if(unit.getType()==UnitType.Zerg_Overlord) {
+			OverloadManager.Instance().addOverload(unit);
 		}
 		
 	}
