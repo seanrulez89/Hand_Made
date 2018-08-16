@@ -106,6 +106,19 @@ public class UnitControl_Zergling {
 			return;
 		}
 		
+		if(SM.enemyMainBaseLocation==null)
+		{
+			for(Unit unit : SM.myZerglingList)
+			{
+				commandUtil.attackMove(unit, SM.myFirstChokePoint.getCenter());
+			}
+			
+			return;
+		}
+			
+		
+		
+		
 		//setStartGatherEndPoint();
 		
 		if(UnitControl_COMMON.moveIndex == UnitControl_COMMON.BASIC_MOVE_INDEX)

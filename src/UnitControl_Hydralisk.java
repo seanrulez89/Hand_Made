@@ -355,8 +355,16 @@ public class UnitControl_Hydralisk {
 			
 			if (nextTarget != null) 
 			{
+				catchAndAttackUnit(Hydralisk, nextTarget);
+				continue;
+				
+				
+				
+				/*
 				commandUtil.attackUnit(Hydralisk, nextTarget);
 				continue;
+				*/
+				
 				
 				/*
 				if (Hydralisk.getGroundWeaponCooldown() == 0) 
@@ -421,6 +429,43 @@ public class UnitControl_Hydralisk {
 
 
 
+	public boolean catchAndAttackUnit(Unit attacker, Unit target) {
+		if (target == null || !target.exists()) {
+			return false;
+		}
+		if (!target.isMoving() || !attacker.canMove() || attacker.isInWeaponRange(target))
+		{
+			commandUtil.attackUnit(attacker, target);
+		}
+		else
+		{
+			Position destination = PredictMovement(target, 8);	// the number is how many frames to look ahead
+			//BWAPI::Broodwar->drawLineMap(attacker->getPosition(), destination, BWAPI::Colors::Blue);
+			MyBotModule.Broodwar.drawLineMap(attacker.getPosition(), destination, Color.Yellow);
+			commandUtil.move(attacker, destination);
+			System.out.println("추격");
+		}
+		return true;
+	}
+
+	private Position PredictMovement(Unit target, int frames) {
+		Position pos =  new Position(
+				target.getPosition().getX() + (int)(frames * target.getVelocityX()),
+				target.getPosition().getY() + (int)(frames * target.getVelocityY())
+			);
+		//ClipToMap(pos);
+		return pos;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	private static UnitControl_Hydralisk instance = new UnitControl_Hydralisk();

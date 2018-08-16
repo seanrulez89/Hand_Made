@@ -120,8 +120,7 @@ public class UnitControl_Mutalisk {
 					airToGround.add(enemy);					
 				}
 				else if(enemy.getType().equals(UnitType.Terran_Firebat)
-						|| enemy.getType().equals(UnitType.Terran_Vulture)
-						|| enemy.getType().equals(UnitType.Terran_Vulture_Spider_Mine)
+						|| enemy.getType().equals(UnitType.Terran_Vulture)						
 						|| enemy.getType().equals(UnitType.Terran_Siege_Tank_Siege_Mode)
 						|| enemy.getType().equals(UnitType.Terran_Siege_Tank_Tank_Mode)
 						|| enemy.getType().equals(UnitType.Zerg_Zergling)
@@ -129,6 +128,7 @@ public class UnitControl_Mutalisk {
 						|| enemy.getType().equals(UnitType.Zerg_Ultralisk)
 						|| enemy.getType().equals(UnitType.Protoss_Zealot)
 						|| enemy.getType().equals(UnitType.Protoss_Reaver))
+					//|| enemy.getType().equals(UnitType.Terran_Vulture_Spider_Mine)
 				{
 					groundToGround.add(enemy);					
 				}
