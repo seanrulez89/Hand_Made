@@ -278,7 +278,20 @@ public class UnitControl_Overlord {
 	
 	public void update()
 	{
-		ArrayList<Unit> myOverLords = getOverLords();
+		
+		for(BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(myPlayer))
+		{
+			OverloadManager.Instance().addExploreArea(baseLocation.getPosition());
+			
+			Position chokePoint = bwta.BWTA.getNearestChokepoint(baseLocation.getPosition()).getCenter();
+			OverloadManager.Instance().addExploreArea(chokePoint);
+		}
+		OverloadManager.Instance().updateWithCombatUnitNum(UnitType.Zerg_Hydralisk, 2);
+		OverloadManager.Instance().updateWithCombatUnitNum(UnitType.Zerg_Mutalisk, 2);
+		
+		OverloadManager.Instance().onUpdate();
+		
+/*		ArrayList<Unit> myOverLords = getOverLords();
 		
 		if(myOverLords.size()>0)
 		{
@@ -321,12 +334,9 @@ public class UnitControl_Overlord {
 	            	commandUtil.move(overlord, getExplorationSite(overlord));
 	                //overlord.move(getExplorationSite(overlord));
 	            }
-					
-					
-				
-				
 			}
 		}
+		*/
 	}
 
 }

@@ -1,26 +1,27 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Queue;
 
 import bwapi.Position;
 import bwapi.Unit;
+import bwapi.UnitType;
 import bwta.BaseLocation;
 
 public class OverloadManager {
+
 	private static class OverloadInfo {
 		Unit overLoad;
 		overloadStatus status;
 		Position exploreArea;
 		Unit followingAttackUnit;
-		List<Unit> dropshipUnitList;
+
 		public OverloadInfo() {
 			super();
-			dropshipUnitList = new ArrayList<Unit>();
 		}
-		
 	}
 
 	public enum overloadStatus {
@@ -29,6 +30,11 @@ public class OverloadManager {
 		withAttackUnit, /// < 공격유닛 따라다님
 		dropship /// < 드랍십으로 이용
 	};
+	
+	private static class WaitingLoadUnitAndOverload{
+		Unit unit;
+		OverloadInfo overloadInfo;
+	}
 
 	private OverloadManager() {
 
@@ -47,17 +53,21 @@ public class OverloadManager {
 	private static List<OverloadInfo> scoutOverloadList = new ArrayList<OverloadInfo>();
 	private static List<OverloadInfo> withAttackUnitOverloadList = new ArrayList<OverloadInfo>();
 	private static List<OverloadInfo> dropshipOverloadList = new ArrayList<OverloadInfo>();
+	private static List<WaitingLoadUnitAndOverload> waitDropshipUnitList = new ArrayList<WaitingLoadUnitAndOverload>();
 	private static BaseLocation baseLocation = InformationManager.Instance()
 			.getMainBaseLocation(InformationManager.Instance().selfPlayer);
 	// 정찰할 지역 리스트를 넣어둔다.
 	private static List<Position> exploreAreaList = new ArrayList<Position>();
+
+	// 따라다닐 유닛 타입과 넘버
+	private Map<UnitType, Integer> withAttackUnitMap = new HashMap<UnitType, Integer>();
 
 	private static Comparator<Position> positionComparator = new Comparator<Position>() {
 
 		@Override
 		public int compare(Position o1, Position o2) {
 			double distance1 = o1.getDistance(baseLocation.getX(), baseLocation.getY());
-			double distance2 = o1.getDistance(baseLocation.getX(), baseLocation.getY());
+			double distance2 = o2.getDistance(baseLocation.getX(), baseLocation.getY());
 			if (distance1 < distance2) {
 				return -1;
 			} else if (distance1 == distance2) {
@@ -67,22 +77,116 @@ public class OverloadManager {
 			}
 		}
 	};
+	
+	public void addDropshipUnit(Unit unit) {
+		WaitingLoadUnitAndOverload waitingLoadUnitAndOverload = new WaitingLoadUnitAndOverload();
+		for(OverloadInfo overloadInfo : dropshipOverloadList) {
+			if(unit.canLoad(overloadInfo.overLoad)) {
+				unit.load(overloadInfo.overLoad);
+				waitingLoadUnitAndOverload.overloadInfo = overloadInfo;
+				waitingLoadUnitAndOverload.unit = unit;
+				waitDropshipUnitList.add(waitingLoadUnitAndOverload);
+				return;
+			}
+		}
+		PriorityQueue<OverloadInfo> overloadInfoQueue = new PriorityQueue<>(10, new Comparator<OverloadInfo>() {
+
+			@Override
+			public int compare(OverloadInfo o1, OverloadInfo o2) {
+				double distance1 = unit.getDistance(o1.overLoad.getX(), o1.overLoad.getY());
+				double distance2 = unit.getDistance(o2.overLoad.getX(), o2.overLoad.getY());
+				if (distance1 < distance2) {
+					return -1;
+				} else if (distance1 == distance2) {
+					return 0;
+				} else {
+					return 1;
+				}
+			}
+		});
+		
+		overloadInfoQueue.addAll(waitOverloadList);
+		overloadInfoQueue.addAll(scoutOverloadList);
+		overloadInfoQueue.addAll(withAttackUnitOverloadList);
+		
+		while(overloadInfoQueue.isEmpty() == false) {
+			OverloadInfo overloadInfo = overloadInfoQueue.poll();
+			if(unit.canLoad(overloadInfo.overLoad)) {
+				unit.load(overloadInfo.overLoad);
+				waitingLoadUnitAndOverload.overloadInfo = overloadInfo;
+				waitingLoadUnitAndOverload.unit = unit;
+				waitDropshipUnitList.add(waitingLoadUnitAndOverload);
+				
+				if(overloadInfo.status==overloadStatus.wait) {
+					waitOverloadList.remove(overloadInfo);
+				}else if(overloadInfo.status==overloadStatus.scout) {
+					scoutOverloadList.remove(overloadInfo);
+				}else if(overloadInfo.status==overloadStatus.withAttackUnit) {
+					withAttackUnitOverloadList.remove(overloadInfo);
+				}
+				
+				overloadInfo.status=overloadStatus.dropship;
+				dropshipOverloadList.add(overloadInfo);
+				break;
+			}
+		}
+	}
+
+	public void unloadDropshipUnits(Unit overload) {
+		for (OverloadInfo overloadInfo : dropshipOverloadList) {
+			if (overload.getID() == overloadInfo.overLoad.getID()) {
+				if (overload.unloadAll()) {
+					dropshipOverloadList.remove(overloadInfo);
+					overloadInfo.status = overloadStatus.wait;
+					waitOverloadList.add(overloadInfo);
+				}
+				break;
+			}
+		}
+	}
+	
+	public boolean canDropshipsGoAttack() {
+		if(waitOverloadList.size()!=0) {
+			return false;
+		}
+		
+		for (OverloadInfo overloadInfo : dropshipOverloadList) {
+			if(overloadInfo.overLoad.getDistance(new Position(63*32, 63*32))>64) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public void updateWithCombatUnitNum(UnitType unitType, int num) {
+		if (withAttackUnitMap.containsKey(unitType)) {
+			if (withAttackUnitMap.get(unitType) != num) {
+				withAttackUnitMap.put(unitType, num);
+				onUpdate();
+			}
+		} else {
+			withAttackUnitMap.put(unitType, num);
+			onUpdate();
+		}
+	}
 
 	public void addExploreArea(Position position) {
-		for(Position explorePosition : exploreAreaList) {
-			if(explorePosition.getX()==position.getX() && explorePosition.getY()==position.getY()) {
+		for (Position explorePosition : exploreAreaList) {
+			if (explorePosition.getX() == position.getX() && explorePosition.getY() == position.getY()) {
 				return;
 			}
 		}
 		exploreAreaList.add(position);
 		Collections.sort(exploreAreaList, positionComparator);
+		rebalance();
 	}
 
 	public void removeExploreArea(Position position) {
-		for(Position explorePosition : exploreAreaList) {
-			if(explorePosition.getX()==position.getX() && explorePosition.getY()==position.getY()) {
+		for (Position explorePosition : exploreAreaList) {
+			if (explorePosition.getX() == position.getX() && explorePosition.getY() == position.getY()) {
 				exploreAreaList.remove(position);
 				Collections.sort(exploreAreaList, positionComparator);
+				rebalance();
 				break;
 			}
 		}
@@ -94,6 +198,7 @@ public class OverloadManager {
 		overloadInfo.status = overloadStatus.wait;
 		waitOverloadList.add(overloadInfo);
 		allOverloadList.add(overloadInfo);
+		rebalance();
 	}
 
 	public void removeOverload(Unit overload) {
@@ -111,6 +216,7 @@ public class OverloadManager {
 					System.out.println("문제가있어요!!!removeOverload");
 				}
 				allOverloadList.remove(overloadInfo);
+				rebalance();
 				return;
 			}
 		}
@@ -118,13 +224,6 @@ public class OverloadManager {
 	}
 
 	public void rebalance() {
-		if (MyBotModule.Broodwar.getFrameCount() % 100 == 0) {
-			tmp();
-			System.out.println("exploreAreaList : " + exploreAreaList);
-		}
-		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) {
-			return;
-		}
 		System.out.println("세팅전");
 		System.out.println("allOverloadlist : " + listTostring(allOverloadList));
 		System.out.println("waitOverloadList : " + listTostring(waitOverloadList));
@@ -132,44 +231,54 @@ public class OverloadManager {
 		System.out.println("withAttackUnitOverloadList : " + listTostring(withAttackUnitOverloadList));
 		PriorityQueue<OverloadInfo> queue = priorityQueueInit();
 		listInit();
-		System.out.println("queue1 : " + queue);
-		// 1. 뮤탈 따라다닐 2마리
-		List<Unit> mutaliskList = StrategyManager.Instance().myMutaliskList;
-		if (mutaliskList != null && mutaliskList.size() != 0 && queue.size() != 0) {
-			System.out.println("뮤탈따라다니자");
-			queue = rebalanceWithAttackUnitOverload(2, mutaliskList.get(0), queue);
-		}else {
-			System.out.println("뮤탈없는이유 : " + (mutaliskList != null)  + " " + (mutaliskList.size() != 0) + " " + (queue.size() != 0) );
+
+		// 1. 뮤탈 따라다니기
+		if (withAttackUnitMap.get(UnitType.Zerg_Mutalisk) != null) {
+			List<Unit> mutaliskList = StrategyManager.Instance().myMutaliskList;
+			if (mutaliskList != null && mutaliskList.size() != 0 && queue.size() != 0) {
+				queue = rebalanceWithAttackUnitOverload(withAttackUnitMap.get(UnitType.Zerg_Mutalisk),
+						mutaliskList.get(0), queue);
+			}
 		}
-		System.out.println("queue2 : " + queue);
-		// 2. 히드라 따라다닐 2마리
-		List<Unit> hydraliskList = StrategyManager.Instance().myHydraliskList;
-		if (hydraliskList != null && hydraliskList.size() != 0 && queue.size() != 0) {
-			System.out.println("히드라따라다니자 : hydraliskList.get(0) (: " + hydraliskList.get(0).getX() + "," + hydraliskList.get(0).getY() +")");
-			queue = rebalanceWithAttackUnitOverload(2, hydraliskList.get(0), queue);
-		}else {
-			System.out.println("히드라없는이유 : " + (hydraliskList != null)  + " " + (hydraliskList.size() != 0) + " " + (queue.size() != 0) );
+
+		// 2. 히드라 따라다니기
+		if (withAttackUnitMap.get(UnitType.Zerg_Hydralisk) != null) {
+			List<Unit> hydraliskList = StrategyManager.Instance().myHydraliskList;
+			if (hydraliskList != null && hydraliskList.size() != 0 && queue.size() != 0) {
+				queue = rebalanceWithAttackUnitOverload(2, hydraliskList.get(0), queue);
+			}
 		}
-		System.out.println("queue3 : " + queue);
+
 		// 3. 정찰시키기
 		if (exploreAreaList != null && exploreAreaList.size() != 0 && queue.size() != 0) {
-			System.out.println("정찰따라다니자");
 			for (Position position : exploreAreaList) {
 				queue = rebalanceExploreOverload(position, queue);
 				if (queue.size() == 0) {
 					break;
 				}
 			}
-		}else {
-			System.out.println("정찰없는이유 : " + (exploreAreaList != null) + " " + (exploreAreaList.size() != 0) + " " + (queue.size() != 0));
-			
 		}
-		System.out.println("queue4 : " + queue);
 		// 4. 남는 오버로드는 대기
 		queue = WaitAll(queue);
-		System.out.println("queue5 : " + queue);
 
-		// 5. 명령 수행
+		System.out.println("세팅후");
+		System.out.println("allOverloadlist : " + listTostring(allOverloadList));
+		System.out.println("waitOverloadList : " + listTostring(waitOverloadList));
+		System.out.println("scoutOverloadList : " + listTostring(scoutOverloadList));
+		System.out.println("withAttackUnitOverloadList : " + listTostring(withAttackUnitOverloadList));
+	}
+
+	public void onUpdate() {
+		for(WaitingLoadUnitAndOverload waitingLoadUnitAndOverload : waitDropshipUnitList) {
+			if(waitingLoadUnitAndOverload.unit.isLoaded()) {
+				waitDropshipUnitList.remove(waitingLoadUnitAndOverload);
+			}else if(waitingLoadUnitAndOverload.unit.canLoad(waitingLoadUnitAndOverload.overloadInfo.overLoad) == false) {
+				waitDropshipUnitList.remove(waitingLoadUnitAndOverload);
+				addDropshipUnit(waitingLoadUnitAndOverload.unit);
+				commandUtil.move(waitingLoadUnitAndOverload.overloadInfo.overLoad, new Position(63*32, 63*32));
+			}
+		}
+		
 		for (OverloadInfo overload : allOverloadList) {
 			if (overload.status == overloadStatus.withAttackUnit) {
 				commandUtil.move(overload.overLoad, overload.followingAttackUnit.getPosition());
@@ -178,14 +287,11 @@ public class OverloadManager {
 			} else if (overload.status == overloadStatus.wait) {
 				commandUtil.move(overload.overLoad, baseLocation.getPosition());
 			} else if (overload.status == overloadStatus.dropship) {
-				// 아직 미구현
+				// 아직 미구현 --> 쓸 일 없음
 			}
 		}
-		System.out.println("세팅후");
-		System.out.println("allOverloadlist : " + listTostring(allOverloadList));
-		System.out.println("waitOverloadList : " + listTostring(waitOverloadList));
-		System.out.println("scoutOverloadList : " + listTostring(scoutOverloadList));
-		System.out.println("withAttackUnitOverloadList : " + listTostring(withAttackUnitOverloadList));
+		System.out.println("waitDropshipUnitList : " + listTostring2(waitDropshipUnitList));
+		System.out.println("dropshipOverloadList : " + listTostring(dropshipOverloadList));
 	}
 
 	private static PriorityQueue<OverloadInfo> priorityQueueInit() {
@@ -194,10 +300,11 @@ public class OverloadManager {
 		System.out.println("waitOverloadList : " + listTostring(waitOverloadList));
 		System.out.println("scoutOverloadList : " + listTostring(scoutOverloadList));
 		System.out.println("withAttackUnitOverloadList : " + listTostring(withAttackUnitOverloadList));
+		System.out.println("dropshipOverloadList : " + listTostring(dropshipOverloadList));
 		PriorityQueue<OverloadInfo> queue = new PriorityQueue<OverloadInfo>(10, new Comparator<OverloadInfo>() {
 			@Override
 			public int compare(OverloadInfo o1, OverloadInfo o2) {
-				return o1.overLoad.getID()-o2.overLoad.getID();
+				return o1.overLoad.getID() - o2.overLoad.getID();
 			}
 		});
 		queue.addAll(waitOverloadList);
@@ -213,7 +320,6 @@ public class OverloadManager {
 			target.status = overloadStatus.wait;
 			target.exploreArea = baseLocation.getPosition();
 			target.followingAttackUnit = null;
-			target.dropshipUnitList.clear();
 			waitOverloadList.add(target);
 		}
 		return waitOverloadQueue;
@@ -221,12 +327,11 @@ public class OverloadManager {
 
 	private static PriorityQueue<OverloadInfo> rebalanceExploreOverload(Position position,
 			PriorityQueue<OverloadInfo> waitOverloadQueue) {
-		System.out.println("position : " + position + " queue : " + waitOverloadQueue);
 		PriorityQueue<OverloadInfo> queue = new PriorityQueue<OverloadInfo>(10, new Comparator<OverloadInfo>() {
 			@Override
 			public int compare(OverloadInfo o1, OverloadInfo o2) {
 				double distance1 = position.getDistance(o1.overLoad.getX(), o1.overLoad.getY());
-				double distance2 = position.getDistance(o1.overLoad.getX(), o1.overLoad.getY());
+				double distance2 = position.getDistance(o2.overLoad.getX(), o2.overLoad.getY());
 				if (distance1 < distance2) {
 					return -1;
 				} else if (distance1 == distance2) {
@@ -241,7 +346,6 @@ public class OverloadManager {
 		overload.status = overloadStatus.scout;
 		overload.exploreArea = position;
 		overload.followingAttackUnit = null;
-		overload.dropshipUnitList.clear();
 
 		scoutOverloadList.add(overload);
 
@@ -261,7 +365,7 @@ public class OverloadManager {
 			@Override
 			public int compare(OverloadInfo o1, OverloadInfo o2) {
 				double distance1 = target.getDistance(o1.overLoad.getX(), o1.overLoad.getY());
-				double distance2 = target.getDistance(o1.overLoad.getX(), o1.overLoad.getY());
+				double distance2 = target.getDistance(o2.overLoad.getX(), o2.overLoad.getY());
 				if (distance1 < distance2) {
 					return -1;
 				} else if (distance1 == distance2) {
@@ -277,7 +381,6 @@ public class OverloadManager {
 			overload.status = overloadStatus.withAttackUnit;
 			overload.exploreArea = null;
 			overload.followingAttackUnit = target;
-			overload.dropshipUnitList.clear();
 
 			withAttackUnitOverloadList.add(overload);
 			number--;
@@ -288,20 +391,20 @@ public class OverloadManager {
 		return queue;
 	}
 
-	private void tmp() {
-		System.out.println("여기가문제니?");
-		for (BaseLocation baseLocation : InformationManager.Instance()
-				.getOccupiedBaseLocations(InformationManager.Instance().selfPlayer)) {
-			addExploreArea(baseLocation.getPosition());
-			addExploreArea(bwta.BWTA.getNearestChokepoint(baseLocation.getPosition()).getCenter());
-		}
-	}
-	
 	private static String listTostring(List<OverloadInfo> list) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("size : " + list.size() + " units : ");
-		for(OverloadInfo overloadInfo : list) {
+		for (OverloadInfo overloadInfo : list) {
 			sb.append(overloadInfo.overLoad.getID() + " ");
+		}
+		return sb.toString();
+	}
+
+	private static String listTostring2(List<WaitingLoadUnitAndOverload> list) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("size : " + list.size() + " units : ");
+		for (WaitingLoadUnitAndOverload waitingLoadUnitAndOverload : list) {
+			sb.append(waitingLoadUnitAndOverload.overloadInfo.overLoad.getID() + "&" + waitingLoadUnitAndOverload.unit.getID() + " " );
 		}
 		return sb.toString();
 	}

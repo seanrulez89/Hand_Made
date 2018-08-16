@@ -1824,6 +1824,9 @@ public class StrategyManager {
 		if(unit.getType()==UnitType.Zerg_Zergling) {
 			myZerglingList.add(unit);
 		}
+		if(unit.getType()==UnitType.Zerg_Overlord) {
+			OverloadManager.Instance().addOverload(unit);
+		}
 	}
 	
 	public void onUnitMorph(Unit unit) {
