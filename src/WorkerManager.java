@@ -75,7 +75,7 @@ public class WorkerManager {
 			}
 		}
 	    return mineralsNearDepot.get(1);
-	}
+	}//현재 미사용. 추후 확인 후 삭제 
 
 
 	public void updateWorkerStatus() {
@@ -133,17 +133,43 @@ public class WorkerManager {
 				// 타겟이 있냐 없냐로 일단 구분하고
 				if(target!=null)
 				{
-					if (worker.isUnderAttack()==true)
+					if (target.getType() ==  UnitType.Protoss_Probe
+							|| target.getType() ==  UnitType.Zerg_Drone
+							||  target.getType() ==  UnitType.Terran_SCV)
 					{
-						setMineralWorker(worker);
-						System.out.println("맞으니까 미네랄로 도망쳐");
-					}
-					else if(worker.getDistance(getClosestResourceDepotFromWorker(worker).getPosition()) < 32 * 8)
+						continue;
+					} // 정찰 일꾼은 무시한다
+
+					else if(worker.isUnderAttack()==true 
+							&& worker.getDistance(getClosestResourceDepotFromWorker(worker).getPosition()) < 32 * 8 
+							&& target.getType() ==  UnitType.Protoss_Probe
+							|| target.getType() ==  UnitType.Zerg_Drone
+							||  target.getType() ==  UnitType.Terran_SCV)
 					{
 						setCombatWorker(worker);
 						commandUtil.attackUnit(worker, target);
-						System.out.println("가까우니까 때려");
-					}
+						System.out.println("나를 공격한 정찰 일꾼 / 가까움 / 전투");
+					} //나를 공격한 일꾼은 때림
+					
+					else if(worker.getDistance(getClosestResourceDepotFromWorker(worker).getPosition()) < 32 * 8 
+							&& target.getType() !=  UnitType.Protoss_Probe
+							|| target.getType() !=  UnitType.Zerg_Drone
+							||  target.getType() !=  UnitType.Terran_SCV)
+					{
+						setCombatWorker(worker);
+						commandUtil.attackUnit(worker, target);
+						System.out.println("적군 / 가까움 / 전투");
+					} //가까운 적군은 떄림
+
+					else if (worker.isUnderAttack()==true
+							&& target.getType() !=  UnitType.Protoss_Probe
+							|| target.getType() !=  UnitType.Zerg_Drone
+							||  target.getType() !=  UnitType.Terran_SCV)
+					{
+						setMineralWorker(worker);
+						System.out.println("적군에게 맞으니까 미네랄로 도망쳐");
+					} //
+
 					else
 					{
 						setMineralWorker(worker);
