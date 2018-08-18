@@ -9,8 +9,226 @@ public class BuildOrder_Initial {
 
 	// 최초 빌드 : 9오버풀 2해처리 빠른 뮤탈리스크 6마리 5분 20초 생성
 	public void setInitialBuildOrder() {
+		
+
 
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
+				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Spawning_Pool,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery, 
+				new Position((StrategyManager.Instance().myMainBaseLocation.getX()+StrategyManager.Instance().myFirstChokePoint.getX())/2, 
+						(StrategyManager.Instance().myMainBaseLocation.getY()+StrategyManager.Instance().myFirstChokePoint.getY())/2 ).toTilePosition(), true);
+	
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true); //16
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true); // 19
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk_Den,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery, 
+				new Position((StrategyManager.Instance().myMainBaseLocation.getX()+StrategyManager.Instance().myFirstChokePoint.getX())/2, 
+						(StrategyManager.Instance().myMainBaseLocation.getY()+StrategyManager.Instance().myFirstChokePoint.getY())/2 ).toTilePosition(), true);
+	
+
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true); // 22
+		
+
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Grooved_Spines, true);
+		
+
+		
+		
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
+				BuildOrderItem.SeedPositionStrategy.SecondChokePoint);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
+				BuildOrderItem.SeedPositionStrategy.SecondChokePoint);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true); //26
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony,
+				BuildOrderItem.SeedPositionStrategy.SecondChokePoint);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony,
+				BuildOrderItem.SeedPositionStrategy.SecondChokePoint);
+		
+
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Muscular_Augments, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
+				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Lair,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+
+		
+		
+		
+/*/// 기존 빌드
+ * 		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
@@ -219,7 +437,7 @@ public class BuildOrder_Initial {
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
-				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);*/
 		
 
 		

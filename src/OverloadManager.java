@@ -174,7 +174,7 @@ public class OverloadManager {
 /*	
 	if (selfUnit.getType() == UnitType.Protoss_Shuttle) {
         if (BWTA.getRegion(selfUnit.getTilePosition()) != null) {
-           System.out.println("BWTA.getRegion(selfUnit.getTilePosition()) != null");
+           //System.out.println("BWTA.getRegion(selfUnit.getTilePosition()) != null");
            this.setSelfUnitRegion(BWTA.getRegion(selfUnit.getTilePosition()));
         }
      }
@@ -225,7 +225,7 @@ public class OverloadManager {
 	public boolean canDropshipsGoAttack() {
 		/*
 		if(waitOverloadList.size()!=0) {
-			System.out.println("--------------------------------------------------------------- 001");
+			//System.out.println("--------------------------------------------------------------- 001");
 			return false;
 		}
 		*/
@@ -233,11 +233,11 @@ public class OverloadManager {
 			if(overloadInfo.overLoad.getDistance(new Position(63*32, 63*32)) > 64 ) 
 			{
 				commandUtil.move(overloadInfo.overLoad, new Position(63*32, 63*32));
-				System.out.println("--------------------------------------------------------------- 002" + dropshipOverloadList.size());
+				//System.out.println("--------------------------------------------------------------- 002" + dropshipOverloadList.size());
 				return false;
 			}
 		}
-		System.out.println("--------------------------------------------------------------- 003" + dropshipOverloadList.size());
+		//System.out.println("--------------------------------------------------------------- 003" + dropshipOverloadList.size());
 		return true;
 	}
 
@@ -296,22 +296,22 @@ public class OverloadManager {
 				} else if (overloadInfo.status == overloadStatus.dropship) {
 					dropshipOverloadList.remove(overloadInfo);
 				} else {
-					System.out.println("문제가있어요!!!removeOverload");
+					//System.out.println("문제가있어요!!!removeOverload");
 				}
 				allOverloadList.remove(overloadInfo);
 				rebalance();
 				return;
 			}
 		}
-		System.out.println("문제가있엉요!!removeOverload");
+		//System.out.println("문제가있엉요!!removeOverload");
 	}
 
 	public void rebalance() {
-		System.out.println("세팅전");
-		System.out.println("allOverloadlist : " + listTostring(allOverloadList));
-		System.out.println("waitOverloadList : " + listTostring(waitOverloadList));
-		System.out.println("scoutOverloadList : " + listTostring(scoutOverloadList));
-		System.out.println("withAttackUnitOverloadList : " + listTostring(withAttackUnitOverloadList));
+		//System.out.println("세팅전");
+		//System.out.println("allOverloadlist : " + listTostring(allOverloadList));
+		//System.out.println("waitOverloadList : " + listTostring(waitOverloadList));
+		//System.out.println("scoutOverloadList : " + listTostring(scoutOverloadList));
+		//System.out.println("withAttackUnitOverloadList : " + listTostring(withAttackUnitOverloadList));
 		PriorityQueue<OverloadInfo> queue = priorityQueueInit();
 		listInit();
 
@@ -344,11 +344,11 @@ public class OverloadManager {
 		// 4. 남는 오버로드는 대기
 		queue = WaitAll(queue);
 
-		System.out.println("세팅후");
-		System.out.println("allOverloadlist : " + listTostring(allOverloadList));
-		System.out.println("waitOverloadList : " + listTostring(waitOverloadList));
-		System.out.println("scoutOverloadList : " + listTostring(scoutOverloadList));
-		System.out.println("withAttackUnitOverloadList : " + listTostring(withAttackUnitOverloadList));
+		//System.out.println("세팅후");
+		//System.out.println("allOverloadlist : " + listTostring(allOverloadList));
+		//System.out.println("waitOverloadList : " + listTostring(waitOverloadList));
+		//System.out.println("scoutOverloadList : " + listTostring(scoutOverloadList));
+		//System.out.println("withAttackUnitOverloadList : " + listTostring(withAttackUnitOverloadList));
 	}
 
 	public void onUpdate() {
@@ -411,17 +411,17 @@ public class OverloadManager {
 				// 아직 미구현 --> 쓸 일 없음
 			}
 		}
-		System.out.println("waitDropshipUnitList : " + listTostring2(waitDropshipUnitList));
-		System.out.println("dropshipOverloadList : " + listTostring(dropshipOverloadList));
+		//System.out.println("waitDropshipUnitList : " + listTostring2(waitDropshipUnitList));
+		//System.out.println("dropshipOverloadList : " + listTostring(dropshipOverloadList));
 	}
 
 	private static PriorityQueue<OverloadInfo> priorityQueueInit() {
-		System.out.println("priorityQueueInit");
-		System.out.println("allOverloadlist : " + listTostring(allOverloadList));
-		System.out.println("waitOverloadList : " + listTostring(waitOverloadList));
-		System.out.println("scoutOverloadList : " + listTostring(scoutOverloadList));
-		System.out.println("withAttackUnitOverloadList : " + listTostring(withAttackUnitOverloadList));
-		System.out.println("dropshipOverloadList : " + listTostring(dropshipOverloadList));
+		//System.out.println("priorityQueueInit");
+		//System.out.println("allOverloadlist : " + listTostring(allOverloadList));
+		//System.out.println("waitOverloadList : " + listTostring(waitOverloadList));
+		//System.out.println("scoutOverloadList : " + listTostring(scoutOverloadList));
+		//System.out.println("withAttackUnitOverloadList : " + listTostring(withAttackUnitOverloadList));
+		//System.out.println("dropshipOverloadList : " + listTostring(dropshipOverloadList));
 		PriorityQueue<OverloadInfo> queue = new PriorityQueue<OverloadInfo>(10, new Comparator<OverloadInfo>() {
 			@Override
 			public int compare(OverloadInfo o1, OverloadInfo o2) {
@@ -431,7 +431,7 @@ public class OverloadManager {
 		queue.addAll(waitOverloadList);
 		queue.addAll(scoutOverloadList);
 		queue.addAll(withAttackUnitOverloadList);
-		System.out.println("queue : " + queue);
+		//System.out.println("queue : " + queue);
 		return queue;
 	}
 

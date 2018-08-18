@@ -95,7 +95,8 @@ public class UnitControl_Hydralisk {
 						|| enemy.getType().equals(UnitType.Terran_Firebat)
 						|| enemy.getType().equals(UnitType.Zerg_Zergling)
 						|| enemy.getType().equals(UnitType.Zerg_Ultralisk)
-						|| enemy.getType().equals(UnitType.Protoss_Zealot))
+						|| enemy.getType().equals(UnitType.Protoss_Zealot)
+						|| enemy.getType().equals(UnitType.Terran_Medic))
 
 				{
 					closeUnit.add(enemy);					
@@ -105,7 +106,7 @@ public class UnitControl_Hydralisk {
 						|| enemy.getType().equals(UnitType.Zerg_Defiler)
 						|| enemy.getType().equals(UnitType.Protoss_High_Templar)
 						|| enemy.getType().equals(UnitType.Terran_Vulture_Spider_Mine)
-						|| enemy.getType().equals(UnitType.Terran_Medic))
+						)
 				{
 					specialUnit.add(enemy);					
 				}
@@ -355,14 +356,44 @@ public class UnitControl_Hydralisk {
 			
 			if (nextTarget != null) 
 			{
+				/*
 				catchAndAttackUnit(Hydralisk, nextTarget);
 				continue;
-				
+				*/
 				
 				
 				/*
 				commandUtil.attackUnit(Hydralisk, nextTarget);
 				continue;
+				*/
+				
+				if (Hydralisk.getGroundWeaponCooldown() == 0) 
+				{
+					//System.out.println("사정거리 이내 / 쿨타임 0");
+					commandUtil.attackUnit(Hydralisk, nextTarget);
+					continue;
+				}				
+				else if(Hydralisk.isUnderAttack())
+				{
+					System.out.println("공격받아서 집으로");
+					commandUtil.move(Hydralisk, SM.myMainBaseLocation.getPosition());
+					continue;
+				}
+				else if(PredictMovement(nextTarget,24).getDistance(Hydralisk) < Hydralisk.getType().groundWeapon().maxRange())
+				{
+					System.out.println("가까워서 멀어져라");
+					commandUtil.move(Hydralisk, PredictMovement(nextTarget,72));
+					continue;
+				}
+				
+				
+				/*
+				else if(Hydralisk.isUnderAttack())//(nextTarget.getDistance(Hydralisk.getPosition()) < Hydralisk.getType().groundWeapon().maxRange())
+				{
+					//System.out.println("사정거리 이내 / 쿨타임 0 아님 / 공격받는중");
+					commandUtil.move(Hydralisk, SM.myMainBaseLocation.getPosition());
+					continue;
+				}
 				*/
 				
 				

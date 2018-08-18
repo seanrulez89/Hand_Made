@@ -36,6 +36,7 @@ public class StrategyManager {
 
 	
 	static int attack_cnt;
+
 	public Position attackTargetPosition;
 
 	UnitControl_MASTER UnitControl_MASTER;
@@ -174,6 +175,7 @@ public class StrategyManager {
 
 		/// 변수 초기값을 설정합니다
 		setVariables();
+		updateVariables();
 		
 		UnitControl_MASTER = new UnitControl_MASTER();
 		
@@ -295,6 +297,8 @@ public class StrategyManager {
 		/// 전반적인 전투 로직 을 갖고 전투를 수행합니다
 		executeCombat();
 
+
+		
 		
 		BuildOrder_Last.Instance().lastBuildOrder();
 		
@@ -660,7 +664,7 @@ public class StrategyManager {
 					}
 				}
 			}	
-
+			/*
 			int numberOfMyCombatUnitTrainingBuilding = 0;
 			numberOfMyCombatUnitTrainingBuilding += myPlayer.allUnitCount(UnitType.Zerg_Hatchery);
 			numberOfMyCombatUnitTrainingBuilding += myPlayer.allUnitCount(UnitType.Zerg_Lair);
@@ -676,7 +680,7 @@ public class StrategyManager {
 					.getConstructionQueueItemCount(UnitType.Zerg_Lair, null);
 			numberOfMyCombatUnitTrainingBuilding += ConstructionManager.Instance()
 					.getConstructionQueueItemCount(UnitType.Zerg_Hive, null);
-			
+			*/
 			
 			
 			if(workerCount>65)
@@ -723,7 +727,11 @@ public class StrategyManager {
 							// 빌드큐에 일꾼 생산이 1개는 있도록 한다
 							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Drone, null) == 0) {
 
-								BuildManager.Instance().buildQueue.queueAsHighestPriority(
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(
+										new MetaType(InformationManager.Instance().getWorkerType()), false);
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(
+										new MetaType(InformationManager.Instance().getWorkerType()), false);
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(
 										new MetaType(InformationManager.Instance().getWorkerType()), false);
 							}
 						}
@@ -759,6 +767,10 @@ public class StrategyManager {
 				&& MyBotModule.Broodwar.self().supplyUsed() <= MyBotModule.Broodwar.self().supplyTotal()) {
 			return;
 		}
+		
+		
+		
+		
 
 		// 1초에 한번만 실행
 		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) {
@@ -947,8 +959,34 @@ public class StrategyManager {
 		{
 			//System.out.println("numberOfMyCombatUnitTrainingBuilding : " + numberOfMyCombatUnitTrainingBuilding);
 			
+			if(numberOfMyCombatUnitTrainingBuilding == 4)
+			{
+				if (nextExpansion.getGeysers().size()>0)
+				{
+					if(availableMinerals>200 && buildNUM == 0 && constNUM == 0)
+					{
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
+								nextExpansion.getTilePosition(), true);
+						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
+								nextExpansion.getTilePosition(), true);
+						
+						System.out.println(1);
+					}
+				}
+				else
+				{
+					if(availableMinerals>200 && buildNUM == 0 && constNUM == 0)
+					{
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
+								nextExpansion.getTilePosition(), true);
+						System.out.println(2);
+					}
+					
+				}
+				
+			}
 			
-			if(numberOfMyCombatUnitTrainingBuilding == 3
+			else if(numberOfMyCombatUnitTrainingBuilding == 3
 					|| numberOfMyCombatUnitTrainingBuilding == 5
 					|| numberOfMyCombatUnitTrainingBuilding == 7
 					|| numberOfMyCombatUnitTrainingBuilding == 9
@@ -1165,7 +1203,7 @@ public class StrategyManager {
 			if (myPlayer.getUpgradeLevel(necessaryUpgradeType2) == 0
 					&& myPlayer.isUpgrading(necessaryUpgradeType2) == false
 					&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType2) == 0) {
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType2, false);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType2, true);
 			}
 			else if(myPlayer.getUpgradeLevel(necessaryUpgradeType2) == 1)
 			{
@@ -1686,7 +1724,7 @@ public class StrategyManager {
 
 		enemyRace = InformationManager.Instance().enemyRace;
 
-		if (BuildManager.Instance().buildQueue.isEmpty()) {
+		if (BuildManager.Instance().buildQueue.isEmpty() && MyBotModule.Broodwar.getFrameCount()>240) {
 			isInitialBuildOrderFinished = true;
 		}
 

@@ -10,12 +10,12 @@ public class BuildOrder_Expansion {
 	
 
 	public static BaseLocation expansion() {
-		
+		/*
 		if(StrategyManager.Instance().enemyMainBaseLocation==null)
 		{
 			return null;
 		}
-		
+		*/
 		
 		BaseLocation nextEXP = null;
 
@@ -62,8 +62,15 @@ public class BuildOrder_Expansion {
 		}
 
 		
+		
+		
 		for (BaseLocation EXPLocation : EXPLocations)
 		{
+			if(EXPLocation.getGeysers().size()==0)
+			{
+				continue;
+			}
+			
 			distanceFromMyLocation = EXPLocation.getDistance(StrategyManager.Instance().myMainBaseLocation);
 
 			for (BaseLocation enemyBaseLocation : enemyBaseLocations) 
