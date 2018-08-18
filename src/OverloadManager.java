@@ -2,7 +2,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -133,28 +135,109 @@ public class OverloadManager {
 	}
 
 	public void unloadDropshipUnits(Unit overload) {
-		for (OverloadInfo overloadInfo : dropshipOverloadList) {
-			if (overload.getID() == overloadInfo.overLoad.getID()) {
+		for (OverloadInfo overloadInfo : dropshipOverloadList) 
+		{
+			if (overload.getID() == overloadInfo.overLoad.getID()) 			
+			{
+				if(overload.getTilePosition()!=null && bwta.BWTA.getRegion(overload.getTilePosition())!=null)
+				{
+					if(bwta.BWTA.getRegion(overload.getTilePosition()).getPolygon().isInside(StrategyManager.Instance().enemyMainBaseLocation.getPosition()))
+					{
+						if (overload.canUnload()) 
+						{
+							overload.unloadAll();
+							dropshipOverloadList.remove(overloadInfo);
+							overloadInfo.status = overloadStatus.wait;
+							waitOverloadList.add(overloadInfo);
+							break;
+						}
+					} 
+					else
+					{
+						commandUtil.move(overload, StrategyManager.Instance().enemyMainBaseLocation.getPosition());
+					}
+					
+				}
+				
+				/*
 				if (overload.unloadAll()) {
 					dropshipOverloadList.remove(overloadInfo);
 					overloadInfo.status = overloadStatus.wait;
 					waitOverloadList.add(overloadInfo);
 				}
 				break;
+				*/
 			}
 		}
 	}
 	
+/*	
+	if (selfUnit.getType() == UnitType.Protoss_Shuttle) {
+        if (BWTA.getRegion(selfUnit.getTilePosition()) != null) {
+           System.out.println("BWTA.getRegion(selfUnit.getTilePosition()) != null");
+           this.setSelfUnitRegion(BWTA.getRegion(selfUnit.getTilePosition()));
+        }
+     }
+	
+	public void reaverAttack(Squad squad, SquadState ss) {
+	      
+	      int enemyCnt = ss.getEneUnitCnt();
+	      List<Unit> unitList = squad.getUnits();
+	      
+	      if (enemyCnt > 0 && ss.getSelfUnitRegion() != null && ss.getTargetUnit() != null) {
+	         if (ss.getSelfUnitRegion().getPolygon().isInside(ss.getTargetUnit().getPosition())) {
+	            for (Unit unit : unitList) {
+	               if (unit.getType() == UnitType.Protoss_Shuttle) 
+	               {
+	                  if (unit.canUnload()) 
+	                  {
+	                     unit.unloadAll();
+	                  }
+	               } else if(!unit.isLoaded()) {
+	                  commandUtil.attackMove(unit, squad.getTargetPosition());
+	               }
+	            }
+	         }
+
+	      } else {
+	         for (Unit unit : unitList) {
+	            if (unit.getType() == UnitType.Protoss_Shuttle) {
+	               unit.rightClick(squad.getTargetPosition());
+	            }
+	         }
+	      }
+	   }
+	
+	*/
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public boolean canDropshipsGoAttack() {
+		/*
 		if(waitOverloadList.size()!=0) {
+			System.out.println("--------------------------------------------------------------- 001");
 			return false;
 		}
-		
+		*/
 		for (OverloadInfo overloadInfo : dropshipOverloadList) {
-			if(overloadInfo.overLoad.getDistance(new Position(63*32, 63*32))>64) {
+			if(overloadInfo.overLoad.getDistance(new Position(63*32, 63*32)) > 64 ) 
+			{
+				commandUtil.move(overloadInfo.overLoad, new Position(63*32, 63*32));
+				System.out.println("--------------------------------------------------------------- 002" + dropshipOverloadList.size());
 				return false;
 			}
 		}
+		System.out.println("--------------------------------------------------------------- 003" + dropshipOverloadList.size());
 		return true;
 	}
 
@@ -269,6 +352,8 @@ public class OverloadManager {
 	}
 
 	public void onUpdate() {
+		
+		/*
 		for(WaitingLoadUnitAndOverload waitingLoadUnitAndOverload : waitDropshipUnitList) {
 			if(waitingLoadUnitAndOverload.unit.isLoaded()) {
 				waitDropshipUnitList.remove(waitingLoadUnitAndOverload);
@@ -278,6 +363,42 @@ public class OverloadManager {
 				commandUtil.move(waitingLoadUnitAndOverload.overloadInfo.overLoad, new Position(63*32, 63*32));
 			}
 		}
+		*/
+		
+		/*
+		Iterator <WaitingLoadUnitAndOverload> lir = waitDropshipUnitList.iterator();		
+		while(lir.hasNext())
+		{
+			WaitingLoadUnitAndOverload waitingLoadUnitAndOverload = lir.next();
+			
+			if(waitingLoadUnitAndOverload.unit.isLoaded()) {
+				waitDropshipUnitList.remove(waitingLoadUnitAndOverload);
+			}else if(waitingLoadUnitAndOverload.unit.canLoad(waitingLoadUnitAndOverload.overloadInfo.overLoad) == false) {
+				waitDropshipUnitList.remove(waitingLoadUnitAndOverload);
+				addDropshipUnit(waitingLoadUnitAndOverload.unit);
+				commandUtil.move(waitingLoadUnitAndOverload.overloadInfo.overLoad, new Position(63*32, 63*32));
+			}
+		}
+		*/
+		
+		for(int i=0; i<waitDropshipUnitList.size(); i++)
+		{
+			WaitingLoadUnitAndOverload waitingLoadUnitAndOverload = waitDropshipUnitList.get(i);
+			
+			if(waitingLoadUnitAndOverload.unit.isLoaded()) {
+				waitDropshipUnitList.remove(waitingLoadUnitAndOverload);
+			}else if(waitingLoadUnitAndOverload.unit.canLoad(waitingLoadUnitAndOverload.overloadInfo.overLoad) == false) {
+				waitDropshipUnitList.remove(waitingLoadUnitAndOverload);
+				addDropshipUnit(waitingLoadUnitAndOverload.unit);
+				commandUtil.move(waitingLoadUnitAndOverload.overloadInfo.overLoad, new Position(63*32, 63*32));
+			}
+			
+		}
+		
+		
+		
+		
+		
 		
 		for (OverloadInfo overload : allOverloadList) {
 			if (overload.status == overloadStatus.withAttackUnit) {

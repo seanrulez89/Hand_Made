@@ -65,10 +65,21 @@ public class UnitControl_Lurker {
 					}
 					*/
 					
+					if(unit.isBurrowed())
+					{
+						unit.unburrow();
+					}
+					
+					if(unit.isLoaded()==false)
+					{
+						OverloadManager.Instance().addDropshipUnit(unit);
+					}
 					
 					
 					
 					
+					
+					/*
 					Unit tempEnemy = null;
 					
 					for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 5*Config.TILE_SIZE))
@@ -108,7 +119,7 @@ public class UnitControl_Lurker {
 						//unit.move(SM.enemyMainBaseLocation.getPosition());
 					}
 					
-					
+					*/
 					
 				}
 			}

@@ -386,7 +386,7 @@ public class StrategyManager {
 
 		MyBotModule.Broodwar.drawTextScreen(100, 240, "Wave Count : " + attack_cnt);
 			
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Lurker) > 4) {
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Lurker) > 4 && myPlayer.getUpgradeLevel(UpgradeType.Ventral_Sacs)==1) {
 
 			if (myHydraliskList.size() > 20) {
 				attack_cnt = attack_cnt + 1;
@@ -395,7 +395,7 @@ public class StrategyManager {
 
 		}
 		
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Zergling) > 30) {
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Zergling) > 30 && myPlayer.getUpgradeLevel(UpgradeType.Ventral_Sacs)==1) {
 			if (myHydraliskList.size() > 20) {
 				attack_cnt = attack_cnt + 1;
 				return true;

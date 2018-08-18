@@ -286,10 +286,57 @@ public class UnitControl_Overlord {
 			Position chokePoint = bwta.BWTA.getNearestChokepoint(baseLocation.getPosition()).getCenter();
 			OverloadManager.Instance().addExploreArea(chokePoint);
 		}
+		/*
+		// 확장기지 중에 아직 정찰이 안된 곳을 다녀봐라, 다녀보면 나중에는 다시 안감, 권순우
+		for(BaseLocation EXPLocation : BWTA.getBaseLocations())
+		{
+			if(MyBotModule.Broodwar.isExplored(EXPLocation.getTilePosition())==false)
+			{
+				OverloadManager.Instance().addExploreArea(EXPLocation.getPosition());
+			}
+		}
+		*/
+		OverloadManager.Instance().addExploreArea(SM.myFirstChokePoint.getPoint());
+		OverloadManager.Instance().addExploreArea(SM.mySecondChokePoint.getPoint());		
+		//explorationSite.add(new Position(63*32, 63*32));
+		
+		if(MyBotModule.Broodwar.mapFileName().equals("(4)CircuitBreaker.scx"))
+		{
+			/*
+			 * 그 외 별도 지정좌표
+			 */			
+		}
+		else
+		{
+			/*
+			 * 그 외 별도 지정좌표
+			 */
+		}
+		
+		
+		
 		OverloadManager.Instance().updateWithCombatUnitNum(UnitType.Zerg_Hydralisk, 2);
 		OverloadManager.Instance().updateWithCombatUnitNum(UnitType.Zerg_Mutalisk, 2);
 		
-		OverloadManager.Instance().onUpdate();
+		OverloadManager.Instance().onUpdate();	
+		
+		
+		if(OverloadManager.Instance().canDropshipsGoAttack()==true)
+		{
+			ArrayList<Unit> myOverLords = getOverLords();
+			
+			if(myOverLords.size()>0)
+			{
+				for(int i = 0 ; i < myOverLords.size() ; i++)
+				{
+					Unit overload = myOverLords.get(i);				
+					OverloadManager.Instance().unloadDropshipUnits(overload);
+				}
+			}
+		}
+		
+		
+		
 		
 /*		ArrayList<Unit> myOverLords = getOverLords();
 		
