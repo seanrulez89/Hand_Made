@@ -379,13 +379,14 @@ public class UnitControl_Hydralisk {
 					commandUtil.move(Hydralisk, SM.myMainBaseLocation.getPosition());
 					continue;
 				}
+				/*
 				else if(PredictMovement(nextTarget,24).getDistance(Hydralisk) < Hydralisk.getType().groundWeapon().maxRange())
 				{
 					//System.out.println("가까워서 멀어져라");
 					commandUtil.move(Hydralisk, PredictMovement(nextTarget,72));
 					continue;
 				}
-				
+				*/
 				
 				/*
 				else if(Hydralisk.isUnderAttack())//(nextTarget.getDistance(Hydralisk.getPosition()) < Hydralisk.getType().groundWeapon().maxRange())

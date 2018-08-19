@@ -231,12 +231,12 @@ public class UnitControl_Zergling {
 			Unit Zergling = SM.myZerglingList.get(i);
 			
 			
-			if(i==1 && Zergling!=null)
+			if(i==1 && Zergling!=null && positionAssigned_01 != null)
 			{
 				commandUtil.attackMove(Zergling, positionAssigned_01);
 				continue;
 			}
-			else if(i==2 && Zergling!=null )
+			else if(i==2 && Zergling!=null && scoutZerglingFleePosition != null && positionAssigned_02!=null)
 			{
 				
 				
@@ -255,7 +255,7 @@ public class UnitControl_Zergling {
 					}
 				}
 				
-				if(Zergling.getDistance(willBeThere) < 32)
+				if(willBeThere!=null && Zergling.getDistance(willBeThere) < 32 )
 				{
 					System.out.println("적 리셋");
 					willBeThere = null;

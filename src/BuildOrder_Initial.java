@@ -45,14 +45,16 @@ public class BuildOrder_Initial {
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
 				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Spawning_Pool,
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
@@ -69,14 +71,19 @@ public class BuildOrder_Initial {
 				new Position((StrategyManager.Instance().myMainBaseLocation.getX()+StrategyManager.Instance().myFirstChokePoint.getX())/2, 
 						(StrategyManager.Instance().myMainBaseLocation.getY()+StrategyManager.Instance().myFirstChokePoint.getY())/2 ).toTilePosition(), true);
 	
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling,
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling,
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
