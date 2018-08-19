@@ -26,6 +26,12 @@ public class UnitControl_Zergling {
 	static int gatherIndex = UnitControl_COMMON.moveIndex - 1;
 
 
+	static Position positionAssigned_01 = null;
+	static Position positionAssigned_02 = null;
+	static Position scoutZerglingFleePosition = null;
+	static Position willBeThere = null;
+	static boolean runrunrun = false;
+	
 
 
 	public Unit getNextTargetOf(UnitType myUnitType, Position averagePosition) {
@@ -92,7 +98,70 @@ public class UnitControl_Zergling {
 		return nextTarget;
 	}
 	
+	public void setPositionAssigned()
+	{
+		List<BaseLocation> enemyBaseLocations = InformationManager.Instance()
+				.getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer);
+
+		List<BaseLocation> EXPLocations = BWTA.getBaseLocations();
+
+		double minDistance = 1000000000;
+		double distanceFromEnemyLocation = 0;
 	
+		
+		for (BaseLocation EXPLocation : EXPLocations)
+		{
+			for (BaseLocation enemyBaseLocation : enemyBaseLocations) 
+			{
+				distanceFromEnemyLocation = EXPLocation.getDistance(enemyBaseLocation);
+
+				if (minDistance > distanceFromEnemyLocation) 
+				{
+					if(EXPLocation.getPosition().equals(StrategyManager.Instance().enemyFirstExpansionLocation.getPosition())==false)
+					{
+						if(EXPLocation.getPosition().equals(StrategyManager.Instance().enemyMainBaseLocation.getPosition())==false)
+						{
+							minDistance = distanceFromEnemyLocation;
+							positionAssigned_01 = EXPLocation.getPosition();
+						}
+						
+						
+					}
+					
+								
+				}
+			}
+		}
+		
+		
+		positionAssigned_02 = UnitControl_COMMON.positionList.get(4);
+		
+		
+		for(BaseLocation startLocation : BWTA.getStartLocations())
+		{
+			if(startLocation.getPosition().equals(StrategyManager.Instance().enemyMainBaseLocation.getPosition())==false)
+			{
+				if(startLocation.getPosition().equals(StrategyManager.Instance().myMainBaseLocation.getPosition())==false)
+				{
+					scoutZerglingFleePosition = startLocation.getPosition();
+				}
+			}
+		}
+		
+		
+		
+		
+	}
+	
+	
+	private Position PredictMovement(Unit target, int frames) {
+		Position pos =  new Position(
+				target.getPosition().getX() + (int)(frames * target.getVelocityX()),
+				target.getPosition().getY() + (int)(frames * target.getVelocityY())
+			);
+		//ClipToMap(pos);
+		return pos;
+	}
 	
 
 	
@@ -116,6 +185,13 @@ public class UnitControl_Zergling {
 			return;
 		}
 			
+		if(positionAssigned_01 == null || positionAssigned_02 == null || MyBotModule.Broodwar.getFrameCount() % 24*60*3 == 0)
+		{
+			setPositionAssigned();			
+		}
+		
+		
+		
 		
 		
 		
@@ -145,14 +221,79 @@ public class UnitControl_Zergling {
 		int i = 0;
 
 
-		List <Unit> goUp = MyBotModule.Broodwar.getUnitsInRadius(SM.enemyFirstChokePoint.getCenter(), 3*Config.TILE_SIZE);
-		MyBotModule.Broodwar.drawCircleMap(SM.enemyFirstChokePoint.getCenter(), 3*Config.TILE_SIZE, Color.Orange);
+		//List <Unit> goUp = MyBotModule.Broodwar.getUnitsInRadius(SM.enemyFirstChokePoint.getCenter(), 3*Config.TILE_SIZE);
+		//MyBotModule.Broodwar.drawCircleMap(SM.enemyFirstChokePoint.getCenter(), 3*Config.TILE_SIZE, Color.Orange);
 
 		
 		
-		for(i=0 ; i<SM.myZerglingList.size() ; i++)
+		a: for(i=0 ; i<SM.myZerglingList.size() ; i++)
 		{
 			Unit Zergling = SM.myZerglingList.get(i);
+			
+			
+			if(i==1 && Zergling!=null)
+			{
+				commandUtil.attackMove(Zergling, positionAssigned_01);
+				continue;
+			}
+			else if(i==2 && Zergling!=null )
+			{
+				
+				
+				int cnt = 0;
+				for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(Zergling.getPosition(), Zergling.getType().sightRange()))
+				{
+					if(enemy.getPlayer()==enemyPlayer )//&& MyBotModule.Broodwar.getFrameCount() % 24 == 0)
+					{
+						System.out.println("적군 유인");
+						willBeThere = PredictMovement(enemy, 24);
+						
+						commandUtil.move(Zergling, scoutZerglingFleePosition);
+						runrunrun = true;
+						cnt++;
+						continue a;
+					}
+				}
+				
+				if(Zergling.getDistance(willBeThere) < 32)
+				{
+					System.out.println("적 리셋");
+					willBeThere = null;
+				}
+				
+				
+				
+				if(cnt==0)
+				{
+					runrunrun=false;
+					
+				}
+				
+				
+				if(runrunrun==false)
+				{
+					if(willBeThere!=null)
+					{
+						System.out.println("예상적목표향해이동");
+						commandUtil.attackMove(Zergling, willBeThere);
+						continue;
+					}
+					else
+					{
+						System.out.println("정찰위치로이동");
+						commandUtil.attackMove(Zergling, positionAssigned_02);
+						continue;
+					}
+					
+					
+				}
+				
+				
+			}
+			
+			
+			
+			
 			
 			/*boolean shouldGoUp = false;
 			for(Unit tempUnit : goUp)
@@ -211,7 +352,15 @@ public class UnitControl_Zergling {
 			
 			if (defenseSite.isEmpty()==false && Zergling.isAttacking()==false)
 			{
-				commandUtil.attackMove(Zergling, UnitControl_COMMON.getClosestDefenseSite(Zergling));				
+				Position toSearch = UnitControl_COMMON.getClosestDefenseSite(Zergling);
+				Unit tt = getNextTargetOf(UnitType.Zerg_Zergling, toSearch);
+				
+				if(tt!=null) 
+				{
+					commandUtil.attackMove(Zergling, toSearch);
+				}
+				
+								
 			}
 			else if(SM.combatState == StrategyManager.CombatState.attackStarted)
 			{

@@ -406,6 +406,13 @@ public class StrategyManager {
 			}
 		}
 		
+		if(MyBotModule.Broodwar.self().supplyTotal() > 350)
+		{
+			attack_cnt = attack_cnt + 1;
+			return true;
+		}
+		
+		
 		
 		
 		return false;
@@ -727,12 +734,9 @@ public class StrategyManager {
 							// 빌드큐에 일꾼 생산이 1개는 있도록 한다
 							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Drone, null) == 0) {
 
-								BuildManager.Instance().buildQueue.queueAsLowestPriority(
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(
 										new MetaType(InformationManager.Instance().getWorkerType()), false);
-								BuildManager.Instance().buildQueue.queueAsLowestPriority(
-										new MetaType(InformationManager.Instance().getWorkerType()), false);
-								BuildManager.Instance().buildQueue.queueAsLowestPriority(
-										new MetaType(InformationManager.Instance().getWorkerType()), false);
+								
 							}
 						}
 					}
@@ -985,6 +989,8 @@ public class StrategyManager {
 				}
 				
 			}
+			
+			//System.out.println("");
 			
 			else if(numberOfMyCombatUnitTrainingBuilding == 3
 					|| numberOfMyCombatUnitTrainingBuilding == 5

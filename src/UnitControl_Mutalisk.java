@@ -490,7 +490,7 @@ public class UnitControl_Mutalisk {
 		
 		if(includeCase==0)
 		{
-			return SM.myFirstExpansionLocation.getPosition();
+			return SM.myMutaliskList.get(0).getPosition();
 		}
 		
 		
@@ -981,6 +981,13 @@ public class UnitControl_Mutalisk {
 				}
 
 			}
+			
+			if(MyBotModule.Broodwar.getFrameCount() % 3 == 0)
+			{
+				commandUtil.move(Mutalisk, averagePosition);
+				continue;
+			}
+			
 			
 			if(SM.enemyMainBaseLocation == null)
 			{

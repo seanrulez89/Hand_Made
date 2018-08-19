@@ -302,8 +302,8 @@ public class UnitControl_Hydralisk {
 		int i = 0;
 
 
-		List <Unit> goUp = MyBotModule.Broodwar.getUnitsInRadius(SM.enemyFirstChokePoint.getCenter(), 3*Config.TILE_SIZE);
-		MyBotModule.Broodwar.drawCircleMap(SM.enemyFirstChokePoint.getCenter(), 3*Config.TILE_SIZE, Color.Orange);
+		//List <Unit> goUp = MyBotModule.Broodwar.getUnitsInRadius(SM.enemyFirstChokePoint.getCenter(), 3*Config.TILE_SIZE);
+		//MyBotModule.Broodwar.drawCircleMap(SM.enemyFirstChokePoint.getCenter(), 3*Config.TILE_SIZE, Color.Orange);
 
 		
 		
@@ -375,13 +375,13 @@ public class UnitControl_Hydralisk {
 				}				
 				else if(Hydralisk.isUnderAttack())
 				{
-					System.out.println("공격받아서 집으로");
+					//System.out.println("공격받아서 집으로");
 					commandUtil.move(Hydralisk, SM.myMainBaseLocation.getPosition());
 					continue;
 				}
 				else if(PredictMovement(nextTarget,24).getDistance(Hydralisk) < Hydralisk.getType().groundWeapon().maxRange())
 				{
-					System.out.println("가까워서 멀어져라");
+					//System.out.println("가까워서 멀어져라");
 					commandUtil.move(Hydralisk, PredictMovement(nextTarget,72));
 					continue;
 				}

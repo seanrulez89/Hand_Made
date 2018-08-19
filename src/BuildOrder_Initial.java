@@ -205,6 +205,7 @@ public class BuildOrder_Initial {
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+		/*
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
@@ -220,11 +221,12 @@ public class BuildOrder_Initial {
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord,
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-		
+		*/
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Lair,
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 
-		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		
 		
 /*/// 기존 빌드
