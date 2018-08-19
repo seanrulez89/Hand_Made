@@ -323,7 +323,7 @@ public class UnitControl_Overlord {
 		
 		if(OverloadManager.Instance().canDropshipsGoAttack()==true)
 		{
-			ArrayList<Unit> myOverLords = getOverLords();
+/*			ArrayList<Unit> myOverLords = getOverLords();
 			
 			if(myOverLords.size()>0)
 			{
@@ -333,6 +333,8 @@ public class UnitControl_Overlord {
 					OverloadManager.Instance().unloadDropshipUnits(overload);
 				}
 			}
+*/
+			OverloadManager.Instance().goDropships();
 		}
 		
 		
