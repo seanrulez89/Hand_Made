@@ -71,14 +71,9 @@ public class ScoutManager {
 	/// 정찰 유닛을 지정하고, 정찰 상태를 업데이트하고, 정찰 유닛을 이동시킵니다
 	public void update()
 	{
+		
 		if (InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer) != null) 		
-		{
-			if(comeBackHome==false)
-			{
-				//moveScoutUnit();
-				comeBackHome=true;
-			}
-			
+		{		
 			return;
 		}
 			
@@ -126,31 +121,52 @@ public class ScoutManager {
 
 		if (enemyBaseLocation == null) {
 			// assign a scout to go scout it
-			if (secondScoutUnit != null) {
-				if (secondScoutTargetBaseLocation == null) {
+			if (secondScoutUnit != null) 
+			{
+				if (secondScoutTargetBaseLocation == null) 
+				{
 					secondScoutTargetBaseLocation = getClosestBaseLocation();
-				} else {
-					if (MyBotModule.Broodwar.isExplored(secondScoutTargetBaseLocation.getTilePosition())) {
+				} 
+				else 
+				{
+					if (MyBotModule.Broodwar.isExplored(secondScoutTargetBaseLocation.getTilePosition())) 
+					{
 						secondScoutTargetBaseLocation = getClosestBaseLocation();
-					} else {
+					} 
+					else 
+					{
 						commandUtil.move(secondScoutUnit, secondScoutTargetBaseLocation.getPosition());
 					}
 				}
 			}
 			
-			if (firstScoutUnit != null) {
-				if (firstScoutTargetBaseLocation == null) {
+			if (firstScoutUnit != null) 
+			{
+				if (firstScoutTargetBaseLocation == null) 
+				{
 					firstScoutTargetBaseLocation = getClosestBaseLocation();
-				} else {
-					if (MyBotModule.Broodwar.isExplored(firstScoutTargetBaseLocation.getTilePosition())) {
+				} 
+				else 
+				{
+					if (MyBotModule.Broodwar.isExplored(firstScoutTargetBaseLocation.getTilePosition())) 
+					{
 						firstScoutTargetBaseLocation = getClosestBaseLocation();
-					} else {
+					} 
+					else 
+					{
 						commandUtil.move(firstScoutUnit, firstScoutTargetBaseLocation.getPosition());
 					}
 				}
 			}
 			
+			/*
+			둘 중의 하나가 죽었는데 죽은애가 살짝 걸쳐서 보긴 봤는데 실제로 정보 업데이트는 못 했다면,
+			나머지 하나가 죽은 애가 향하던 곳으로 마저 정찰해야 한다
 			
+			
+			
+			
+			*/
 
 			
 			

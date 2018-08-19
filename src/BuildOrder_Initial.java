@@ -51,7 +51,7 @@ public class BuildOrder_Initial {
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
-				BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		
 		
 		

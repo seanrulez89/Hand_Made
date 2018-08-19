@@ -239,7 +239,7 @@ public class UnitControl_Zergling {
 				//commandUtil.attackMove(Zergling, positionAssigned_01);
 				continue;
 			}
-			else if(i==2 && Zergling!=null && scoutZerglingFleePosition != null && positionAssigned_02!=null)
+			else if(i==0 && Zergling!=null && scoutZerglingFleePosition != null && positionAssigned_02!=null)
 			{
 				
 				

@@ -207,8 +207,8 @@ public class UnitControl_COMMON {
 			
 			defenseSite.add(position);
 			
-			Position chokePoint = bwta.BWTA.getNearestChokepoint(position).getCenter();
-			defenseSite.add(chokePoint);
+			//Position chokePoint = bwta.BWTA.getNearestChokepoint(position).getCenter();
+			//defenseSite.add(chokePoint);
 			
 		}
 		

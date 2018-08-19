@@ -792,7 +792,7 @@ public class StrategyManager {
 		// InitialBuildOrder 진행중에는 아무것도 하지 않습니다
 		// InitialBuildOrder 진행중이라도 supplyUsed 가 supplyTotal 보다 커져버리면 실행하도록 합니다
 		if (isInitialBuildOrderFinished == false
-				&& MyBotModule.Broodwar.self().supplyUsed() >= MyBotModule.Broodwar.self().supplyTotal()) {
+				&& MyBotModule.Broodwar.self().supplyUsed() <= MyBotModule.Broodwar.self().supplyTotal()) {
 			return;
 		}
 		
@@ -811,10 +811,10 @@ public class StrategyManager {
 			// 서플라이가 다 꽉찼을때 새 서플라이를 지으면 지연이 많이 일어나므로, supplyMargin (게임에서의 서플라이 마진 값의 2배)만큼
 			// 부족해지면 새 서플라이를 짓도록 한다
 			// 이렇게 값을 정해놓으면, 게임 초반부에는 서플라이를 너무 일찍 짓고, 게임 후반부에는 서플라이를 너무 늦게 짓게 된다
-			int supplyMargin = 12;
+			int supplyMargin = 18;
 			
 			
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)>2)
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)>4)
 			{
 				supplyMargin = 36;
 			}
