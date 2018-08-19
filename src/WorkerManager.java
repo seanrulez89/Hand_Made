@@ -126,7 +126,7 @@ public class WorkerManager {
 			
 			if (MyBotModule.Broodwar.getFrameCount() < 7680 && MyBotModule.Broodwar.getFrameCount() > 240) {
 				
-				Unit target = getClosestEnemyUnitFromWorker(worker); //32*8 내에 있는 적을 반환한다
+				Unit target = getWeakestEnemyUnitFromWorker(worker); //32*8 내에 있는 적을 반환한다
 				// 권순우 5는 적어서 8로 늘림 
 				
 				
@@ -146,7 +146,7 @@ public class WorkerManager {
 							|| target.getType() ==  UnitType.Zerg_Drone
 							||  target.getType() ==  UnitType.Terran_SCV)
 					{
-						setCombatWorker(worker);
+						//setCombatWorker(worker);
 						commandUtil.attackUnit(worker, target);
 						System.out.println("나를 공격한 정찰 일꾼 / 가까움 / 전투");
 					} //나를 공격한 일꾼은 때림
@@ -156,7 +156,7 @@ public class WorkerManager {
 							|| target.getType() !=  UnitType.Zerg_Drone
 							||  target.getType() !=  UnitType.Terran_SCV)
 					{
-						setCombatWorker(worker);
+						//setCombatWorker(worker);
 						commandUtil.attackUnit(worker, target);
 						System.out.println("적군 / 가까움 / 전투");
 					} //가까운 적군은 떄림
@@ -222,7 +222,7 @@ public class WorkerManager {
 
 		//////// 초반 긴급 방어 구축
 
-		if (MyBotModule.Broodwar.getFrameCount() < 7680 && MyBotModule.Broodwar.getFrameCount() > 240) {
+		if (MyBotModule.Broodwar.getFrameCount() < 10080 && MyBotModule.Broodwar.getFrameCount() > 240) {
 			
 			List<BaseLocation> myBaseLocations = InformationManager.Instance()
 					.getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
@@ -251,29 +251,29 @@ public class WorkerManager {
 						/*
 						numberOfEarlyAttackUnit += StrategyManager.Instance().enemyPlayer.allUnitCount(UnitType.Zerg_Zergling);
 						numberOfEarlyAttackUnit += StrategyManager.Instance().enemyPlayer.allUnitCount(UnitType.Terran_Marine);
+
 						*/
-			if(StrategyManager.Instance().myPlayer.completedUnitCount(UnitType.Zerg_Zergling) <= 4 
-					   && numberOfEarlyAttackUnit >= 3
-					   && defenceFlagforEarlyAttack == 0
-					   || StrategyManager.Instance().enemyPlayer.allUnitCount(UnitType.Protoss_Zealot) != 0)
+			if(MyBotModule.Broodwar.getFrameCount()%720==0)
+			{
+				defenceFlagforEarlyAttack = 0;
+				System.out.println(MyBotModule.Broodwar.getFrameCount()/24+"초/ 플래그 초기화");
+			}
+			if(numberOfEarlyAttackUnit >= 1 && defenceFlagforEarlyAttack == 0)
+
 					{
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
-									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
 									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
 									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 						System.out.println("저글링 생산!");
 						defenceFlagforEarlyAttack = 1;
-					}
+						
+					}//30초에 한번 실행 :  기지 근처에 적이 있으면 저글링 4마리 생산 (경기 시간 10분까지만)
 													
 			
 			// 권순우 일단 뭐든 적이 있으면
 			if(numberOfEarlyAttackUnit>0)
 			{
-				///////////////////////////////////////////////////////////
-				//초반러시 유닛이 저글링 혹은 마린 3마리 이상이거나, 질럿이고
-				//현재 저글링이 3마리 이하이면 저글링을 바로 생산한다. - 0815 노승호
 				
 				
 				// 저그의 경우 크립 콜로니 갯수를 셀 때 성큰 콜로니 갯수까지 포함해서 세어야, 크립 콜로니를 지정한 숫자까지만 만든다
@@ -328,12 +328,12 @@ public class WorkerManager {
 					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) < 4) {
 
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony,
-								BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
+								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony,
-								BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
+								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 
 					}
-				}
+				}//Mainbase는 너무 안쪽이고 1st choke point는 적절한데 가끔 언덕 아래로 배치되면 망테크;
 
 				if (myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) > 0
 						&& numberOfUnitType_Zerg_Sunken_Colony < 4) {
@@ -341,9 +341,9 @@ public class WorkerManager {
 					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) < 4) {
 
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Sunken_Colony,
-								BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
+								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Sunken_Colony,
-								BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
+								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 					}
 				}
 			}
@@ -378,8 +378,12 @@ public class WorkerManager {
 					if (gasWorker != null) {
 						if (!gasWorker.isCarryingMinerals()) // 0626 미네랄을 들지 않은 일꾼만 가스를 캐라!
 						{
-							workerData.setWorkerJob(gasWorker, WorkerData.WorkerJob.Gas, unit);
-							// System.out.println("New gasworker set");
+
+							if(workerData.getWorkers().size() >= 5) {    //0819 드론이 5마리 이상일때만
+								workerData.setWorkerJob(gasWorker, WorkerData.WorkerJob.Gas, unit); 
+								// System.out.println("New gasworker set");								
+							}
+
 						}
 					}
 				}
@@ -433,7 +437,7 @@ public class WorkerManager {
 			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat) {
 				MyBotModule.Broodwar.drawCircleMap(worker.getPosition().getX(), worker.getPosition().getY(), 4,
 						Color.Yellow, true);
-				Unit target = getClosestEnemyUnitFromWorker(worker);
+				Unit target = getWeakestEnemyUnitFromWorker(worker);
 
 				if (target != null) {
 					commandUtil.attackUnit(worker, target);
@@ -888,6 +892,28 @@ public class WorkerManager {
 			double dist = unit.getDistance(worker);
 
 			if ((dist < 32 * 8) && (closestUnit == null || (dist < closestDist))) {
+				closestUnit = unit;
+				closestDist = dist;
+			}
+		}
+
+		return closestUnit;
+	}
+	
+	public Unit getWeakestEnemyUnitFromWorker(Unit worker) {
+		if (worker == null)
+			return null;
+
+		Unit closestUnit = null;
+		double closestDist = 10000;
+		int lowestHP = 1000;
+		
+
+		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+			double dist = unit.getDistance(worker);
+			int hp = unit.getHitPoints();
+
+			if ((hp < lowestHP) && (dist < 32 * 8) && (closestUnit == null || (dist < closestDist))) {
 				closestUnit = unit;
 				closestDist = dist;
 			}
