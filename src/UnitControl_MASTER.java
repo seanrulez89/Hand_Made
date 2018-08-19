@@ -17,19 +17,25 @@ public class UnitControl_MASTER {
 	UnitControl_COMMON COMMON = new UnitControl_COMMON();
 	
 	public void update() {
-		
+
 		COMMON.getDefenseSite();
+
 		COMMON.getMovePosition();
+
 		COMMON.getLocalDefense();
 		
 		
 		
+
 		if(StrategyManager.Instance().combatState != StrategyManager.CombatState.eliminateEnemy
 				&& MyBotModule.Broodwar.getFrameCount() % 2 == 0)
 		{
 			//Zergling = new UnitControl_Zergling();
+		
 			Zergling.update();
+	;
 		}
+		
 		
 		
 		if(StrategyManager.Instance().enemyMainBaseLocation!=null 
@@ -39,28 +45,36 @@ public class UnitControl_MASTER {
 			
 			
 			
+		
 			//Mutalisk = new UnitControl_Mutalisk();
 			Mutalisk.update();	
+		
 			
 			//Hydralisk = new UnitControl_Hydralisk();
 			Hydralisk.update();	
 			
+			
 			Lurker = new UnitControl_Lurker();
+			
 			Lurker.update();
+			
 			
 
 			
 			
 			
 		}
+		
 		
 		if(StrategyManager.Instance().enemyMainBaseLocation!=null 
 				&& StrategyManager.Instance().combatState != StrategyManager.CombatState.eliminateEnemy
 				&& MyBotModule.Broodwar.getFrameCount() % 24 == 0)
 		{			
+			
 			Defiler = new UnitControl_Defiler();
 			Defiler.update();
 			
+		
 		}
 		
 		
@@ -68,15 +82,18 @@ public class UnitControl_MASTER {
 		
 		
 		
+	
 		
 		if(StrategyManager.Instance().enemyMainBaseLocation!=null 
 				&& StrategyManager.Instance().combatState != StrategyManager.CombatState.eliminateEnemy)
 		{
-			Overlord = new UnitControl_Overlord();
+		
+			Overlord = new UnitControl_Overlord();			
 			Overlord.update();
+			
 		}
 		
-
+		
 	}
 	
 	

@@ -22,11 +22,12 @@ public class UnitControl_COMMON {
 	
 	
 	public void getDefenseSite() {
-	
+		
 		if(defenseSite.isEmpty()==false)
 		{
 			defenseSite.clear();
 		}
+		
 		
 		
 		// 건물이나 드론이 얻어맞는 경우
@@ -45,6 +46,7 @@ public class UnitControl_COMMON {
 		}
 
 		
+		
 		MyBotModule.Broodwar.drawCircleMap(StrategyManager.Instance().mySecondChokePoint.getCenter(), 12 * Config.TILE_SIZE, Color.Blue);
 		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(StrategyManager.Instance().mySecondChokePoint.getCenter(), 12 * Config.TILE_SIZE)) 
 		{
@@ -56,6 +58,7 @@ public class UnitControl_COMMON {
 		
 		
 
+		
 		// 기지 주변에 악당이 등장하는 경우
 		for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(MyBotModule.Broodwar.self())) 
 		{
@@ -69,36 +72,47 @@ public class UnitControl_COMMON {
 		}
 		
 		
+		
 	}
 	
 	
 	public void getMovePosition ()
 	{
+		
 		if(positionList == null || positionList.isEmpty())
 		{
 			//System.out.println("positionList == null || positionList.isEmpty()");
 			positionList = InformationManager.getAssemblyPlaceList(ASSEMBLY_NUMBER);
+			
 		}
 
 		
 		
 
+		
 		if(StrategyManager.Instance().enemyMainBaseLocation==null)
 		{
+			
 			movePosition = StrategyManager.Instance().mySecondChokePoint.getCenter();
 			moveIndex = BASIC_MOVE_INDEX;
+			
 		}
 		else if(StrategyManager.Instance().combatState == StrategyManager.CombatState.attackStarted)
 		{
+			
 			//List<Position> positionList = InformationManager.Instance().getAssemblyPlaceList(10);
 
 			if(moveIndex>=5)
 			{
+				
 				movePosition = StrategyManager.Instance().enemyMainBaseLocation.getPosition();
+				
 			}
 			else
 			{
+				
 				movePosition = positionList.get(moveIndex);
+				
 			}
 			
 			
@@ -106,21 +120,31 @@ public class UnitControl_COMMON {
 
 			//System.out.println("moveIndex : " + moveIndex);
 			
+			
 			if(UnitControl_Hydralisk.gatherIndex == moveIndex && UnitControl_Zergling.gatherIndex == moveIndex)
 			{
+				
 				moveIndex++;
+				
 				
 				if(moveIndex>(positionList.size()-1))
 				{
+					
 					moveIndex=(positionList.size()-1);
+					
+
 				}
 			}			
 		}
 		else
 		{
+			
 			movePosition = StrategyManager.Instance().mySecondChokePoint.getCenter();
+			
 			moveIndex = BASIC_MOVE_INDEX;			
+			
 		}
+		
 		
 		
 		

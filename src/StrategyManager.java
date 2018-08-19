@@ -275,32 +275,40 @@ public class StrategyManager {
 		//drawStrategyManagerStatus(); 2017년 버전의 화면 정보 나타내기. 화면이 중첩되서 주석처리함
 
 		//saveGameLog(); 자꾸 에러가 나서 주석처리함
-
+		
 		/// 변수 값을 업데이트 합니다
 		updateVariables();
+		
 	
 		/// 일꾼을 계속 추가 생산합니다
 		executeWorkerTraining();
 		
+		
 		/// Supply DeadLock 예방 및 SupplyProvider 가 부족해질 상황 에 대한 선제적 대응으로서 SupplyProvider를 추가 건설/생산합니다
 		executeSupplyManagement();
+		
 
 		/// 방어건물 및 공격유닛 생산 건물을 건설합니다
 		executeBuildingConstruction();
+		
 					
 		/// 업그레이드 및 테크 리서치를 실행합니다
 		executeUpgradeAndTechResearch();
+		
 
 		/// 공격유닛을 계속 추가 생산합니다
 		executeCombatUnitTraining();
+		
 
 		/// 전반적인 전투 로직 을 갖고 전투를 수행합니다
 		executeCombat();
+		
 
 
 		
 		
 		BuildOrder_Last.Instance().lastBuildOrder();
+		
 		
 
 		/*
@@ -313,9 +321,17 @@ public class StrategyManager {
 
 
 		UnitControl_MASTER.update();
-		
+		/*
+		for(Unit unit : myPlayer.getUnits())
+		{
+			if(unit.getType().equals(UnitType.Zerg_Hatchery))
+			{
+				System.out.println("unit.getInitialHitPoints() : " + unit.getInitialHitPoints());
+				System.out.println("unit.getHitPoints() : " + unit.getHitPoints());
+			}
+		}
 
-
+*/
 
 	}
 
@@ -721,7 +737,7 @@ public class StrategyManager {
 
 			//System.out.println("현재 : " + workerCount + " / 최적 : " + optimalWorkerCount);
 			
-			
+			//enemyMainBaseLocation.getGeysers().get(0).getPosition().getX()
 			
 			if (workerCount < optimalWorkerCount) {
 				for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
@@ -734,8 +750,16 @@ public class StrategyManager {
 							// 빌드큐에 일꾼 생산이 1개는 있도록 한다
 							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Drone, null) == 0) {
 
-								BuildManager.Instance().buildQueue.queueAsHighestPriority(
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(
 										new MetaType(InformationManager.Instance().getWorkerType()), false);
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(
+										new MetaType(InformationManager.Instance().getWorkerType()), false);
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(
+										new MetaType(InformationManager.Instance().getWorkerType()), false);
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(
+										new MetaType(InformationManager.Instance().getWorkerType()), false);
+								
+								
 								
 							}
 						}
@@ -768,7 +792,7 @@ public class StrategyManager {
 		// InitialBuildOrder 진행중에는 아무것도 하지 않습니다
 		// InitialBuildOrder 진행중이라도 supplyUsed 가 supplyTotal 보다 커져버리면 실행하도록 합니다
 		if (isInitialBuildOrderFinished == false
-				&& MyBotModule.Broodwar.self().supplyUsed() <= MyBotModule.Broodwar.self().supplyTotal()) {
+				&& MyBotModule.Broodwar.self().supplyUsed() >= MyBotModule.Broodwar.self().supplyTotal()) {
 			return;
 		}
 		

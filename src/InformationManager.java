@@ -36,6 +36,10 @@ public class InformationManager {
 			super();
 			this.positionList = new ArrayList<TilePosition>();
 		}
+		@Override
+		public String toString() {
+			return "ShortestPath [positionList=" + positionList + "]";
+		}
 	}
 	
 	static ShortestPath shortestPath;
@@ -118,9 +122,9 @@ public class InformationManager {
 
 	/// Unit 및 BaseLocation, ChokePoint 등에 대한 정보를 업데이트합니다
 	public void update() {
-		if(mainBaseLocations.get(enemyPlayer) != null) {
-			tmptmptmptmp();
-		}
+		
+		
+		
 		updateUnitsInfo();
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
 		if (MyBotModule.Broodwar.getFrameCount() % 120 == 0) {
@@ -266,6 +270,9 @@ public class InformationManager {
 			BaseLocation unexplored = null;
 
 			for (BaseLocation startLocation : BWTA.getStartLocations()) {
+				if(startLocation.getPosition().equals(getMainBaseLocation(selfPlayer).getPosition())) {
+					continue;
+				}
 				if (existsPlayerBuildingInRegion(BWTA.getRegion(startLocation.getTilePosition()), enemyPlayer)) {
 					if (enemyStartLocationFound == false) {
 						enemyStartLocationFound = true;
@@ -770,6 +777,7 @@ public class InformationManager {
 	}
 	
 	private static void getPath(Position enemyPosition) {
+		
 		shortestPath = new ShortestPath();
 		Position myPosition = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getPosition();
 		shortestPath.positionList = BWTA.getShortestPath(myPosition.toTilePosition(), enemyPosition.toTilePosition());
@@ -783,15 +791,24 @@ public class InformationManager {
 	}
 	
 	public static List<Position> getAssemblyPlaceList(int number){
-		if(shortestPath==null || shortestPath.positionList==null) {
+		
+		if(shortestPath==null || shortestPath.positionList==null || shortestPath.positionList.size()==0) {
+			
 			return new ArrayList<Position>();
 		}
+		
 		int size = shortestPath.positionList.size();
+		
 		int length = size/number;
+		
 		List<Position> retList = new ArrayList<Position>();
+		
+		//System.out.println(shortestPath);
 		for(int i = 0; i<size; i = i+length) {
+			
 			retList.add(shortestPath.positionList.get(i).toPosition());
 		}
+		
 		return retList;
 	}
 }

@@ -18,6 +18,8 @@ public class WorkerManager {
 
 	/// 일꾼 중 한명을 Repair Worker 로 정해서, 전체 수리 대상을 하나씩 순서대로 수리합니다
 	private Unit currentRepairWorker = null;
+	
+	private static int deadDrone = 0;
 
 	private static WorkerManager instance = new WorkerManager();
 
@@ -28,7 +30,7 @@ public class WorkerManager {
 
 	/// 일꾼 유닛들의 상태를 저장하는 workerData 객체를 업데이트하고, 일꾼 유닛들이 자원 채취 등 임무 수행을 하도록 합니다
 	public void update() {
-
+		long time = System.currentTimeMillis();
 		// 1초에 1번만 실행한다
 		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0)
 			return;
@@ -56,7 +58,6 @@ public class WorkerManager {
 		handleCombatWorkers();			
 		handleRepairWorkers();
 		// rebalanceWorkers(); //0628 이걸 하는건 좋은데 이걸 하니까 우왕좌왕 미네랄 못캐는 애들이 생기는듯 계속 새로 할당되서
-
 	}
 	
 
@@ -88,6 +89,15 @@ public class WorkerManager {
 			if (!worker.isCompleted() || worker == null) {
 				continue;
 			}
+			
+			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Build)
+			{
+				continue;
+			}
+			
+			
+			
+			
 			
 			// 게임상에서 worker가 isIdle 상태가 되었으면 (새로 탄생했거나, 그전 임무가 끝난 경우), WorkerData 도 Idle 로
 			// 맞춘 후, handleGasWorkers, handleIdleWorkers 등에서 새 임무를 지정한다
@@ -124,7 +134,8 @@ public class WorkerManager {
 			
 			
 			
-			if (MyBotModule.Broodwar.getFrameCount() < 7680 && MyBotModule.Broodwar.getFrameCount() > 240) {
+			if (MyBotModule.Broodwar.getFrameCount() > 240) // MyBotModule.Broodwar.getFrameCount() < 7680
+			{
 				
 				Unit target = getWeakestEnemyUnitFromWorker(worker); //32*8 내에 있는 적을 반환한다
 				// 권순우 5는 적어서 8로 늘림 
@@ -133,47 +144,59 @@ public class WorkerManager {
 				// 타겟이 있냐 없냐로 일단 구분하고
 				if(target!=null)
 				{
-					if (target.getType() ==  UnitType.Protoss_Probe
-							|| target.getType() ==  UnitType.Zerg_Drone
-							||  target.getType() ==  UnitType.Terran_SCV)
+					 // 정찰 일꾼은 무시한다
+
+					if(worker.isUnderAttack()==true)
+					{
+						if(worker.getDistance(getClosestResourceDepotFromWorker(worker).getPosition()) < 32 * 8 )
+						{
+							if(target.getType() == UnitType.Protoss_Probe
+									|| target.getType() == UnitType.Zerg_Drone
+									|| target.getType() == UnitType.Terran_SCV)
+									
+							{
+								//setCombatWorker(worker);
+								commandUtil.attackUnit(worker, target);
+								//System.out.println("나를 공격한 정찰 일꾼 / 가까움 / 전투");
+								//나를 공격한 일꾼은 때림
+							}
+						}
+					}
+					else if (target.getType() == UnitType.Protoss_Probe
+								|| target.getType() == UnitType.Zerg_Drone
+								|| target.getType() == UnitType.Terran_SCV)							
 					{
 						continue;
-					} // 정찰 일꾼은 무시한다
-
-					else if(worker.isUnderAttack()==true 
-							&& worker.getDistance(getClosestResourceDepotFromWorker(worker).getPosition()) < 32 * 8 
-							&& target.getType() ==  UnitType.Protoss_Probe
-							|| target.getType() ==  UnitType.Zerg_Drone
-							||  target.getType() ==  UnitType.Terran_SCV)
-					{
-						//setCombatWorker(worker);
-						commandUtil.attackUnit(worker, target);
-						System.out.println("나를 공격한 정찰 일꾼 / 가까움 / 전투");
-					} //나를 공격한 일꾼은 때림
+					}
+							 
+					 
 					
-					else if(worker.getDistance(getClosestResourceDepotFromWorker(worker).getPosition()) < 32 * 8 
-							&& target.getType() !=  UnitType.Protoss_Probe
-							|| target.getType() !=  UnitType.Zerg_Drone
-							||  target.getType() !=  UnitType.Terran_SCV)
+					else if(worker.getDistance(getClosestResourceDepotFromWorker(worker).getPosition()) < 32 * 8)
 					{
-						//setCombatWorker(worker);
-						commandUtil.attackUnit(worker, target);
-						System.out.println("적군 / 가까움 / 전투");
-					} //가까운 적군은 떄림
-
-					else if (worker.isUnderAttack()==true
-							&& target.getType() !=  UnitType.Protoss_Probe
-							|| target.getType() !=  UnitType.Zerg_Drone
-							||  target.getType() !=  UnitType.Terran_SCV)
+						if(target.getType() != UnitType.Protoss_Probe
+								|| target.getType() != UnitType.Zerg_Drone
+								|| target.getType() != UnitType.Terran_SCV)
+						{
+							//setCombatWorker(worker);
+							commandUtil.attackUnit(worker, target);
+							//System.out.println("적군 / 가까움 / 전투");
+							//가까운 적군은 떄림
+						}
+					}
+					else if (worker.isUnderAttack()==true)
 					{
-						setMineralWorker(worker);
-						System.out.println("적군에게 맞으니까 미네랄로 도망쳐");
-					} //
-
+						if(target.getType() != UnitType.Protoss_Probe
+								&& target.getType() != UnitType.Zerg_Drone
+								&& target.getType() != UnitType.Terran_SCV)
+						{
+							setMineralWorker(worker);
+							//System.out.println("적군에게 맞으니까 미네랄로 도망쳐");
+						}
+					}
 					else
 					{
 						setMineralWorker(worker);
-						System.out.println("멀어졌어 싸우지말고 미네랄 캐");
+						//System.out.println("멀어졌어 싸우지말고 미네랄 캐");
 					}
 				}
 				else
@@ -181,7 +204,7 @@ public class WorkerManager {
 					if(workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat)
 					{
 						setMineralWorker(worker);
-						System.out.println("적군 없어 하던 일 해");
+						//System.out.println("적군 없어 하던 일 해");
 					}
 				}
 				
@@ -222,7 +245,7 @@ public class WorkerManager {
 
 		//////// 초반 긴급 방어 구축
 
-		if (MyBotModule.Broodwar.getFrameCount() < 10080 && MyBotModule.Broodwar.getFrameCount() > 240) {
+		if (MyBotModule.Broodwar.getFrameCount() < 24*60*6.5 && MyBotModule.Broodwar.getFrameCount() > 240) {
 			
 			List<BaseLocation> myBaseLocations = InformationManager.Instance()
 					.getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
@@ -258,17 +281,35 @@ public class WorkerManager {
 				defenceFlagforEarlyAttack = 0;
 				System.out.println(MyBotModule.Broodwar.getFrameCount()/24+"초/ 플래그 초기화");
 			}
-			if(numberOfEarlyAttackUnit >= 1 && defenceFlagforEarlyAttack == 0)
+			
+			if(numberOfEarlyAttackUnit >= 1 && defenceFlagforEarlyAttack == 0 && myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool)>0)
+			{
+				
+				
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
+						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+				
+				System.out.println("저글링 생산!");
+				defenceFlagforEarlyAttack = 1;
 
-					{
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
-									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
-									BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-						System.out.println("저글링 생산!");
-						defenceFlagforEarlyAttack = 1;
-						
-					}//30초에 한번 실행 :  기지 근처에 적이 있으면 저글링 4마리 생산 (경기 시간 10분까지만)
+			}//30초에 한번 실행 :  기지 근처에 적이 있으면 저글링 4마리 생산 (경기 시간 10분까지만)
+
+			
+			
+			if(numberOfEarlyAttackUnit == 0)
+			{
+				for(int i = 0 ; i < deadDrone ; i++)
+				{
+					System.out.println("드론 죽은 만큼 추가");
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(InformationManager.Instance().getWorkerType(),
+							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+					deadDrone--;
+				}
+			}
+			
+			
 													
 			
 			// 권순우 일단 뭐든 적이 있으면
@@ -288,13 +329,14 @@ public class WorkerManager {
 				numberOfUnitType_Zerg_Sunken_Colony += myPlayer.allUnitCount(UnitType.Zerg_Sunken_Colony);
 				numberOfUnitType_Zerg_Sunken_Colony += BuildManager.Instance().buildQueue
 						.getItemCount(UnitType.Zerg_Sunken_Colony);
+/*
+				System.out.println("numberOfUnitType_Zerg_Creep_Colony : " +
+				numberOfUnitType_Zerg_Creep_Colony);
+				System.out.println("+++++");
+				System.out.println("numberOfUnitType_Zerg_Sunken_Colony : " +
+				numberOfUnitType_Zerg_Sunken_Colony);
 
-				// System.out.println("numberOfUnitType_Zerg_Creep_Colony : " +
-				// numberOfUnitType_Zerg_Creep_Colony);
-				// System.out.println("+++++");
-				// System.out.println("numberOfUnitType_Zerg_Sunken_Colony : " +
-				// numberOfUnitType_Zerg_Sunken_Colony);
-
+*/				
 				for (Unit building : MyBotModule.Broodwar.self().getUnits()) 
 				{
 					if (building.getType().equals(UnitType.Zerg_Hatchery) && building.canCancelMorph()) 
@@ -322,15 +364,13 @@ public class WorkerManager {
 				* 현재 순간으로 땡겨오는 식으로 구현하면 좋겠지만
 				* 그건 너무 어려워 ㅎㅎ
 				*/				
-				if (numberOfUnitType_Zerg_Creep_Colony < 6
-						&& myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0) {
+				if (numberOfUnitType_Zerg_Creep_Colony < 7) {
 
-					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) < 4) {
+					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) < 6) {
 
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony,
 								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony,
-								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						
 
 					}
 				}//Mainbase는 너무 안쪽이고 1st choke point는 적절한데 가끔 언덕 아래로 배치되면 망테크;
@@ -340,10 +380,8 @@ public class WorkerManager {
 
 					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) < 4) {
 
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Sunken_Colony,
-								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Sunken_Colony,
-								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Sunken_Colony, true);
+						
 					}
 				}
 			}
@@ -1080,6 +1118,8 @@ public class WorkerManager {
 		if (unit == null)
 			return;
 
+		
+		
 		// ResourceDepot 건물이 파괴되면, 자료구조 삭제 처리를 한 후, 일꾼들을 Idle 상태로 만들어 rebalanceWorkers 한
 		// 효과가 나게 한다
 		if (unit.getType().isResourceDepot() && unit.getPlayer() == MyBotModule.Broodwar.self()) {
@@ -1088,6 +1128,7 @@ public class WorkerManager {
 
 		// 일꾼이 죽으면, 자료구조 삭제 처리를 한 후, rebalanceWorkers 를 한다
 		if (unit.getType().isWorker() && unit.getPlayer() == MyBotModule.Broodwar.self()) {
+			deadDrone++;
 			workerData.workerDestroyed(unit);
 			rebalanceWorkers();
 		}

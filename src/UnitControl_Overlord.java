@@ -318,7 +318,7 @@ public class UnitControl_Overlord {
 		OverloadManager.Instance().updateWithCombatUnitNum(UnitType.Zerg_Hydralisk, 2);
 		OverloadManager.Instance().updateWithCombatUnitNum(UnitType.Zerg_Mutalisk, 2);
 		
-		OverloadManager.Instance().onUpdate();	
+		
 		
 		
 		if(OverloadManager.Instance().canDropshipsGoAttack()==true)
@@ -337,7 +337,7 @@ public class UnitControl_Overlord {
 			OverloadManager.Instance().goDropships();
 		}
 		
-		
+		OverloadManager.Instance().onUpdate();	
 		
 		
 /*		ArrayList<Unit> myOverLords = getOverLords();

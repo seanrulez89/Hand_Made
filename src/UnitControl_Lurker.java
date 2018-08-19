@@ -64,7 +64,7 @@ public class UnitControl_Lurker {
 						myOverLords.get(6).unloadAll(new Position(63*32, 63*32));
 					}
 					*/
-					
+					/*
 					if(unit.isBurrowed())
 					{
 						unit.unburrow();
@@ -73,20 +73,71 @@ public class UnitControl_Lurker {
 					if(unit.isLoaded()==false)
 					{
 						OverloadManager.Instance().addDropshipUnit(unit);
-					}
+					}*/
 					
-					/*
-					if(bwta.BWTA.getRegion(unit.getTilePosition()).getPolygon().isInside(StrategyManager.Instance().enemyMainBaseLocation.getPosition())==false)
-					{
-						if(unit.isBurrowed())
+					//bwta.BWTA.getRegion(unit.getTilePosition()).getPolygon().isInside(StrategyManager.Instance().enemyMainBaseLocation.getPosition())==false
+					if(unit.getTilePosition()!=null)
+					{					
+						if(bwta.BWTA.getRegion(unit.getTilePosition())!=null)
 						{
-							unit.unburrow();
-						}
-						
-						if(unit.isLoaded()==false)
-						{
-							OverloadManager.Instance().addDropshipUnit(unit);
-						}
+							if(bwta.BWTA.getRegion(unit.getTilePosition()).getPolygon()!=null)
+							{
+								if(bwta.BWTA.getRegion(unit.getTilePosition()).getPolygon().isInside(StrategyManager.Instance().enemyMainBaseLocation.getPosition())==false)
+								{
+									if(unit.isBurrowed())
+									{
+										unit.unburrow();
+									}
+									
+									if(unit.isLoaded()==false)
+									{
+										OverloadManager.Instance().addDropshipUnit(unit);
+									}
+								}
+								else
+								{
+									Unit tempEnemy = null;
+									for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), 5*Config.TILE_SIZE))
+									{
+										if(enemy.isFlying()==true)
+										{
+											continue;
+										}
+										
+										if(enemy.isLifted() == true)
+										{
+											continue;
+										}
+										
+										if(enemy.getPlayer() == enemyPlayer)
+										{
+											tempEnemy = enemy;
+											break;
+										}
+									}
+									
+									if(tempEnemy!=null)
+									{
+										if(unit.isBurrowed()==false)
+										{
+											unit.burrow();
+										}
+									}
+									else
+									{
+										if(unit.isBurrowed() == true)
+										{
+											unit.unburrow();
+										}
+										
+										commandUtil.move(unit, UnitControl_COMMON.movePosition);
+										//unit.move(SM.enemyMainBaseLocation.getPosition());
+									}
+								}
+								
+								
+							}
+						}	
 					}
 					else
 					{
@@ -129,7 +180,7 @@ public class UnitControl_Lurker {
 						}
 					}
 					
-					*/
+					
 					
 					
 					

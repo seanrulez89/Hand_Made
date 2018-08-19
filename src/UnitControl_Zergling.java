@@ -45,7 +45,8 @@ public class UnitControl_Zergling {
 		 																			
 		for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(averagePosition, myUnitType.sightRange())) {
 
-			if (enemy.getPlayer() == enemyPlayer) {
+			if (enemy.getPlayer() == enemyPlayer) 
+			{
 				
 				if(enemy.isVisible() == false)
 				{
@@ -69,7 +70,9 @@ public class UnitControl_Zergling {
 						|| enemy.getType().equals(UnitType.Terran_Missile_Turret)
 						|| enemy.getType().equals(UnitType.Zerg_Spore_Colony)
 						|| enemy.getType().equals(UnitType.Protoss_Photon_Cannon)
-						|| enemy.getType().equals(UnitType.Terran_Bunker))
+						|| enemy.getType().equals(UnitType.Terran_Bunker)
+						|| enemy.getType().equals(UnitType.Protoss_Zealot)
+						|| enemy.getType().equals(UnitType.Zerg_Zergling))
 //						|| enemy.getType().equals(UnitType.Terran_Medic))
 				{
 					mustKillFirst.add(enemy);					
@@ -233,7 +236,7 @@ public class UnitControl_Zergling {
 			
 			if(i==1 && Zergling!=null && positionAssigned_01 != null)
 			{
-				commandUtil.attackMove(Zergling, positionAssigned_01);
+				//commandUtil.attackMove(Zergling, positionAssigned_01);
 				continue;
 			}
 			else if(i==2 && Zergling!=null && scoutZerglingFleePosition != null && positionAssigned_02!=null)
@@ -245,8 +248,10 @@ public class UnitControl_Zergling {
 				{
 					if(enemy.getPlayer()==enemyPlayer )//&& MyBotModule.Broodwar.getFrameCount() % 24 == 0)
 					{
-						System.out.println("적군 유인");
-						willBeThere = PredictMovement(enemy, 24);
+						//System.out.println("적군 유인");
+						if(Zergling.getDistance(scoutZerglingFleePosition) >= 32 ) {
+							willBeThere = PredictMovement(enemy, 24);
+						}
 						
 						commandUtil.move(Zergling, scoutZerglingFleePosition);
 						runrunrun = true;
@@ -255,9 +260,18 @@ public class UnitControl_Zergling {
 					}
 				}
 				
+				if(scoutZerglingFleePosition!=null && Zergling.getDistance(scoutZerglingFleePosition) < 32 )
+				{
+					//System.out.println("적 리셋");
+					willBeThere = null;
+				}
+				
+				
+				
+				
 				if(willBeThere!=null && Zergling.getDistance(willBeThere) < 32 )
 				{
-					System.out.println("적 리셋");
+					//System.out.println("적 리셋");
 					willBeThere = null;
 				}
 				
@@ -274,13 +288,13 @@ public class UnitControl_Zergling {
 				{
 					if(willBeThere!=null)
 					{
-						System.out.println("예상적목표향해이동");
+						//System.out.println("예상적목표향해이동");
 						commandUtil.attackMove(Zergling, willBeThere);
 						continue;
 					}
 					else
 					{
-						System.out.println("정찰위치로이동");
+						//System.out.println("정찰위치로이동");
 						commandUtil.attackMove(Zergling, positionAssigned_02);
 						continue;
 					}

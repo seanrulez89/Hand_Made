@@ -41,12 +41,21 @@ public class BuildOrder_Initial {
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		
-		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
 				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Spawning_Pool,
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
+				BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true);
+		
+		
+		
+
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
@@ -153,10 +162,10 @@ public class BuildOrder_Initial {
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
-				BuildOrderItem.SeedPositionStrategy.SecondChokePoint);
+				BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
-				BuildOrderItem.SeedPositionStrategy.SecondChokePoint);
+				BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
@@ -180,10 +189,10 @@ public class BuildOrder_Initial {
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony,
-				BuildOrderItem.SeedPositionStrategy.SecondChokePoint);
+				BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony,
-				BuildOrderItem.SeedPositionStrategy.SecondChokePoint);
+				BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
 		
 
 		
