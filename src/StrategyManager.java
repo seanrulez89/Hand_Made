@@ -1870,6 +1870,8 @@ public class StrategyManager {
 			
 			if(unit.getType()==UnitType.Zerg_Overlord) {
 				OverloadManager.Instance().removeOverload(unit);
+			} else if(unit.getType()==UnitType.Zerg_Hydralisk || unit.getType()==UnitType.Zerg_Mutalisk) {
+				OverloadManager.Instance().rebalance();;
 			}
 			
 		} else if (unit.getPlayer() == enemyPlayer) {

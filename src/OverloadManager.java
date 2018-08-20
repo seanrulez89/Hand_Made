@@ -2,13 +2,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-import bwapi.Order;
 import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.Unit;
@@ -68,9 +65,21 @@ public class OverloadManager {
 	// 따라다닐 유닛 타입과 넘버
 	private Map<UnitType, Integer> withAttackUnitMap = new HashMap<UnitType, Integer>();
 
-	private static Comparator<Position> positionComparator=new Comparator<Position>(){
+	private static Comparator<Position> positionComparator = new Comparator<Position>() {
 
-	@Override public int compare(Position o1,Position o2){double distance1=o1.getDistance(baseLocation.getX(),baseLocation.getY());double distance2=o2.getDistance(baseLocation.getX(),baseLocation.getY());if(distance1<distance2){return-1;}else if(distance1==distance2){return 0;}else{return 1;}}};
+		@Override
+		public int compare(Position o1, Position o2) {
+			double distance1 = o1.getDistance(baseLocation.getX(), baseLocation.getY());
+			double distance2 = o2.getDistance(baseLocation.getX(), baseLocation.getY());
+			if (distance1 < distance2) {
+				return -1;
+			} else if (distance1 == distance2) {
+				return 0;
+			} else {
+				return 1;
+			}
+		}
+	};
 
 	public void addDropshipUnit(Unit unit) {
 		WaitingLoadUnitAndOverload waitingLoadUnitAndOverload = new WaitingLoadUnitAndOverload();
@@ -127,7 +136,7 @@ public class OverloadManager {
 	}
 
 	public boolean canDropshipsGoAttack() {
-		if(dropshipOverloadList.size()==0) {
+		if (dropshipOverloadList.size() == 0) {
 			return false;
 		}
 		for (OverloadInfo overloadInfo : dropshipOverloadList) {
@@ -213,14 +222,14 @@ public class OverloadManager {
 				} else if (overloadInfo.status == overloadStatus.dropshipAttack) {
 					dropshipOverloadList.remove(overloadInfo);
 				} else {
-					 System.out.println("문제가있어요!!!removeOverload");
+					System.out.println("문제가있어요!!!removeOverload");
 				}
 				allOverloadList.remove(overloadInfo);
 				rebalance();
 				return;
 			}
 		}
-		 System.out.println("문제가있어요2!!removeOverload");
+		System.out.println("문제가있어요2!!removeOverload");
 	}
 
 	public void rebalance() {
@@ -231,8 +240,8 @@ public class OverloadManager {
 		if (withAttackUnitMap.get(UnitType.Zerg_Mutalisk) != null) {
 			List<Unit> mutaliskList = StrategyManager.Instance().myMutaliskList;
 			if (mutaliskList != null && mutaliskList.size() != 0 && queue.size() != 0) {
-				queue = rebalanceWithAttackUnitOverload(withAttackUnitMap.get(UnitType.Zerg_Mutalisk),
-						mutaliskList.get(0), queue);
+				queue = rebalanceWithAttackUnitOverload(withAttackUnitMap.get(UnitType.Zerg_Mutalisk), mutaliskList,
+						queue);
 			}
 		}
 
@@ -240,7 +249,7 @@ public class OverloadManager {
 		if (withAttackUnitMap.get(UnitType.Zerg_Hydralisk) != null) {
 			List<Unit> hydraliskList = StrategyManager.Instance().myHydraliskList;
 			if (hydraliskList != null && hydraliskList.size() != 0 && queue.size() != 0) {
-				queue = rebalanceWithAttackUnitOverload(2, hydraliskList.get(0), queue);
+				queue = rebalanceWithAttackUnitOverload(2, hydraliskList, queue);
 			}
 		}
 
@@ -258,6 +267,7 @@ public class OverloadManager {
 	}
 
 	public void onUpdate() {
+		// 드랍십 관련 update
 		for (int i = 0; i < waitDropshipUnitList.size(); i++) {
 			WaitingLoadUnitAndOverload waitingLoadUnitAndOverload = waitDropshipUnitList.get(i);
 			if (waitingLoadUnitAndOverload.unit.isLoaded()) {
@@ -283,13 +293,63 @@ public class OverloadManager {
 			}
 		}
 
-		if(MyBotModule.Broodwar.getFrameCount() % 24 != 0) {
+		// 공격유닛따라다니기 관련 update
+		if (MyBotModule.Broodwar.getFrameCount() % 24 == 0 && withAttackUnitOverloadList.size() != 0) {
+			Unit underAttackHydralisk = null;
+			Unit underAttackMutallisk = null;
+			a: for (Unit hydra : StrategyManager.Instance().myHydraliskList) {
+				for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(hydra.getPosition(), 6 * Config.TILE_SIZE)) {
+					if (enemy.getPlayer() == StrategyManager.Instance().enemyPlayer) {
+						underAttackHydralisk = hydra;
+						break a;
+					}
+				}
+			}
+			a: for (Unit mutal : StrategyManager.Instance().myMutaliskList) {
+				for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(mutal.getPosition(), 6 * Config.TILE_SIZE)) {
+					if (enemy.getPlayer() == StrategyManager.Instance().enemyPlayer) {
+						underAttackMutallisk = mutal;
+						break a;
+					}
+				}
+			}
+
+			for (OverloadInfo overloadInfo : withAttackUnitOverloadList) {
+				if (overloadInfo.followingAttackUnit.getType() == UnitType.Zerg_Hydralisk) {
+					if (underAttackHydralisk != null) {
+						overloadInfo.followingAttackUnit = underAttackHydralisk;
+					} else if (overloadInfo.followingAttackUnit == null
+							|| overloadInfo.followingAttackUnit.exists() == false
+							|| overloadInfo.followingAttackUnit.getHitPoints() <= 0) {
+						if (StrategyManager.Instance().myHydraliskList.size() > 0) {
+							overloadInfo.followingAttackUnit = StrategyManager.Instance().myHydraliskList.get(0);
+						}
+					}
+				} else if (overloadInfo.followingAttackUnit.getType() == UnitType.Zerg_Mutalisk) {
+					if (underAttackMutallisk != null) {
+						overloadInfo.followingAttackUnit = underAttackMutallisk;
+					} else if (overloadInfo.followingAttackUnit == null
+							|| overloadInfo.followingAttackUnit.exists() == false
+							|| overloadInfo.followingAttackUnit.getHitPoints() <= 0) {
+						if (StrategyManager.Instance().myHydraliskList.size() > 0) {
+							overloadInfo.followingAttackUnit = StrategyManager.Instance().myMutaliskList.get(0);
+						}
+					}
+				}
+			}
+		}
+
+		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) {
 			return;
 		}
 
 		for (OverloadInfo overloadInfo : allOverloadList) {
 			if (overloadInfo.status == overloadStatus.withAttackUnit) {
-				commandUtil.move(overloadInfo.overLoad, overloadInfo.followingAttackUnit.getPosition());
+				if (overloadInfo.overLoad.isUnderAttack()) {
+					commandUtil.move(overloadInfo.overLoad, baseLocation.getPosition());
+				} else {
+					commandUtil.move(overloadInfo.overLoad, overloadInfo.followingAttackUnit.getPosition());
+				}
 			} else if (overloadInfo.status == overloadStatus.scout) {
 				commandUtil.move(overloadInfo.overLoad, overloadInfo.exploreArea);
 			} else if (overloadInfo.status == overloadStatus.wait) {
@@ -299,85 +359,45 @@ public class OverloadManager {
 			} else if (overloadInfo.status == overloadStatus.dropshipConcentrating) {
 				commandUtil.move(overloadInfo.overLoad, new Position(63 * 32, 63 * 32));
 			} else if (overloadInfo.status == overloadStatus.dropshipAttack) {
-				if(overloadInfo.overLoad.getLoadedUnits()==null || overloadInfo.overLoad.getLoadedUnits().size()==0) 
-				{
+				if (overloadInfo.overLoad.getLoadedUnits() == null
+						|| overloadInfo.overLoad.getLoadedUnits().size() == 0) {
 					dropshipOverloadList.remove(overloadInfo);
 					overloadInfo.status = overloadStatus.wait;
 					waitOverloadList.add(overloadInfo);
 				}
-				
+
 				System.out.println("overloadInfo.overLoad.getHitPoints() : " + overloadInfo.overLoad.getHitPoints());
-				if(overloadInfo.overLoad.getHitPoints()<50){
-					System.out.println("피 없으니 내리자");
-					if(overloadInfo.overLoad.unloadAll(overloadInfo.overLoad.getPosition(), false)) {
+				if (overloadInfo.overLoad.getHitPoints() < 50) {
+					if (overloadInfo.overLoad.unloadAll(overloadInfo.overLoad.getPosition(), false)) {
 						System.out.println("정상적으로 내렸다");
-					}else {
+					} else {
 						System.out.println("못내림..");
 					}
 					continue;
 				}
-				
-				TilePosition enemyBasePosition = StrategyManager.Instance().enemyMainBaseLocation.getTilePosition();
-				TilePosition enemyBaseGeysersPosition = StrategyManager.Instance().enemyMainBaseLocation.getGeysers().get(0).getTilePosition();
-				TilePosition targetPosition = new TilePosition((enemyBasePosition.getX() + enemyBaseGeysersPosition.getX())/2, (enemyBasePosition.getY() + enemyBaseGeysersPosition.getY())/2);
-				System.out.println("enemyPosition : (" + enemyBasePosition.getX() + "," + enemyBasePosition.getY() +")");
-				System.out.println("enemyBaseGeysersPosition : (" + enemyBaseGeysersPosition.getX() + "," + enemyBaseGeysersPosition.getY() +")");
-				System.out.println("targetPosition : (" + targetPosition.getX() + "," + targetPosition.getY() +")");
 
-				if(enemyBaseGeysersPosition.isValid() == false) {
+				TilePosition enemyBasePosition = StrategyManager.Instance().enemyMainBaseLocation.getTilePosition();
+				TilePosition enemyBaseGeysersPosition = StrategyManager.Instance().enemyMainBaseLocation.getGeysers()
+						.get(0).getTilePosition();
+				TilePosition targetPosition = new TilePosition(
+						(enemyBasePosition.getX() + enemyBaseGeysersPosition.getX()) / 2,
+						(enemyBasePosition.getY() + enemyBaseGeysersPosition.getY()) / 2);
+
+				if (enemyBaseGeysersPosition.isValid() == false) {
 					commandUtil.move(overloadInfo.overLoad, enemyBasePosition.toPosition());
-				}else {
-					if(overloadInfo.overLoad.getDistance(targetPosition.toPosition())<32) {
-						System.out.println("미네랄 위치 다 옴");
+				} else {
+					if (overloadInfo.overLoad.getDistance(targetPosition.toPosition()) < 32) {
 						if (overloadInfo.overLoad.canUnload()) {
-							if(overloadInfo.overLoad.unloadAll(overloadInfo.overLoad.getPosition(), false)) {
+							if (overloadInfo.overLoad.unloadAll(overloadInfo.overLoad.getPosition(), false)) {
 								System.out.println("정상적으로 내렸다");
-							}else {
+							} else {
 								System.out.println("못내림..");
 							}
 						}
-					}else {
-						System.out.println("이동하자!! targetPosition : " + targetPosition.getX() + " + targetPosition.getY()");
-								commandUtil.move(overloadInfo.overLoad, targetPosition.toPosition());
+					} else {
+						commandUtil.move(overloadInfo.overLoad, targetPosition.toPosition());
 					}
 				}
-				
-				
-				
-				/*
-				
-				
-				if (overloadInfo.overLoad.getTilePosition() != null && bwta.BWTA.getRegion(overloadInfo.overLoad.getTilePosition()) != null && bwta.BWTA.getRegion(overloadInfo.overLoad.getTilePosition()).getPolygon() != null) 
-				{
-					if (bwta.BWTA.getRegion(overloadInfo.overLoad.getTilePosition()).getPolygon()
-							.isInside(StrategyManager.Instance().enemyMainBaseLocation.getPosition())) 
-					{
-						if (overloadInfo.overLoad.canUnload()) 
-						{
-//							if(overloadInfo.overLoad.isMoving()) {
-//								
-//								overloadInfo.overLoad.stop();
-//								//commandUtil.move(overloadInfo.overLoad, overloadInfo.overLoad.getPosition());
-//							}
-							System.out.println("명령1 : " + overloadInfo.overLoad.getOrder());
-							System.out.println("command1 : " + overloadInfo.overLoad.getLastCommand());
-							if(overloadInfo.overLoad.unloadAll(overloadInfo.overLoad.getPosition(), false)) 
-							{
-								System.out.println("명령2 : " + overloadInfo.overLoad.getOrder());
-								System.out.println("command2 : " + overloadInfo.overLoad.getLastCommand());
-								System.out.println("하차!!오버로드삭제!!!");
-							}
-						}
-					} 
-					else 
-					{
-						System.out.println("아직 미도달 이동!");
-						
-						commandUtil.move(overloadInfo.overLoad, StrategyManager.Instance().enemyMainBaseLocation.getPosition());
-					}
-					
-				}
-				*/
 			}
 		}
 	}
@@ -439,13 +459,13 @@ public class OverloadManager {
 		withAttackUnitOverloadList.clear();
 	}
 
-	private static PriorityQueue<OverloadInfo> rebalanceWithAttackUnitOverload(int number, Unit target,
+	private static PriorityQueue<OverloadInfo> rebalanceWithAttackUnitOverload(int number, List<Unit> targetList,
 			PriorityQueue<OverloadInfo> waitOverloadQueue) {
 		PriorityQueue<OverloadInfo> queue = new PriorityQueue<OverloadInfo>(10, new Comparator<OverloadInfo>() {
 			@Override
 			public int compare(OverloadInfo o1, OverloadInfo o2) {
-				double distance1 = target.getDistance(o1.overLoad.getX(), o1.overLoad.getY());
-				double distance2 = target.getDistance(o2.overLoad.getX(), o2.overLoad.getY());
+				double distance1 = targetList.get(0).getDistance(o1.overLoad.getX(), o1.overLoad.getY());
+				double distance2 = targetList.get(0).getDistance(o2.overLoad.getX(), o2.overLoad.getY());
 				if (distance1 < distance2) {
 					return -1;
 				} else if (distance1 == distance2) {
@@ -456,11 +476,13 @@ public class OverloadManager {
 			}
 		});
 		queue.addAll(waitOverloadQueue);
+		int cnt = 0;
 		while (queue.isEmpty() == false) {
 			OverloadInfo overload = queue.poll();
 			overload.status = overloadStatus.withAttackUnit;
 			overload.exploreArea = null;
-			overload.followingAttackUnit = target;
+			overload.followingAttackUnit = targetList.get(Math.min(cnt, targetList.size() - 1));
+			cnt++;
 
 			withAttackUnitOverloadList.add(overload);
 			number--;
