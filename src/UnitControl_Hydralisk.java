@@ -24,6 +24,7 @@ public class UnitControl_Hydralisk {
 	
 	static int balanceIndex = 0;
 	static int gatherIndex = UnitControl_COMMON.moveIndex - 1;
+	static boolean goOut = false;
 
 
 
@@ -275,6 +276,30 @@ public class UnitControl_Hydralisk {
 		if(SM.myHydraliskList.size() == 0)
 		{
 			return;
+		}
+		
+		if(SM.isInitialBuildOrderFinished==true && myPlayer.minerals()>350)
+		{
+			goOut = true;
+		}
+		
+		if(goOut==false)
+		{
+			if(SM.enemyMainBaseLocation==null 
+					|| SM.isInitialBuildOrderFinished==false 
+					|| (SM.isInitialBuildOrderFinished==true && myPlayer.minerals()<350))
+			{
+				
+				
+				
+				for(Unit unit : SM.myHydraliskList)
+				{
+					//unit.attack(SM.myFirstChokePoint.getCenter());
+					commandUtil.attackMove(unit, SM.myFirstChokePoint.getCenter());
+				}
+				
+				return;
+			}
 		}
 		
 		//setStartGatherEndPoint();

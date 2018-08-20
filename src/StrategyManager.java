@@ -752,12 +752,7 @@ public class StrategyManager {
 
 								BuildManager.Instance().buildQueue.queueAsLowestPriority(
 										new MetaType(InformationManager.Instance().getWorkerType()), false);
-								BuildManager.Instance().buildQueue.queueAsLowestPriority(
-										new MetaType(InformationManager.Instance().getWorkerType()), false);
-								BuildManager.Instance().buildQueue.queueAsLowestPriority(
-										new MetaType(InformationManager.Instance().getWorkerType()), false);
-								BuildManager.Instance().buildQueue.queueAsLowestPriority(
-										new MetaType(InformationManager.Instance().getWorkerType()), false);
+								
 								
 								
 								
@@ -986,6 +981,25 @@ public class StrategyManager {
 		if(nextExpansion!=null)
 		{
 			//System.out.println("numberOfMyCombatUnitTrainingBuilding : " + numberOfMyCombatUnitTrainingBuilding);
+			
+			
+			if(numberOfMyCombatUnitTrainingBuilding == 2)
+			{
+				
+					if(availableMinerals>350 && buildNUM == 0 && constNUM == 0)
+					{
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
+								BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor,
+								BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+						
+						System.out.println("앞마당 진출");
+					}
+				
+				
+			}
+			
+			
 			
 			if(numberOfMyCombatUnitTrainingBuilding == 4)
 			{

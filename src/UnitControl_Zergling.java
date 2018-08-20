@@ -31,6 +31,7 @@ public class UnitControl_Zergling {
 	static Position scoutZerglingFleePosition = null;
 	static Position willBeThere = null;
 	static boolean runrunrun = false;
+	static boolean goOut = false;
 	
 
 
@@ -41,7 +42,8 @@ public class UnitControl_Zergling {
 		double tempHP = 0;		
 
 		
-		ArrayList <Unit> mustKillFirst = new ArrayList<Unit>();		 
+		ArrayList <Unit> mustKillFirst = new ArrayList<Unit>();
+		ArrayList <Unit> groundUnit = new ArrayList<Unit>();	
 		 																			
 		for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(averagePosition, myUnitType.sightRange())) {
 
@@ -57,6 +59,10 @@ public class UnitControl_Zergling {
 				{
 					continue;
 				}
+				else
+				{
+					groundUnit.add(enemy);
+				}
 				
 				if(enemy.isDefenseMatrixed()==true)
 				{
@@ -71,12 +77,14 @@ public class UnitControl_Zergling {
 						|| enemy.getType().equals(UnitType.Zerg_Spore_Colony)
 						|| enemy.getType().equals(UnitType.Protoss_Photon_Cannon)
 						|| enemy.getType().equals(UnitType.Terran_Bunker)
-						|| enemy.getType().equals(UnitType.Protoss_Zealot)
-						|| enemy.getType().equals(UnitType.Zerg_Zergling))
-//						|| enemy.getType().equals(UnitType.Terran_Medic))
+						|| enemy.getType().equals(UnitType.Protoss_Reaver))
 				{
 					mustKillFirst.add(enemy);					
 				}
+				
+				
+				
+				
 				
 
 			}
@@ -178,15 +186,31 @@ public class UnitControl_Zergling {
 			return;
 		}
 		
-		if(SM.enemyMainBaseLocation==null)
+		if(SM.isInitialBuildOrderFinished==true && myPlayer.minerals()>350)
 		{
-			for(Unit unit : SM.myZerglingList)
-			{
-				commandUtil.attackMove(unit, SM.myFirstChokePoint.getCenter());
-			}
-			
-			return;
+			goOut = true;
 		}
+		
+		if(goOut==false)
+		{
+			if(SM.enemyMainBaseLocation==null 
+					|| SM.isInitialBuildOrderFinished==false 
+					|| (SM.isInitialBuildOrderFinished==true && myPlayer.minerals()<350))
+			{
+				
+				
+				
+				for(Unit unit : SM.myZerglingList)
+				{
+					//unit.attack(SM.myFirstChokePoint.getCenter());
+					commandUtil.attackMove(unit, SM.myFirstChokePoint.getCenter());
+				}
+				
+				return;
+			}
+		}
+		
+		
 			
 		if(positionAssigned_01 == null || positionAssigned_02 == null || MyBotModule.Broodwar.getFrameCount() % 24*60*3 == 0)
 		{
