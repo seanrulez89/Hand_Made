@@ -1078,7 +1078,9 @@ public class WorkerManager {
 			for(int i = 0; i<baseLocationSize; i++) {
 				double distance = baseLocationList.get(i).getPosition().getDistance(unit.getPosition());
 				if(distance<minDistances[i]) {
-					workerData.removeDepot(minDistanceUnits[i]);
+					if(minDistanceUnits[i]!=null) {
+						workerData.removeDepot(minDistanceUnits[i]);
+					}
 					workerData.addDepot(unit);
 					rebalanceWorkers();
 					break;
