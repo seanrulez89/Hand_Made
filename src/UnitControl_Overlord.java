@@ -286,11 +286,14 @@ public class UnitControl_Overlord {
 			Position chokePoint = bwta.BWTA.getNearestChokepoint(baseLocation.getPosition()).getCenter();
 			OverloadManager.Instance().addExploreArea(chokePoint);
 		}
+		
+		/*
 		for(BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(enemyPlayer))
 		{
 			Position chokePoint = bwta.BWTA.getNearestChokepoint(baseLocation.getPosition()).getCenter();
 			OverloadManager.Instance().addExploreArea(chokePoint);
 		}
+		*/ //적군 초크포인트는 가지망
 		
 		/*
 		// 확장기지 중에 아직 정찰이 안된 곳을 다녀봐라, 다녀보면 나중에는 다시 안감, 권순우
@@ -304,19 +307,35 @@ public class UnitControl_Overlord {
 		*/
 		OverloadManager.Instance().addExploreArea(SM.myFirstChokePoint.getPoint());
 		OverloadManager.Instance().addExploreArea(SM.mySecondChokePoint.getPoint());		
-		//explorationSite.add(new Position(63*32, 63*32));
+		OverloadManager.Instance().addExploreArea(new Position(63*32, 63*32));
 		
 		if(MyBotModule.Broodwar.mapFileName().equals("(4)CircuitBreaker.scx"))
 		{
-			/*
-			 * 그 외 별도 지정좌표
-			 */			
+			//11시
+			OverloadManager.Instance().addExploreArea(new Position(22*32, 26*32));
+			OverloadManager.Instance().addExploreArea(new Position(17*32, 41*32));
+			//7시
+			OverloadManager.Instance().addExploreArea(new Position(25*32, 101*32));
+			OverloadManager.Instance().addExploreArea(new Position(27*32, 77*32));
+			//5시
+			OverloadManager.Instance().addExploreArea(new Position(99*32, 76*32));
+			OverloadManager.Instance().addExploreArea(new Position(103*32, 101*32));
+			//1시
+			OverloadManager.Instance().addExploreArea(new Position(104*32, 25*32));
+			OverloadManager.Instance().addExploreArea(new Position(100*32, 50*32));
+
 		}
 		else
 		{
-			/*
-			 * 그 외 별도 지정좌표
-			 */
+			//1시
+			OverloadManager.Instance().addExploreArea(new Position(80*32, 25*32));
+			//5시
+			OverloadManager.Instance().addExploreArea(new Position(102*32, 79*32));
+			//7시
+			OverloadManager.Instance().addExploreArea(new Position(51*32, 105*32));
+			//11시
+			OverloadManager.Instance().addExploreArea(new Position(23*32, 47*32));
+
 		}
 		
 		

@@ -242,6 +242,28 @@ public class WorkerManager {
 				System.out.println("공격해제");
 			}
 		}
+		
+		
+		
+		
+		///////스포닝 풀 강제 재생성
+		if (MyBotModule.Broodwar.getFrameCount() >= 24*60*6.5)
+		{
+			if(MyBotModule.Broodwar.getFrameCount()%14400==0)
+			{
+				if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Zerg_Spawning_Pool)==0
+				&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Zerg_Drone)>=5)
+				{
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spawning_Pool,
+							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+					
+					
+				}			}
+			System.out.println("스포닝 풀 강제 생성");
+		} //게임 시간 8분 이후, 1분에 한번씩 스포닝풀 체크
+		  //스포닝풀이 없고 드론이 5마리 이상이면 스포닝 풀을 만든다.
+		
+		
 
 		//////// 초반 긴급 방어 구축
 

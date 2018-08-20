@@ -9,7 +9,6 @@ public class BuildOrder_Initial {
 
 	// 최초 빌드 : 9오버풀 2해처리 빠른 뮤탈리스크 6마리 5분 20초 생성
 	public void setInitialBuildOrder() {
-		
 
 
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
