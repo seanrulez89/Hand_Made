@@ -3,10 +3,15 @@ import java.util.*;
 
 import bwapi.*;
 import bwta.*;
+import bwta.Region;
 
 
 public class UnitControl_Zergling {
 
+	private Vector<Position> enemyBaseRegionVertices = new Vector<Position>();
+	private int currentScoutFreeToVertexIndex = -1;
+	
+	
 	private CommandUtil commandUtil = new CommandUtil();
 	StrategyManager SM = StrategyManager.Instance();
 	
@@ -28,7 +33,7 @@ public class UnitControl_Zergling {
 
 	static Position positionAssigned_01 = null;
 	static Position positionAssigned_02 = null;
-	static Position scoutZerglingFleePosition = null;
+	static BaseLocation scoutZerglingFleePosition = null;
 	static Position willBeThere = null;
 	static boolean runrunrun = false;
 	static boolean goOut = false;
@@ -144,20 +149,30 @@ public class UnitControl_Zergling {
 			}
 		}
 		
-		
-		positionAssigned_02 = UnitControl_COMMON.positionList.get(4);
-		
-		
-		for(BaseLocation startLocation : BWTA.getStartLocations())
+		if(SM.enemyMainBaseLocation!=null)
 		{
-			if(startLocation.getPosition().equals(StrategyManager.Instance().enemyMainBaseLocation.getPosition())==false)
+			positionAssigned_02 = UnitControl_COMMON.positionList.get(4);
+		}
+		else
+		{
+			positionAssigned_02 = new Position(63*32, 63*32);
+		}
+		
+		if(SM.enemyMainBaseLocation!=null)
+		{
+			for(BaseLocation startLocation : BWTA.getStartLocations())
 			{
-				if(startLocation.getPosition().equals(StrategyManager.Instance().myMainBaseLocation.getPosition())==false)
+				if(startLocation.getPosition().equals(StrategyManager.Instance().enemyMainBaseLocation.getPosition())==false)
 				{
-					scoutZerglingFleePosition = startLocation.getPosition();
+					if(startLocation.getPosition().equals(StrategyManager.Instance().myMainBaseLocation.getPosition())==false)
+					{
+						scoutZerglingFleePosition = startLocation;
+					}
 				}
 			}
 		}
+		
+		
 		
 		
 		
@@ -191,21 +206,80 @@ public class UnitControl_Zergling {
 			goOut = true;
 		}
 		
-		if(goOut==false)
-		{
-			if(SM.enemyMainBaseLocation==null 
-					|| SM.isInitialBuildOrderFinished==false 
-					|| (SM.isInitialBuildOrderFinished==true && myPlayer.minerals()<350))
-			{
-				
-				
-				
-				for(Unit unit : SM.myZerglingList)
-				{
-					//unit.attack(SM.myFirstChokePoint.getCenter());
-					commandUtil.attackMove(unit, SM.myFirstChokePoint.getCenter());
+		if (goOut == false) {
+			if (SM.enemyMainBaseLocation == null || SM.isInitialBuildOrderFinished == false
+					|| (SM.isInitialBuildOrderFinished == true && myPlayer.minerals() < 350)) {
+
+				/*
+				 * for(Unit unit : SM.myZerglingList) {
+				 * 
+				 * commandUtil.attackMove(unit, SM.myFirstChokePoint.getCenter()); }
+				 */
+
+				if (positionAssigned_01 == null || positionAssigned_02 == null
+						|| MyBotModule.Broodwar.getFrameCount() % 24 * 60 * 3 == 0) {
+					setPositionAssigned();
 				}
-				
+
+				a: for (int i = 0; i < SM.myZerglingList.size(); i++) {
+					Unit Zergling = SM.myZerglingList.get(i);
+
+					if (i == 0 && Zergling != null && scoutZerglingFleePosition != null
+							&& positionAssigned_02 != null) {
+
+						int cnt = 0;
+						for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(Zergling.getPosition(),
+								Zergling.getType().sightRange())) {
+							if (enemy.getPlayer() == enemyPlayer)// && MyBotModule.Broodwar.getFrameCount() % 24 == 0)
+							{
+								// System.out.println("적군 유인");
+								if (Zergling.getDistance(scoutZerglingFleePosition) >= 32) {
+									willBeThere = PredictMovement(enemy, 24);
+								}
+
+								//commandUtil.move(Zergling, scoutZerglingFleePosition);
+								
+								commandUtil.move(Zergling, getScoutFleePositionFromEnemyRegionVertices(Zergling));
+								runrunrun = true;
+								cnt++;
+								continue a;
+							}
+						}
+
+						if (scoutZerglingFleePosition != null && Zergling.getDistance(scoutZerglingFleePosition) < 32) {
+							// System.out.println("적 리셋");
+							willBeThere = null;
+						}
+
+						if (willBeThere != null && Zergling.getDistance(willBeThere) < 32) {
+							// System.out.println("적 리셋");
+							willBeThere = null;
+						}
+
+						if (cnt == 0) {
+							runrunrun = false;
+
+						}
+
+						if (runrunrun == false) {
+							if (willBeThere != null) {
+								// System.out.println("예상적목표향해이동");
+								commandUtil.attackMove(Zergling, willBeThere);
+								continue;
+							} else {
+								// System.out.println("정찰위치로이동");
+								commandUtil.attackMove(Zergling, positionAssigned_02);
+								continue;
+							}
+
+						}
+
+					} else {
+						commandUtil.attackMove(Zergling, SM.myFirstChokePoint.getCenter());
+					}
+
+				}
+
 				return;
 			}
 		}
@@ -277,7 +351,8 @@ public class UnitControl_Zergling {
 							willBeThere = PredictMovement(enemy, 24);
 						}
 						
-						commandUtil.move(Zergling, scoutZerglingFleePosition);
+						//commandUtil.move(Zergling, scoutZerglingFleePosition);
+						commandUtil.move(Zergling, getScoutFleePositionFromEnemyRegionVertices(Zergling));
 						runrunrun = true;
 						cnt++;
 						continue a;
@@ -545,6 +620,217 @@ public class UnitControl_Zergling {
 			}
 		}*/
 	}
+	
+	public Position getScoutFleePositionFromEnemyRegionVertices(Unit currentScoutUnit)
+	{
+		// calculate enemy region vertices if we haven't yet
+		if (enemyBaseRegionVertices.isEmpty()) {
+			calculateEnemyRegionVertices();
+		}
+
+		if (enemyBaseRegionVertices.isEmpty()) {
+			return MyBotModule.Broodwar.self().getStartLocation().toPosition();
+		}
+
+		// if this is the first flee, we will not have a previous perimeter index
+		if (currentScoutFreeToVertexIndex == -1)
+		{
+			// so return the closest position in the polygon
+			int closestPolygonIndex = getClosestVertexIndex(currentScoutUnit);
+
+			if (closestPolygonIndex == -1)
+			{
+				return MyBotModule.Broodwar.self().getStartLocation().toPosition();
+			}
+			else
+			{
+				// set the current index so we know how to iterate if we are still fleeing later
+				currentScoutFreeToVertexIndex = closestPolygonIndex;
+				return enemyBaseRegionVertices.get(closestPolygonIndex);
+			}
+		}
+		// if we are still fleeing from the previous frame, get the next location if we are close enough
+		else
+		{
+			double distanceFromCurrentVertex = enemyBaseRegionVertices.get(currentScoutFreeToVertexIndex).getDistance(currentScoutUnit.getPosition());
+
+			// keep going to the next vertex in the perimeter until we get to one we're far enough from to issue another move command
+			while (distanceFromCurrentVertex < 128)
+			{
+				currentScoutFreeToVertexIndex = (currentScoutFreeToVertexIndex + 1) % enemyBaseRegionVertices.size();
+				distanceFromCurrentVertex = enemyBaseRegionVertices.get(currentScoutFreeToVertexIndex).getDistance(currentScoutUnit.getPosition());
+			}
+
+			return enemyBaseRegionVertices.get(currentScoutFreeToVertexIndex);
+		}
+	}
+
+	// Enemy MainBaseLocation 이 있는 Region 의 가장자리를  enemyBaseRegionVertices 에 저장한다
+	// Region 내 모든 건물을 Eliminate 시키기 위한 지도 탐색 로직 작성시 참고할 수 있다
+	public void calculateEnemyRegionVertices()
+	{/*
+		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy());
+		if (enemyBaseLocation == null) {
+			return;
+		}
+*/
+		if(scoutZerglingFleePosition==null)
+		{
+			return;
+		}
+		
+		
+		Region enemyRegion = scoutZerglingFleePosition.getRegion();
+		if (enemyRegion == null) {
+			return;
+		}
+		final Position basePosition = MyBotModule.Broodwar.self().getStartLocation().toPosition();
+		final Vector<TilePosition> closestTobase = MapTools.Instance().getClosestTilesTo(basePosition);
+		Set<Position> unsortedVertices = new HashSet<Position>();
+
+		// check each tile position
+		for (int i = 0; i < closestTobase.size(); ++i)
+		{
+			final TilePosition tp = closestTobase.get(i);
+
+			if (BWTA.getRegion(tp) != enemyRegion)
+			{
+				continue;
+			}
+
+			// a tile is 'surrounded' if
+			// 1) in all 4 directions there's a tile position in the current region
+			// 2) in all 4 directions there's a buildable tile
+			boolean surrounded = true;
+			if (BWTA.getRegion(new TilePosition(tp.getX() + 1, tp.getY())) != enemyRegion || !MyBotModule.Broodwar.isBuildable(new TilePosition(tp.getX() + 1, tp.getY()))
+					|| BWTA.getRegion(new TilePosition(tp.getX(), tp.getY() + 1)) != enemyRegion || !MyBotModule.Broodwar.isBuildable(new TilePosition(tp.getX(), tp.getY() + 1))
+					|| BWTA.getRegion(new TilePosition(tp.getX() - 1, tp.getY())) != enemyRegion || !MyBotModule.Broodwar.isBuildable(new TilePosition(tp.getX() - 1, tp.getY()))
+					|| BWTA.getRegion(new TilePosition(tp.getX(), tp.getY() - 1)) != enemyRegion || !MyBotModule.Broodwar.isBuildable(new TilePosition(tp.getX(), tp.getY() - 1)))
+			{
+				surrounded = false;
+			}
+
+			// push the tiles that aren't surrounded 
+			// Region의 가장자리 타일들만 추가한다
+			if (!surrounded && MyBotModule.Broodwar.isBuildable(tp))
+			{
+				if (Config.DrawScoutInfo)
+				{
+					int x1 = tp.getX() * 32 + 2;
+					int y1 = tp.getY() * 32 + 2;
+					int x2 = (tp.getX() + 1) * 32 - 2;
+					int y2 = (tp.getY() + 1) * 32 - 2;
+					MyBotModule.Broodwar.drawTextMap(x1 + 3, y1 + 2, "" + BWTA.getGroundDistance(tp, basePosition.toTilePosition()));
+					MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Green, false);
+				}
+
+				unsortedVertices.add(new Position(tp.toPosition().getX() + 16, tp.toPosition().getY() + 16));
+			}
+		}
+
+		Vector<Position> sortedVertices = new Vector<Position>();
+		Position current = unsortedVertices.iterator().next();
+		enemyBaseRegionVertices.add(current);
+		unsortedVertices.remove(current);
+
+		// while we still have unsorted vertices left, find the closest one remaining to current
+		while (!unsortedVertices.isEmpty())
+		{
+			double bestDist = 1000000;
+			Position bestPos = null;
+
+			for (final Position pos : unsortedVertices)
+			{
+				double dist = pos.getDistance(current);
+
+				if (dist < bestDist)
+				{
+					bestDist = dist;
+					bestPos = pos;
+				}
+			}
+
+			current = bestPos;
+			sortedVertices.add(bestPos);
+			unsortedVertices.remove(bestPos);
+		}
+
+		// let's close loops on a threshold, eliminating death grooves
+		int distanceThreshold = 100;
+
+		while (true)
+		{
+			// find the largest index difference whose distance is less than the threshold
+			int maxFarthest = 0;
+			int maxFarthestStart = 0;
+			int maxFarthestEnd = 0;
+
+			// for each starting vertex
+			for (int i = 0; i < (int)sortedVertices.size(); ++i)
+			{
+				int farthest = 0;
+				int farthestIndex = 0;
+
+				// only test half way around because we'll find the other one on the way back
+				for (int j= 1; j < sortedVertices.size() / 2; ++j)
+				{
+					int jindex = (i + j) % sortedVertices.size();
+
+					if (sortedVertices.get(i).getDistance(sortedVertices.get(jindex)) < distanceThreshold)
+					{
+						farthest = j;
+						farthestIndex = jindex;
+					}
+				}
+
+				if (farthest > maxFarthest)
+				{
+					maxFarthest = farthest;
+					maxFarthestStart = i;
+					maxFarthestEnd = farthestIndex;
+				}
+			}
+
+			// stop when we have no long chains within the threshold
+			if (maxFarthest < 4)
+			{
+				break;
+			}
+
+			double dist = sortedVertices.get(maxFarthestStart).getDistance(sortedVertices.get(maxFarthestEnd));
+
+			Vector<Position> temp = new Vector<Position>();
+
+			for (int s = maxFarthestEnd; s != maxFarthestStart; s = (s + 1) % sortedVertices.size())
+			{
+				
+				temp.add(sortedVertices.get(s));
+			}
+
+			sortedVertices = temp;
+		}
+
+		enemyBaseRegionVertices = sortedVertices;
+	}
+	
+	public int getClosestVertexIndex(Unit unit)
+	{
+		int closestIndex = -1;
+		double closestDistance = 10000000;
+
+		for (int i = 0; i < enemyBaseRegionVertices.size(); ++i)
+		{
+			double dist = unit.getDistance(enemyBaseRegionVertices.get(i));
+			if (dist < closestDistance)
+			{
+				closestDistance = dist;
+				closestIndex = i;
+			}
+		}
+
+		return closestIndex;
+	}
+	
 	
 	private static UnitControl_Zergling instance = new UnitControl_Zergling();
 

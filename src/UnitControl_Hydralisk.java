@@ -289,13 +289,33 @@ public class UnitControl_Hydralisk {
 					|| SM.isInitialBuildOrderFinished==false 
 					|| (SM.isInitialBuildOrderFinished==true && myPlayer.minerals()<350))
 			{
-				
-				
-				
+				ArrayList <Position> defenseSite = UnitControl_COMMON.defenseSite;
 				for(Unit unit : SM.myHydraliskList)
-				{
-					//unit.attack(SM.myFirstChokePoint.getCenter());
-					commandUtil.attackMove(unit, SM.myFirstChokePoint.getCenter());
+				{				
+					Unit nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, unit.getPosition());	
+					if (nextTarget != null) 
+					{
+						if (unit.getGroundWeaponCooldown() == 0) 
+						{
+							commandUtil.attackUnit(unit, nextTarget);
+							continue;
+						}				
+						else if(unit.isUnderAttack())
+						{
+							commandUtil.move(unit, SM.myMainBaseLocation.getPosition());
+							continue;
+						}					
+					}
+					
+					if (defenseSite.isEmpty()==false && unit.isAttacking()==false)
+					{
+						commandUtil.attackMove(unit, UnitControl_COMMON.getClosestDefenseSite(unit));
+					}
+					else
+					{
+						commandUtil.attackMove(unit, SM.myFirstChokePoint.getCenter());
+					}
+	
 				}
 				
 				return;

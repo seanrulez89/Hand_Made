@@ -226,6 +226,18 @@ public class UnitControl_COMMON {
 			{
 				iter.remove();
 			}
+			
+			if(StrategyManager.Instance().myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)<2 && StrategyManager.Instance().isInitialBuildOrderFinished==true)
+			{
+				if(position.equals(StrategyManager.Instance().myFirstExpansionLocation.getPosition()))
+				{
+					iter.remove();
+					System.out.println("아직 앞마당 안지었어");
+				}
+				
+			}
+			
+			
 		}
 
 		

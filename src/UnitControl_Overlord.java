@@ -307,10 +307,11 @@ public class UnitControl_Overlord {
 		*/
 		OverloadManager.Instance().addExploreArea(SM.myFirstChokePoint.getPoint());
 		OverloadManager.Instance().addExploreArea(SM.mySecondChokePoint.getPoint());		
-		OverloadManager.Instance().addExploreArea(new Position(63*32, 63*32));
+		//OverloadManager.Instance().addExploreArea(new Position(63*32, 63*32));
 		
 		if(MyBotModule.Broodwar.mapFileName().equals("(4)CircuitBreaker.scx"))
 		{
+			/*
 			//11시
 			OverloadManager.Instance().addExploreArea(new Position(22*32, 26*32));
 			OverloadManager.Instance().addExploreArea(new Position(17*32, 41*32));
@@ -323,10 +324,10 @@ public class UnitControl_Overlord {
 			//1시
 			OverloadManager.Instance().addExploreArea(new Position(104*32, 25*32));
 			OverloadManager.Instance().addExploreArea(new Position(100*32, 50*32));
-
+*/
 		}
 		else
-		{
+		{/*
 			//1시
 			OverloadManager.Instance().addExploreArea(new Position(80*32, 25*32));
 			//5시
@@ -335,7 +336,7 @@ public class UnitControl_Overlord {
 			OverloadManager.Instance().addExploreArea(new Position(51*32, 105*32));
 			//11시
 			OverloadManager.Instance().addExploreArea(new Position(23*32, 47*32));
-
+*/
 		}
 		
 		

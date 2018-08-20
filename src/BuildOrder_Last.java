@@ -28,7 +28,7 @@ public class BuildOrder_Last {
 	
 	public void lastBuildOrder() {
 		
-		if(myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)<3)
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)<2 || SM.isInitialBuildOrderFinished==false)
 		{
 			return;
 		}
@@ -44,7 +44,7 @@ public class BuildOrder_Last {
 				+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Evolution_Chamber,	null);
 
 		
-		if(myPlayer.hasResearched(TechType.Lurker_Aspect)==true && spireNumber == 0)
+		if(spireNumber == 0) // myPlayer.hasResearched(TechType.Lurker_Aspect)==true &&
 		{
 			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spire,
 					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);

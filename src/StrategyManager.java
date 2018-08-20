@@ -422,7 +422,7 @@ public class StrategyManager {
 			}
 		}
 		
-		if(MyBotModule.Broodwar.self().supplyTotal() > 350)
+		if(MyBotModule.Broodwar.self().supplyTotal() > 300)
 		{
 			attack_cnt = attack_cnt + 1;
 			return true;
@@ -446,12 +446,12 @@ public class StrategyManager {
 			return true;
 		}
 		
-		
+		/*
 		if (myLurkerList.size() < 3) {
 			System.out.println(222);
 			return true;
 		}
-		
+		*/
 		
 		
 		if (myHydraliskList.size() < 13) {
@@ -750,7 +750,7 @@ public class StrategyManager {
 							// 빌드큐에 일꾼 생산이 1개는 있도록 한다
 							if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Drone, null) == 0) {
 
-								BuildManager.Instance().buildQueue.queueAsLowestPriority(
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(
 										new MetaType(InformationManager.Instance().getWorkerType()), false);
 								
 								
@@ -1005,7 +1005,7 @@ public class StrategyManager {
 			{
 				if (nextExpansion.getGeysers().size()>0)
 				{
-					if(availableMinerals>200 && buildNUM == 0 && constNUM == 0)
+					if(availableMinerals>350 && buildNUM == 0 && constNUM == 0)
 					{
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 								nextExpansion.getTilePosition(), true);
@@ -1017,7 +1017,7 @@ public class StrategyManager {
 				}
 				else
 				{
-					if(availableMinerals>200 && buildNUM == 0 && constNUM == 0)
+					if(availableMinerals>300 && buildNUM == 0 && constNUM == 0)
 					{
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 								nextExpansion.getTilePosition(), true);
@@ -1031,7 +1031,7 @@ public class StrategyManager {
 			//System.out.println("");
 			
 			else if(numberOfMyCombatUnitTrainingBuilding == 3
-					|| numberOfMyCombatUnitTrainingBuilding == 5
+					
 					|| numberOfMyCombatUnitTrainingBuilding == 7
 					|| numberOfMyCombatUnitTrainingBuilding == 9
 					|| numberOfMyCombatUnitTrainingBuilding == 11
@@ -1074,12 +1074,17 @@ public class StrategyManager {
 			*/
 			else
 			{
-				if(availableMinerals>350 && buildNUM == 0 && constNUM == 0)
+				if(myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)>1)
 				{
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
-							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-					System.out.println(4);
+					if(availableMinerals>350 && buildNUM == 0 && constNUM == 0)
+					{
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
+								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						System.out.println(4);
+					}
 				}
+				
+				
 			}
 			
 			
@@ -1145,6 +1150,10 @@ public class StrategyManager {
 
 		// InitialBuildOrder 진행중에는 아무것도 하지 않습니다
 		if (isInitialBuildOrderFinished == false) {
+			return;
+		}
+		
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)<2) {
 			return;
 		}
 

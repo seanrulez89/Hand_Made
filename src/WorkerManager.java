@@ -258,8 +258,10 @@ public class WorkerManager {
 							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 					
 					
-				}			}
-			System.out.println("스포닝 풀 강제 생성");
+				}			
+			}
+			
+			//System.out.println("스포닝 풀 강제 생성");
 		} //게임 시간 8분 이후, 1분에 한번씩 스포닝풀 체크
 		  //스포닝풀이 없고 드론이 5마리 이상이면 스포닝 풀을 만든다.
 		
@@ -390,8 +392,10 @@ public class WorkerManager {
 
 					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) < 6) {
 
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony,
+						/*
+						 * BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony,
 								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+								*/
 						
 
 					}
@@ -401,9 +405,9 @@ public class WorkerManager {
 						&& numberOfUnitType_Zerg_Sunken_Colony < 4) {
 
 					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) < 4) {
-
+						/*
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Sunken_Colony, true);
-						
+						*/
 					}
 				}
 			}

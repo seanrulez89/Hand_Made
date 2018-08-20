@@ -128,12 +128,12 @@ public class OverloadManager {
 				}
 			}
 		});
-		System.out.println(retList);
-		System.out.print("position : ");
+		//System.out.println(retList);
+		//System.out.print("position : ");
 		for(Position pos : exploreAreaList) {
-			System.out.print("(" + pos.getX() + "," + pos.getY()+"), ");
+			//System.out.print("(" + pos.getX() + "," + pos.getY()+"), ");
 		}
-		System.out.println();
+		//System.out.println();
 		return retList;
 	}
 	
