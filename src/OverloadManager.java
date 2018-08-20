@@ -13,6 +13,16 @@ import bwapi.UnitType;
 import bwta.BaseLocation;
 
 public class OverloadManager {
+	private static class ScoutInfo{
+		Position overloadPosition;
+		int sumHitPoint;
+		int avgAttackPoint;
+		@Override
+		public String toString() {
+			return "ScoutInfo [overloadPosition=" + overloadPosition + ", sumHitPoint=" + sumHitPoint
+					+ ", avgAttackPoint=" + avgAttackPoint + "]";
+		}
+	}
 
 	private static class OverloadInfo {
 		Unit overLoad;
@@ -71,7 +81,7 @@ public class OverloadManager {
 		public int compare(Position o1, Position o2) {
 			double distance1 = o1.getDistance(baseLocation.getX(), baseLocation.getY());
 			double distance2 = o2.getDistance(baseLocation.getX(), baseLocation.getY());
-			if (distance1 < distance2) {
+			if (distance1 > distance2) {
 				return -1;
 			} else if (distance1 == distance2) {
 				return 0;
@@ -80,6 +90,55 @@ public class OverloadManager {
 			}
 		}
 	};
+	
+	public List<ScoutInfo> getRushInfo(){
+		List<ScoutInfo> retList = new ArrayList<ScoutInfo>();
+		for(OverloadInfo overloadInfo : scoutOverloadList) {
+			int sumHitPoint = 0;
+			int avgAttackPoint = 0;
+			int cnt = 0;
+			for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(overloadInfo.overLoad.getPosition(), 6 * Config.TILE_SIZE)) {
+				if (enemy.getPlayer() == StrategyManager.Instance().enemyPlayer) {
+					sumHitPoint+=enemy.getHitPoints();
+					sumHitPoint+=enemy.getShields();
+					avgAttackPoint+=enemy.getType().groundWeapon().damageAmount();
+					cnt++;
+				}
+			}
+			ScoutInfo scoutInfo = new ScoutInfo();
+			if(cnt!=0) {
+				scoutInfo.avgAttackPoint = avgAttackPoint/cnt;
+			}
+			scoutInfo.sumHitPoint = sumHitPoint;
+			scoutInfo.overloadPosition = new Position(overloadInfo.overLoad.getPosition().getX(), overloadInfo.overLoad.getPosition().getY());
+			retList.add(scoutInfo);
+		}
+		Collections.sort(retList, new Comparator<ScoutInfo>() {
+
+			@Override
+			public int compare(ScoutInfo o1, ScoutInfo o2) {
+				double distance1 = o1.overloadPosition.getDistance(baseLocation.getX(), baseLocation.getY());
+				double distance2 = o2.overloadPosition.getDistance(baseLocation.getX(), baseLocation.getY());
+				if (distance1 < distance2) {
+					return -1;
+				} else if (distance1 == distance2) {
+					return 0;
+				} else {
+					return 1;
+				}
+			}
+		});
+		System.out.println(retList);
+		System.out.print("position : ");
+		for(Position pos : exploreAreaList) {
+			System.out.print("(" + pos.getX() + "," + pos.getY()+"), ");
+		}
+		System.out.println();
+		return retList;
+	}
+	
+	
+	
 
 	public void addDropshipUnit(Unit unit) {
 		WaitingLoadUnitAndOverload waitingLoadUnitAndOverload = new WaitingLoadUnitAndOverload();
@@ -351,7 +410,11 @@ public class OverloadManager {
 					commandUtil.move(overloadInfo.overLoad, overloadInfo.followingAttackUnit.getPosition());
 				}
 			} else if (overloadInfo.status == overloadStatus.scout) {
-				commandUtil.move(overloadInfo.overLoad, overloadInfo.exploreArea);
+				if (overloadInfo.overLoad.isUnderAttack()) {
+					commandUtil.move(overloadInfo.overLoad, baseLocation.getPosition());
+				} else {
+					commandUtil.move(overloadInfo.overLoad, overloadInfo.exploreArea);
+				}
 			} else if (overloadInfo.status == overloadStatus.wait) {
 				commandUtil.move(overloadInfo.overLoad, baseLocation.getPosition());
 			} else if (overloadInfo.status == overloadStatus.dropshipWaitingForUnit) {
@@ -504,7 +567,7 @@ public class OverloadManager {
 
 	private static String listTostring2(List<WaitingLoadUnitAndOverload> list) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("size : " + list.size() + " units : ");
+		sb.append("size : " + list.size() + " units : ");	
 		for (WaitingLoadUnitAndOverload waitingLoadUnitAndOverload : list) {
 			sb.append(waitingLoadUnitAndOverload.overloadInfo.overLoad.getID() + "&"
 					+ waitingLoadUnitAndOverload.unit.getID() + " ");

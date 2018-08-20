@@ -286,6 +286,12 @@ public class UnitControl_Overlord {
 			Position chokePoint = bwta.BWTA.getNearestChokepoint(baseLocation.getPosition()).getCenter();
 			OverloadManager.Instance().addExploreArea(chokePoint);
 		}
+		for(BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(enemyPlayer))
+		{
+			Position chokePoint = bwta.BWTA.getNearestChokepoint(baseLocation.getPosition()).getCenter();
+			OverloadManager.Instance().addExploreArea(chokePoint);
+		}
+		
 		/*
 		// 확장기지 중에 아직 정찰이 안된 곳을 다녀봐라, 다녀보면 나중에는 다시 안감, 권순우
 		for(BaseLocation EXPLocation : BWTA.getBaseLocations())
@@ -318,6 +324,8 @@ public class UnitControl_Overlord {
 		OverloadManager.Instance().updateWithCombatUnitNum(UnitType.Zerg_Hydralisk, 2);
 		OverloadManager.Instance().updateWithCombatUnitNum(UnitType.Zerg_Mutalisk, 2);
 		
+		
+		OverloadManager.Instance().getRushInfo();
 		
 		
 		
