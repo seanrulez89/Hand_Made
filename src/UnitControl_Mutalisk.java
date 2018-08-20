@@ -981,13 +981,13 @@ public class UnitControl_Mutalisk {
 				}
 
 			}
-			
+			/*
 			if(MyBotModule.Broodwar.getFrameCount() % 3 == 0)
 			{
 				commandUtil.move(Mutalisk, averagePosition);
 				continue;
 			}
-			
+			*/
 			
 			if(SM.enemyMainBaseLocation == null)
 			{

@@ -33,6 +33,9 @@ public class UnitControl_MASTER {
 			//Zergling = new UnitControl_Zergling();
 		
 			Zergling.update();
+			
+			//Hydralisk = new UnitControl_Hydralisk();
+			Hydralisk.update();	
 	;
 		}
 		
@@ -50,8 +53,7 @@ public class UnitControl_MASTER {
 			Mutalisk.update();	
 		
 			
-			//Hydralisk = new UnitControl_Hydralisk();
-			Hydralisk.update();	
+			
 			
 			
 			Lurker = new UnitControl_Lurker();

@@ -28,6 +28,13 @@ public class BuildOrder_Last {
 	
 	public void lastBuildOrder() {
 		
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)<3)
+		{
+			return;
+		}
+		
+		
+		
 		int spireNumber = myPlayer.allUnitCount(UnitType.Zerg_Spire)
 				+ BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spire)
 				+ ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spire, null);
