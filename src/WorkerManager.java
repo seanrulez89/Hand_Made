@@ -242,6 +242,28 @@ public class WorkerManager {
 				System.out.println("공격해제");
 			}
 		}
+		
+		
+		
+		
+		///////스포닝 풀 강제 재생성
+		if (MyBotModule.Broodwar.getFrameCount() >= 24*60*6.5)
+		{
+			if(MyBotModule.Broodwar.getFrameCount()%14400==0)
+			{
+				if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Zerg_Spawning_Pool)==0
+				&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Zerg_Drone)>=5)
+				{
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spawning_Pool,
+							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+					
+					
+				}			}
+			System.out.println("스포닝 풀 강제 생성");
+		} //게임 시간 8분 이후, 1분에 한번씩 스포닝풀 체크
+		  //스포닝풀이 없고 드론이 5마리 이상이면 스포닝 풀을 만든다.
+		
+		
 
 		//////// 초반 긴급 방어 구축
 
@@ -1062,11 +1084,15 @@ public class WorkerManager {
 			
 			// 각 점령지에서 가장 가까운 해처리의 거리 계산
 			double[] minDistances = new double[baseLocationSize]; 
+			Unit[] minDistanceUnits = new Unit[baseLocationSize]; 
 			Arrays.fill(minDistances, 987654321);
 			for(int i = 0; i< baseLocationSize; i++) {
 				for(int j = 0; j<depotList.size(); j++) {
 					double distance = baseLocationList.get(i).getPosition().getDistance(depotList.get(j).getPosition());
-					minDistances[i] = Math.min(minDistances[i], distance);
+					if(distance<minDistances[i]) {
+						minDistances[i] = distance;
+						minDistanceUnits[i] = depotList.get(j);
+					}
 				}
 			}
 			
@@ -1074,6 +1100,9 @@ public class WorkerManager {
 			for(int i = 0; i<baseLocationSize; i++) {
 				double distance = baseLocationList.get(i).getPosition().getDistance(unit.getPosition());
 				if(distance<minDistances[i]) {
+					if(minDistanceUnits[i]!=null) {
+						workerData.removeDepot(minDistanceUnits[i]);
+					}
 					workerData.addDepot(unit);
 					rebalanceWorkers();
 					break;

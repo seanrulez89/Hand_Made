@@ -15,6 +15,7 @@ public class BuildOrder_Initial {
 	
 	// 최초 빌드 : 9오버풀 2해처리 빠른 뮤탈리스크 6마리 5분 20초 생성
 	public void setInitialBuildOrder() {
+
 		
 		int Mx = StrategyManager.Instance().myMainBaseLocation.getX();
 		int Cx = StrategyManager.Instance().myFirstChokePoint.getX();
@@ -26,6 +27,7 @@ public class BuildOrder_Initial {
 		
 		simCity();
 		
+
 
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
