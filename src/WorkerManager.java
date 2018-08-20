@@ -10,6 +10,7 @@ import bwta.*;
 public class WorkerManager {
 	
 	static int defenceFlagforEarlyAttack=0;
+	static int FlagforReconstructedSpawningPool=0;
 
 	/// 각 Worker 에 대한 WorkerJob 상황을 저장하는 자료구조 객체
 	private WorkerData workerData = new WorkerData();
@@ -241,27 +242,38 @@ public class WorkerManager {
 				setMineralWorker(worker);				
 				System.out.println("공격해제");
 			}
+			
+			///////스포닝 풀 강제 재생성
+			if (MyBotModule.Broodwar.getFrameCount() >= 24*60*7)
+			{
+				if(MyBotModule.Broodwar.getFrameCount()%1440==0)
+				//FlagforReconstructedSpawningPool=0;
+				{
+					if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Zerg_Spawning_Pool)==0
+					&& workerData.getWorkers().size() >= 5
+					&& FlagforReconstructedSpawningPool==0)
+					{
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spawning_Pool,
+								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+						FlagforReconstructedSpawningPool=1;
+					//	System.out.println("스포닝 풀 : "+MyBotModule.Broodwar.self().completedUnitCount(UnitType.Zerg_Spawning_Pool)+
+					//						"드론 : "+ workerData.getWorkers().size()+
+					//						"Flag : "+FlagforReconstructedSpawningPool);
+					//	System.out.println("스포닝 풀 강제 생성");
+						
+					}	
+
+				}
+
+			} //게임 시간 7분 이후, 1분에 한번씩 스포닝풀 체크
+			  //스포닝풀이 없고 드론이 5마리 이상이면 스포닝 풀을 만든다. (현재 1회만 동작)
+			
 		}
 		
 		
 		
 		
-		///////스포닝 풀 강제 재생성
-		if (MyBotModule.Broodwar.getFrameCount() >= 24*60*6.5)
-		{
-			if(MyBotModule.Broodwar.getFrameCount()%14400==0)
-			{
-				if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Zerg_Spawning_Pool)==0
-				&& MyBotModule.Broodwar.self().completedUnitCount(UnitType.Zerg_Drone)>=5)
-				{
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spawning_Pool,
-							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-					
-					
-				}			}
-			System.out.println("스포닝 풀 강제 생성");
-		} //게임 시간 8분 이후, 1분에 한번씩 스포닝풀 체크
-		  //스포닝풀이 없고 드론이 5마리 이상이면 스포닝 풀을 만든다.
+
 		
 		
 
@@ -301,7 +313,7 @@ public class WorkerManager {
 			if(MyBotModule.Broodwar.getFrameCount()%720==0)
 			{
 				defenceFlagforEarlyAttack = 0;
-				System.out.println(MyBotModule.Broodwar.getFrameCount()/24+"초/ 플래그 초기화");
+				//System.out.println(MyBotModule.Broodwar.getFrameCount()/24+"초/ 플래그 초기화");
 			}
 			
 			if(numberOfEarlyAttackUnit >= 1 && defenceFlagforEarlyAttack == 0 && myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool)>0)
