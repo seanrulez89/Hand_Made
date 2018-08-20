@@ -1062,11 +1062,15 @@ public class WorkerManager {
 			
 			// 각 점령지에서 가장 가까운 해처리의 거리 계산
 			double[] minDistances = new double[baseLocationSize]; 
+			Unit[] minDistanceUnits = new Unit[baseLocationSize]; 
 			Arrays.fill(minDistances, 987654321);
 			for(int i = 0; i< baseLocationSize; i++) {
 				for(int j = 0; j<depotList.size(); j++) {
 					double distance = baseLocationList.get(i).getPosition().getDistance(depotList.get(j).getPosition());
-					minDistances[i] = Math.min(minDistances[i], distance);
+					if(distance<minDistances[i]) {
+						minDistances[i] = distance;
+						minDistanceUnits[i] = depotList.get(j);
+					}
 				}
 			}
 			
@@ -1074,6 +1078,7 @@ public class WorkerManager {
 			for(int i = 0; i<baseLocationSize; i++) {
 				double distance = baseLocationList.get(i).getPosition().getDistance(unit.getPosition());
 				if(distance<minDistances[i]) {
+					workerData.removeDepot(minDistanceUnits[i]);
 					workerData.addDepot(unit);
 					rebalanceWorkers();
 					break;
