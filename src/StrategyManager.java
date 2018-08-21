@@ -982,8 +982,8 @@ public class StrategyManager {
 		{
 			//System.out.println("numberOfMyCombatUnitTrainingBuilding : " + numberOfMyCombatUnitTrainingBuilding);
 			
-			
-			if(numberOfMyCombatUnitTrainingBuilding == 2)
+			/*
+			if(numberOfMyCombatUnitTrainingBuilding == 3)
 			{
 				
 					if(availableMinerals>350 && buildNUM == 0 && constNUM == 0)
@@ -998,10 +998,10 @@ public class StrategyManager {
 				
 				
 			}
+			*/
 			
-			
-			
-			if(numberOfMyCombatUnitTrainingBuilding == 4)
+			/*
+			if(numberOfMyCombatUnitTrainingBuilding == 3)
 			{
 				if (nextExpansion.getGeysers().size()>0)
 				{
@@ -1027,11 +1027,10 @@ public class StrategyManager {
 				}
 				
 			}
-			
+			*/
 			//System.out.println("");
 			
-			else if(numberOfMyCombatUnitTrainingBuilding == 3
-					
+			if(numberOfMyCombatUnitTrainingBuilding == 4				
 					|| numberOfMyCombatUnitTrainingBuilding == 7
 					|| numberOfMyCombatUnitTrainingBuilding == 9
 					|| numberOfMyCombatUnitTrainingBuilding == 11
@@ -1074,9 +1073,10 @@ public class StrategyManager {
 			*/
 			else
 			{
+				// 2, 3, 5, 6 
 				if(myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)>1)
 				{
-					if(availableMinerals>350 && buildNUM == 0 && constNUM == 0)
+					if(availableMinerals>300 && buildNUM == 0 && constNUM == 0)
 					{
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
@@ -1153,7 +1153,7 @@ public class StrategyManager {
 			return;
 		}
 		
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)<2) {
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)<3) {
 			return;
 		}
 

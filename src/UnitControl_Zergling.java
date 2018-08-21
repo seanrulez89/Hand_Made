@@ -124,30 +124,34 @@ public class UnitControl_Zergling {
 		double minDistance = 1000000000;
 		double distanceFromEnemyLocation = 0;
 	
-		
-		for (BaseLocation EXPLocation : EXPLocations)
+		if(SM.enemyMainBaseLocation!=null)
 		{
-			for (BaseLocation enemyBaseLocation : enemyBaseLocations) 
+			for (BaseLocation EXPLocation : EXPLocations)
 			{
-				distanceFromEnemyLocation = EXPLocation.getDistance(enemyBaseLocation);
-
-				if (minDistance > distanceFromEnemyLocation) 
+				for (BaseLocation enemyBaseLocation : enemyBaseLocations) 
 				{
-					if(EXPLocation.getPosition().equals(StrategyManager.Instance().enemyFirstExpansionLocation.getPosition())==false)
+					distanceFromEnemyLocation = EXPLocation.getDistance(enemyBaseLocation);
+
+					if (minDistance > distanceFromEnemyLocation) 
 					{
-						if(EXPLocation.getPosition().equals(StrategyManager.Instance().enemyMainBaseLocation.getPosition())==false)
+						if(EXPLocation.getPosition().equals(StrategyManager.Instance().enemyFirstExpansionLocation.getPosition())==false)
 						{
-							minDistance = distanceFromEnemyLocation;
-							positionAssigned_01 = EXPLocation.getPosition();
+							if(EXPLocation.getPosition().equals(StrategyManager.Instance().enemyMainBaseLocation.getPosition())==false)
+							{
+								minDistance = distanceFromEnemyLocation;
+								positionAssigned_01 = EXPLocation.getPosition();
+							}
+							
+							
 						}
 						
-						
+									
 					}
-					
-								
 				}
 			}
 		}
+		
+		
 		
 		if(SM.enemyMainBaseLocation!=null)
 		{
