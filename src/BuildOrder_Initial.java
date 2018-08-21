@@ -47,7 +47,8 @@ public class BuildOrder_Initial {
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord,
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery, between.toTilePosition(), true); // hatcheryPosition
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
+				hatcheryPosition.toTilePosition(), true); // hatcheryPosition
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
@@ -88,10 +89,10 @@ public class BuildOrder_Initial {
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
-				BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true); // creepColony_FIRST
+				creepColony_FIRST.toTilePosition(), true); // creepColony_FIRST
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
-				BuildOrderItem.SeedPositionStrategy.FirstChokePoint, true); // creepColony_SECOND
+				creepColony_SECOND.toTilePosition(), true); // creepColony_SECOND
 		
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling,
@@ -950,86 +951,87 @@ public class BuildOrder_Initial {
 		StrategyManager SM = StrategyManager.Instance();
 		
 		// 몇시 방향이냐가 아니고 4분면에서 몇사분면인가를 판단
-		int enemyMainBasePosition = 0;
+		int myMainBasePosition = 0;
 		
 		if(SM.myMainBaseLocation.getX()/32 > 63 && SM.myMainBaseLocation.getY()/32 > 63)
 		{
-			enemyMainBasePosition = 4;
+			myMainBasePosition = 4;
 		}
 		else if(SM.myMainBaseLocation.getX()/32 < 63 && SM.myMainBaseLocation.getY()/32 > 63)
 		{
-			enemyMainBasePosition = 3;
+			myMainBasePosition = 3;
 		}
 		else if(SM.myMainBaseLocation.getX()/32 < 63 && SM.myMainBaseLocation.getY()/32 < 63)
 		{
-			enemyMainBasePosition = 2;
+			myMainBasePosition = 2;
 		}
 		else
 		{
-			enemyMainBasePosition = 1;
+			myMainBasePosition = 1;
 		}
 		
 		
 		
 		if(MyBotModule.Broodwar.mapFileName().equals("(4)CircuitBreaker.scx"))
 		{
-			if(enemyMainBasePosition == 1)
+			if(myMainBasePosition == 1)
 			{
-				hatcheryPosition = SM.myMainBaseLocation.getPosition();
-				creepColony_FIRST = SM.myMainBaseLocation.getPosition();
-				creepColony_SECOND = SM.myMainBaseLocation.getPosition();			
+				hatcheryPosition = new Position(120*32, 24*32);
+				creepColony_FIRST = new Position(118*32, 23*32);
+				creepColony_SECOND = new Position(124*32, 25*32);
+				//gatherPoint = new Position(42*32,3*32);
+
+			}
+			else if(myMainBasePosition == 2)
+			{
+				hatcheryPosition = new Position(3*32, 24*32);
+				creepColony_FIRST = new Position(7*32, 23*32);
+				creepColony_SECOND = new Position(2*32, 24*32);
 				//gatherPoint = new Position(42*32,3*32);
 			}
-			else if(enemyMainBasePosition == 2)
+			else if(myMainBasePosition == 3)
 			{
-				hatcheryPosition = SM.myMainBaseLocation.getPosition();
-				creepColony_FIRST = SM.myMainBaseLocation.getPosition();
-				creepColony_SECOND = SM.myMainBaseLocation.getPosition();			
-				//gatherPoint = new Position(42*32,3*32);
-			}
-			else if(enemyMainBasePosition == 3)
-			{
-				hatcheryPosition = SM.myMainBaseLocation.getPosition();
-				creepColony_FIRST = SM.myMainBaseLocation.getPosition();
-				creepColony_SECOND = SM.myMainBaseLocation.getPosition();			
+				hatcheryPosition = new Position(3*32, 101*32);
+				creepColony_FIRST = new Position(1*32, 101*32);
+				creepColony_SECOND = new Position(7*32, 102*32);
 				//gatherPoint = new Position(42*32,3*32);
 			}
 			else
 			{
-				hatcheryPosition = SM.myMainBaseLocation.getPosition();
-				creepColony_FIRST = SM.myMainBaseLocation.getPosition();
-				creepColony_SECOND = SM.myMainBaseLocation.getPosition();			
+				hatcheryPosition = new Position(120*32, 102*32);
+				creepColony_FIRST = new Position(124*32, 101*32);
+				creepColony_SECOND = new Position(118*32, 102*32);
 				//gatherPoint = new Position(42*32,3*32);
 			}	
 		}
 		else
 		{
-			if(enemyMainBasePosition == 1)
+			if(myMainBasePosition == 1)
 			{
-				hatcheryPosition = SM.myMainBaseLocation.getPosition();
-				creepColony_FIRST = SM.myMainBaseLocation.getPosition();
-				creepColony_SECOND = SM.myMainBaseLocation.getPosition();			
+				hatcheryPosition = new Position(98*32, 6*32);
+				creepColony_FIRST = new Position(102*32, 8*32);
+				creepColony_SECOND = new Position(102*32, 10*32);
 				//gatherPoint = new Position(42*32,3*32);
 			}
-			else if(enemyMainBasePosition == 2)
+			else if(myMainBasePosition == 2)
 			{
-				hatcheryPosition = SM.myMainBaseLocation.getPosition();
-				creepColony_FIRST = SM.myMainBaseLocation.getPosition();
-				creepColony_SECOND = SM.myMainBaseLocation.getPosition();			
-				//gatherPoint = new Position(42*32,3*32);
+				hatcheryPosition = new Position(16*32, 26*32);
+				creepColony_FIRST = new Position(20*32, 27*32);
+				creepColony_SECOND = new Position(15*32, 24*32);
+//gatherPoint = new Position(42*32,3*32);
 			}
-			else if(enemyMainBasePosition == 3)
+			else if(myMainBasePosition == 3)
 			{
-				hatcheryPosition = SM.myMainBaseLocation.getPosition();
-				creepColony_FIRST = SM.myMainBaseLocation.getPosition();
-				creepColony_SECOND = SM.myMainBaseLocation.getPosition();			
-				//gatherPoint = new Position(42*32,3*32);
+				hatcheryPosition = new Position(24*32, 120*32);
+				creepColony_FIRST = new Position(22*32, 120*32);
+				creepColony_SECOND = new Position(28*32, 122*32);
+//gatherPoint = new Position(42*32,3*32);
 			}
 			else
 			{
-				hatcheryPosition = SM.myMainBaseLocation.getPosition();
-				creepColony_FIRST = SM.myMainBaseLocation.getPosition();
-				creepColony_SECOND = SM.myMainBaseLocation.getPosition();			
+				hatcheryPosition = new Position(116*32, 100*32);
+				creepColony_FIRST = new Position(114*32, 101*32);
+				creepColony_SECOND = new Position(120*32, 101*32);
 				//gatherPoint = new Position(42*32,3*32);
 			}	
 			
