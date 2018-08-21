@@ -48,6 +48,7 @@ public class UnitControl_Zergling {
 
 		
 		ArrayList <Unit> mustKillFirst = new ArrayList<Unit>();
+		ArrayList <Unit> mustKillSecond = new ArrayList<Unit>();
 		ArrayList <Unit> groundUnit = new ArrayList<Unit>();	
 		 																			
 		for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(averagePosition, myUnitType.sightRange())) {
@@ -60,7 +61,7 @@ public class UnitControl_Zergling {
 					continue;
 				}
 				
-				if(enemy.isFlying() == true)
+				if(enemy.isFlying() == true || enemy.isLifted()==true)
 				{
 					continue;
 				}
@@ -87,7 +88,43 @@ public class UnitControl_Zergling {
 					mustKillFirst.add(enemy);					
 				}
 				
-				
+				if(enemy.getType().equals(UnitType.Zerg_Zergling)
+						|| enemy.getType().equals(UnitType.Zerg_Hydralisk)
+						|| enemy.getType().equals(UnitType.Zerg_Ultralisk)
+					//	|| enemy.getType().equals(UnitType.Zerg_Mutalisk)
+					//	|| enemy.getType().equals(UnitType.Zerg_Guardian)
+						|| enemy.getType().equals(UnitType.Zerg_Broodling)
+						|| enemy.getType().equals(UnitType.Zerg_Infested_Terran)
+						|| enemy.getType().equals(UnitType.Zerg_Sunken_Colony)
+						|| enemy.getType().equals(UnitType.Protoss_Zealot)
+						|| enemy.getType().equals(UnitType.Protoss_Dragoon)
+						|| enemy.getType().equals(UnitType.Protoss_Dark_Templar)
+						|| enemy.getType().equals(UnitType.Protoss_Archon)
+						|| enemy.getType().equals(UnitType.Protoss_Reaver)
+						|| enemy.getType().equals(UnitType.Protoss_Scarab)
+					//	|| enemy.getType().equals(UnitType.Protoss_Arbiter)
+					//	|| enemy.getType().equals(UnitType.Protoss_Scout)
+					//	|| enemy.getType().equals(UnitType.Protoss_Carrier)
+					//	|| enemy.getType().equals(UnitType.Protoss_Interceptor)
+						|| enemy.getType().equals(UnitType.Protoss_Photon_Cannon)
+						|| enemy.getType().equals(UnitType.Terran_Marine)
+						|| enemy.getType().equals(UnitType.Terran_Firebat)
+						|| enemy.getType().equals(UnitType.Terran_Ghost)
+						|| enemy.getType().equals(UnitType.Terran_Bunker)
+						|| enemy.getType().equals(UnitType.Terran_Goliath)
+						|| enemy.getType().equals(UnitType.Terran_Siege_Tank_Siege_Mode)
+						|| enemy.getType().equals(UnitType.Terran_Siege_Tank_Tank_Mode)
+						|| enemy.getType().equals(UnitType.Terran_Vulture)
+						|| enemy.getType().equals(UnitType.Terran_Vulture_Spider_Mine)
+						|| enemy.getType().equals(UnitType.Terran_Wraith)
+						|| enemy.getType().equals(UnitType.Terran_Battlecruiser)
+						
+						
+						
+						)
+				{
+					mustKillSecond.add(enemy);	
+				}
 				
 				
 				
@@ -98,6 +135,18 @@ public class UnitControl_Zergling {
 		
 		
 		for(Unit enemy : mustKillFirst)
+		{
+			tempHP = enemy.getHitPoints();
+			if (targetHP > tempHP) {
+				targetHP = tempHP;
+				nextTarget = enemy;
+			}
+		}
+		
+		if(nextTarget!=null)
+		{return nextTarget;}
+		
+		for(Unit enemy : mustKillSecond)
 		{
 			tempHP = enemy.getHitPoints();
 			if (targetHP > tempHP) {
@@ -470,11 +519,11 @@ public class UnitControl_Zergling {
 			if (defenseSite.isEmpty()==false && Zergling.isAttacking()==false)
 			{
 				Position toSearch = UnitControl_COMMON.getClosestDefenseSite(Zergling);
-				Unit tt = getNextTargetOf(UnitType.Zerg_Zergling, toSearch);
+				nextTarget = getNextTargetOf(UnitType.Zerg_Zergling, toSearch);
 				
-				if(tt!=null) 
+				if(nextTarget!=null) 
 				{
-					commandUtil.attackMove(Zergling, toSearch);
+					commandUtil.attackUnit(Zergling, nextTarget);
 				}
 				
 								

@@ -1070,7 +1070,9 @@ public class StrategyManager {
 			}
 			
 
-			else if(numberOfMyCombatUnitTrainingBuilding == 7)
+			else if(numberOfMyCombatUnitTrainingBuilding == 7
+					|| numberOfMyCombatUnitTrainingBuilding == 9
+					|| numberOfMyCombatUnitTrainingBuilding == 10)
 			{
 				if (nextExpansion.getGeysers().size()>0)
 				{
@@ -1097,7 +1099,7 @@ public class StrategyManager {
 			}			
 			else if(numberOfMyCombatUnitTrainingBuilding == 4
 					|| numberOfMyCombatUnitTrainingBuilding == 5
-					|| numberOfMyCombatUnitTrainingBuilding == 9
+					
 					|| numberOfMyCombatUnitTrainingBuilding == 11
 					|| numberOfMyCombatUnitTrainingBuilding == 13)
 			{

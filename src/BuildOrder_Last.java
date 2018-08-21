@@ -28,7 +28,7 @@ public class BuildOrder_Last {
 	
 	public void lastBuildOrder() {
 		// myPlayer.allUnitCount(UnitType.Zerg_Hatchery) < 3
-		if(myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)<3 || SM.isInitialBuildOrderFinished==false )
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)<4 || SM.isInitialBuildOrderFinished==false )
 		{
 			return;
 		}
