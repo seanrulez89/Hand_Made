@@ -31,7 +31,6 @@ public class WorkerManager {
 
 	/// 일꾼 유닛들의 상태를 저장하는 workerData 객체를 업데이트하고, 일꾼 유닛들이 자원 채취 등 임무 수행을 하도록 합니다
 	public void update() {
-		long time = System.currentTimeMillis();
 		// 1초에 1번만 실행한다
 		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0)
 			return;
@@ -1109,43 +1108,43 @@ public class WorkerManager {
 		// ResourceDepot 건물이 신규 생성되면, 자료구조 추가 처리를 한 후, rebalanceWorkers 를 한다
 		if (unit.getType().isResourceDepot() && unit.getPlayer() == MyBotModule.Broodwar.self()) {
 			List<Unit> depotList = workerData.getDepots();
-			
-			
-			// 단순 유닛생산용 해처리들은 depot에 할당하지 못하도록 수정 shsh0823.lee 2018.08.11
-			List<BaseLocation> baseLocationList = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
-			int baseLocationSize = baseLocationList.size();
-			
-			// 각 점령지에서 가장 가까운 해처리의 거리 계산
-			double[] minDistances = new double[baseLocationSize]; 
-			Unit[] minDistanceUnits = new Unit[baseLocationSize]; 
-			Arrays.fill(minDistances, 987654321);
-			for(int i = 0; i< baseLocationSize; i++) {
-				for(int j = 0; j<depotList.size(); j++) {
-					double distance = baseLocationList.get(i).getPosition().getDistance(depotList.get(j).getPosition());
+			if(depotList==null || depotList.size()==0) {
+				workerData.addDepot(unit);
+				rebalanceWorkers();
+			}else {
+				// 단순 유닛생산용 해처리들은 depot에 할당하지 못하도록 수정 shsh0823.lee 2018.08.11
+				List<BaseLocation> baseLocationList = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
+				int baseLocationSize = baseLocationList.size();
+				
+				// 각 점령지에서 가장 가까운 해처리의 거리 계산
+				double[] minDistances = new double[baseLocationSize]; 
+				Unit[] minDistanceUnits = new Unit[baseLocationSize]; 
+				Arrays.fill(minDistances, 987654321);
+				for(int i = 0; i< baseLocationSize; i++) {
+					for(int j = 0; j<depotList.size(); j++) {
+						double distance = baseLocationList.get(i).getPosition().getDistance(depotList.get(j).getPosition());
+						if(distance<minDistances[i]) {
+							minDistances[i] = distance;
+							minDistanceUnits[i] = depotList.get(j);
+						}
+					}
+				}
+				for(int i = 0; i<baseLocationSize; i++) {
+					double distance = baseLocationList.get(i).getPosition().getDistance(unit.getPosition());
 					if(distance<minDistances[i]) {
-						minDistances[i] = distance;
-						minDistanceUnits[i] = depotList.get(j);
+						if(baseLocationSize==depotList.size()) {
+							workerData.removeDepot(minDistanceUnits[i]);
+						}
+						workerData.addDepot(unit);
+						rebalanceWorkers();
+						break;
 					}
 				}
 			}
-			
-			// 현재 지어진 해처리가 기존 점령지의 최소 거리보다 더 가깝다면, 현재 해처리로 인해 점령된 지역이므로 추가
-			for(int i = 0; i<baseLocationSize; i++) {
-				double distance = baseLocationList.get(i).getPosition().getDistance(unit.getPosition());
-				if(distance<minDistances[i]) {
-					if(minDistanceUnits[i]!=null) {
-						workerData.removeDepot(minDistanceUnits[i]);
-					}
-					workerData.addDepot(unit);
-					rebalanceWorkers();
-					break;
-				}
-			}
-			//System.out.println("depotList : " + depotList);
 		}
 
-		// 일꾼이 신규 생성되면, 자료구조 추가 처리를 한다.
-		if (unit.getType().isWorker() && unit.getPlayer() == MyBotModule.Broodwar.self() && unit.getHitPoints() >= 0) {
+	// 일꾼이 신규 생성되면, 자료구조 추가 처리를 한다.
+		if(unit.getType().isWorker()&&unit.getPlayer()==MyBotModule.Broodwar.self()&&unit.getHitPoints()>=0){
 			workerData.addWorker(unit);
 			rebalanceWorkers();
 		}
