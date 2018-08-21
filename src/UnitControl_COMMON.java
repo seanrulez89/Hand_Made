@@ -121,7 +121,7 @@ public class UnitControl_COMMON {
 			//System.out.println("moveIndex : " + moveIndex);
 			
 			
-			if(UnitControl_Hydralisk.gatherIndex == moveIndex && UnitControl_Zergling.gatherIndex == moveIndex && OverloadManager.Instance().canDropshipsGoAttack()==true)
+			if(UnitControl_Hydralisk.gatherIndex == moveIndex && UnitControl_Zergling.gatherIndex == moveIndex)// && OverloadManager.Instance().canDropshipsGoAttack()==true)
 			{
 				
 				moveIndex++;

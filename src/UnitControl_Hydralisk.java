@@ -506,7 +506,7 @@ public class UnitControl_Hydralisk {
 			gatherIndex=UnitControl_COMMON.moveIndex - 1;
 		}
 		
-		if(UnitControl_COMMON.enoughGathered(UnitType.Zerg_Hydralisk, UnitControl_COMMON.movePosition, 6, 0.3) == true && gatherIndex<UnitControl_COMMON.moveIndex )
+		if(UnitControl_COMMON.enoughGathered(UnitType.Zerg_Hydralisk, UnitControl_COMMON.movePosition, 6, 0.4) == true && gatherIndex<UnitControl_COMMON.moveIndex )
 		{
 			gatherIndex++;
 			if(gatherIndex>(UnitControl_COMMON.positionList.size()-1))
@@ -676,7 +676,7 @@ public class UnitControl_Hydralisk {
 			else if(SM.combatState == StrategyManager.CombatState.attackStarted)
 			{
 				//commandUtil.attackMove(Hydralisk, movePosition);
-				if(i>9)
+				if(i>5)
 				{
 					commandUtil.attackMove(Hydralisk, movePosition);
 					continue;

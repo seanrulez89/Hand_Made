@@ -98,7 +98,7 @@ public class BuildOrder_Last {
 						&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == true
 						&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Melee_Attacks) == 0) 
 				{
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Melee_Attacks, true, chamber.getID());
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Melee_Attacks, true, chamber.getID());
 					return;
 				}
 				else if(myPlayer.getUpgradeLevel(UpgradeType.Zerg_Melee_Attacks) == 2
@@ -107,7 +107,7 @@ public class BuildOrder_Last {
 						&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Melee_Attacks) == 0
 						&& myPlayer.completedUnitCount(UnitType.Zerg_Hive)>0)
 				{
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Melee_Attacks, true, chamber.getID());
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Melee_Attacks, true, chamber.getID());
 					return;
 				}
 
@@ -117,7 +117,7 @@ public class BuildOrder_Last {
 						&& myPlayer.isUpgrading(UpgradeType.Zerg_Melee_Attacks) == true
 						&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Missile_Attacks) == 0) 
 				{
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Missile_Attacks, true, chamber.getID());
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Missile_Attacks, true, chamber.getID());
 					return;
 				}
 				else if(myPlayer.getUpgradeLevel(UpgradeType.Zerg_Missile_Attacks) == 2
@@ -126,7 +126,7 @@ public class BuildOrder_Last {
 						&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Missile_Attacks) == 0
 						&& myPlayer.completedUnitCount(UnitType.Zerg_Hive)>0)
 				{
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Missile_Attacks, true, chamber.getID());
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Missile_Attacks, true, chamber.getID());
 					return;
 				}
 				
