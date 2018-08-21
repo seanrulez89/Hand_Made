@@ -265,7 +265,171 @@ public class UnitControl_Hydralisk {
 		return nextTarget;
 	}
 	
+	
+	public static Position setFleePoint (Position averagePosition)
+	{
+		Position position = StrategyManager.Instance().myMainBaseLocation.getPosition();
+		
+		int currentEnemy = 0;
+		int minEnemy = 100000;
 
+		
+		for(int i = -1 ; i < 2 ; i++)
+		{
+			for(int j = -1 ; j < 2 ; j++)
+			{
+				Position tempPosition = new Position(averagePosition.getX()+4*Config.TILE_SIZE*i+16*i, averagePosition.getY()+4*Config.TILE_SIZE*j+16*j);
+				
+				MyBotModule.Broodwar.drawCircleMap(tempPosition, 3 * Config.TILE_SIZE, Color.Red);
+
+				currentEnemy = 0;
+				for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(tempPosition, 3 * Config.TILE_SIZE))				
+				{
+					if(enemy.getPlayer() == StrategyManager.Instance().enemyPlayer) // 벙커와 터렛과 기타등등 모두 포함해야함 canattack이 좀 이상한거 같아
+					{
+						if(isAttackUnit(enemy))
+						{
+							//System.out.println(enemy.getType().toString());
+							
+							currentEnemy = currentEnemy + enemy.getHitPoints() + enemy.getShields();
+							
+							//currentEnemy++;
+						}
+					}
+				}
+				
+				//System.out.println("currentEnemy : " + currentEnemy);
+				
+				int x = tempPosition.getX()/32;
+				int y = tempPosition.getY()/32;
+				
+				
+				if(currentEnemy<minEnemy && x > 0 && x < 128 && y > 0  && y < 128)
+				{
+					minEnemy = currentEnemy;
+					position = tempPosition;
+				}			
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		return position;
+	}
+	
+
+	public static boolean isAttackUnit(Unit enemy)
+	{
+		boolean isAttackUnit = false;
+		
+		if(enemy.getType().equals(UnitType.Zerg_Zergling)
+				|| enemy.getType().equals(UnitType.Zerg_Hydralisk)
+				|| enemy.getType().equals(UnitType.Zerg_Ultralisk)
+				|| enemy.getType().equals(UnitType.Zerg_Mutalisk)
+				|| enemy.getType().equals(UnitType.Zerg_Guardian)
+				|| enemy.getType().equals(UnitType.Zerg_Broodling)
+				|| enemy.getType().equals(UnitType.Zerg_Infested_Terran)
+				|| enemy.getType().equals(UnitType.Zerg_Sunken_Colony)
+				|| enemy.getType().equals(UnitType.Protoss_Zealot)
+				|| enemy.getType().equals(UnitType.Protoss_Dragoon)
+				|| enemy.getType().equals(UnitType.Protoss_Dark_Templar)
+				|| enemy.getType().equals(UnitType.Protoss_Archon)
+				|| enemy.getType().equals(UnitType.Protoss_Reaver)
+				|| enemy.getType().equals(UnitType.Protoss_Scarab)
+				|| enemy.getType().equals(UnitType.Protoss_Arbiter)
+				|| enemy.getType().equals(UnitType.Protoss_Scout)
+				|| enemy.getType().equals(UnitType.Protoss_Carrier)
+				|| enemy.getType().equals(UnitType.Protoss_Interceptor)
+				|| enemy.getType().equals(UnitType.Protoss_Photon_Cannon)
+				|| enemy.getType().equals(UnitType.Terran_Marine)
+				|| enemy.getType().equals(UnitType.Terran_Firebat)
+				|| enemy.getType().equals(UnitType.Terran_Ghost)
+				|| enemy.getType().equals(UnitType.Terran_Bunker)
+				|| enemy.getType().equals(UnitType.Terran_Goliath)
+				|| enemy.getType().equals(UnitType.Terran_Siege_Tank_Siege_Mode)
+				|| enemy.getType().equals(UnitType.Terran_Siege_Tank_Tank_Mode)
+				|| enemy.getType().equals(UnitType.Terran_Vulture)
+				|| enemy.getType().equals(UnitType.Terran_Vulture_Spider_Mine)
+				|| enemy.getType().equals(UnitType.Terran_Wraith)
+				|| enemy.getType().equals(UnitType.Terran_Battlecruiser)
+				
+				
+				
+				)
+		{
+			isAttackUnit = true;
+			return isAttackUnit;
+		}
+		
+		
+		
+		
+		
+		return isAttackUnit;
+	}
+
+	
+	public Position getAveragePosition(List <Unit> Units)
+	{
+		Position averagePosition = null;
+		
+		int x = 0;
+		int y = 0;
+		int includeCase = 0;
+		
+		for(Unit unit : Units)
+		{
+			Unit tempEnemy = null;
+			
+			for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(unit.getPosition(), unit.getType().sightRange())) 
+			{
+				
+				
+				if (enemy.getPlayer() == enemyPlayer) {
+					tempEnemy = enemy;
+					//System.out.println("include");
+					includeCase++;
+					break;
+				}
+				
+			}
+			if(tempEnemy!=null)
+			{
+				x += unit.getX();
+				y += unit.getY();
+			}
+
+		}
+		
+		if(includeCase==0)
+		{
+			return SM.myMainBaseLocation.getPosition();
+		}
+		
+		
+		
+		x = x/includeCase;
+		y = y/includeCase;
+		
+		averagePosition = new Position(x,y);
+		
+		//MyBotModule.Broodwar.drawCircleMap(averagePosition, 7 * Config.TILE_SIZE, Color.Red);
+		
+		return averagePosition;
+	}
+	
+	
+	
+	
+	
 
 	
 	
@@ -277,6 +441,8 @@ public class UnitControl_Hydralisk {
 		{
 			return;
 		}
+		
+		Position averagePosition = getAveragePosition(SM.myHydraliskList);
 		
 		if(SM.isInitialBuildOrderFinished==true && myPlayer.minerals()>350)
 		{
@@ -300,11 +466,22 @@ public class UnitControl_Hydralisk {
 							commandUtil.attackUnit(unit, nextTarget);
 							continue;
 						}				
-						else if(unit.isUnderAttack())
+						else
 						{
-							commandUtil.move(unit, SM.myMainBaseLocation.getPosition());
+							commandUtil.move(unit, setFleePoint(averagePosition));
 							continue;
-						}					
+						}
+						
+						
+						
+						/*
+						else if(Hydralisk.isUnderAttack())
+						{
+							//System.out.println("공격받아서 집으로");
+							commandUtil.move(Hydralisk, SM.myMainBaseLocation.getPosition());
+							continue;
+						}
+						*/					
 					}
 					
 					if (defenseSite.isEmpty()==false && unit.isAttacking()==false)
@@ -329,7 +506,7 @@ public class UnitControl_Hydralisk {
 			gatherIndex=UnitControl_COMMON.moveIndex - 1;
 		}
 		
-		if(UnitControl_COMMON.enoughGathered(UnitType.Zerg_Hydralisk, UnitControl_COMMON.movePosition, 5, 0.5) == true && gatherIndex<UnitControl_COMMON.moveIndex )
+		if(UnitControl_COMMON.enoughGathered(UnitType.Zerg_Hydralisk, UnitControl_COMMON.movePosition, 6, 0.3) == true && gatherIndex<UnitControl_COMMON.moveIndex )
 		{
 			gatherIndex++;
 			if(gatherIndex>(UnitControl_COMMON.positionList.size()-1))
@@ -417,13 +594,24 @@ public class UnitControl_Hydralisk {
 					//System.out.println("사정거리 이내 / 쿨타임 0");
 					commandUtil.attackUnit(Hydralisk, nextTarget);
 					continue;
-				}				
+				}
+				else
+				{
+					commandUtil.move(Hydralisk, setFleePoint(averagePosition));
+					continue;
+				}
+				
+				
+				
+				/*
 				else if(Hydralisk.isUnderAttack())
 				{
 					//System.out.println("공격받아서 집으로");
 					commandUtil.move(Hydralisk, SM.myMainBaseLocation.getPosition());
 					continue;
 				}
+				*/
+				
 				/*
 				else if(PredictMovement(nextTarget,24).getDistance(Hydralisk) < Hydralisk.getType().groundWeapon().maxRange())
 				{
@@ -487,7 +675,48 @@ public class UnitControl_Hydralisk {
 			}
 			else if(SM.combatState == StrategyManager.CombatState.attackStarted)
 			{
-				commandUtil.attackMove(Hydralisk, movePosition);	
+				//commandUtil.attackMove(Hydralisk, movePosition);
+				if(i>9)
+				{
+					commandUtil.attackMove(Hydralisk, movePosition);
+					continue;
+				}
+				else
+				{
+					if(Hydralisk.getTilePosition()!=null)
+					{					
+						if(bwta.BWTA.getRegion(Hydralisk.getTilePosition())!=null)
+						{
+							if(bwta.BWTA.getRegion(Hydralisk.getTilePosition()).getPolygon()!=null)
+							{
+								if(bwta.BWTA.getRegion(Hydralisk.getTilePosition()).getPolygon().isInside(StrategyManager.Instance().enemyMainBaseLocation.getPosition())==false)
+								{
+									if(Hydralisk.isLoaded()==false)
+									{
+										OverloadManager.Instance().addDropshipUnit(Hydralisk);
+										continue;
+									}
+								}
+								else
+								{
+									commandUtil.attackMove(Hydralisk, movePosition);
+									continue;
+								}
+								
+								
+							}
+						}	
+					}
+					else
+					{						
+						commandUtil.attackMove(Hydralisk, movePosition);
+						continue;
+					}
+				}
+				
+				commandUtil.attackMove(Hydralisk, movePosition);
+				continue;
+
 			}
 			else if (SM.myHydraliskList.size() > 12) 
 			{			

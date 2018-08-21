@@ -668,9 +668,9 @@ public class UnitControl_Mutalisk {
 		
 	}
 	
-	public Position setFleePoint (Position averagePosition)
+	public static Position setFleePoint (Position averagePosition)
 	{
-		Position position = SM.myMainBaseLocation.getPosition();
+		Position position = StrategyManager.Instance().myMainBaseLocation.getPosition();
 		
 		int currentEnemy = 0;
 		int minEnemy = 100000;
@@ -687,7 +687,7 @@ public class UnitControl_Mutalisk {
 				currentEnemy = 0;
 				for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(tempPosition, 3 * Config.TILE_SIZE))				
 				{
-					if(enemy.getPlayer() == enemyPlayer) // 벙커와 터렛과 기타등등 모두 포함해야함 canattack이 좀 이상한거 같아
+					if(enemy.getPlayer() == StrategyManager.Instance().enemyPlayer) // 벙커와 터렛과 기타등등 모두 포함해야함 canattack이 좀 이상한거 같아
 					{
 						if(isAttackUnit(enemy))
 						{
@@ -728,7 +728,7 @@ public class UnitControl_Mutalisk {
 	}
 	
 
-	public boolean isAttackUnit(Unit enemy)
+	public static boolean isAttackUnit(Unit enemy)
 	{
 		boolean isAttackUnit = false;
 		

@@ -216,14 +216,17 @@ public class BuildOrder_Initial {
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery, 
 				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor, 
-				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
-
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(),
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+		
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor, 
+				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+
+
 		
 		/*
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling,
@@ -975,6 +978,8 @@ public class BuildOrder_Initial {
 		{
 			if(enemyMainBasePosition == 1)
 			{
+				hatcheryPosition = new Position(10,10);
+				
 				hatcheryPosition = SM.myMainBaseLocation.getPosition();
 				creepColony_FIRST = SM.myMainBaseLocation.getPosition();
 				creepColony_SECOND = SM.myMainBaseLocation.getPosition();			

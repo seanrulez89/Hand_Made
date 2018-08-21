@@ -121,7 +121,7 @@ public class UnitControl_COMMON {
 			//System.out.println("moveIndex : " + moveIndex);
 			
 			
-			if(UnitControl_Hydralisk.gatherIndex == moveIndex && UnitControl_Zergling.gatherIndex == moveIndex)
+			if(UnitControl_Hydralisk.gatherIndex == moveIndex && UnitControl_Zergling.gatherIndex == moveIndex && OverloadManager.Instance().canDropshipsGoAttack()==true)
 			{
 				
 				moveIndex++;
@@ -232,7 +232,7 @@ public class UnitControl_COMMON {
 				if(position.equals(StrategyManager.Instance().myFirstExpansionLocation.getPosition()))
 				{
 					iter.remove();
-					System.out.println("아직 앞마당 안지었어");
+					//System.out.println("아직 앞마당 안지었어");
 				}
 				
 			}
