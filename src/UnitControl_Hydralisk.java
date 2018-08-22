@@ -444,18 +444,18 @@ public class UnitControl_Hydralisk {
 		
 		Position averagePosition = getAveragePosition(SM.myHydraliskList);
 		
-		if(SM.isInitialBuildOrderFinished==true && myPlayer.minerals()>350)
+		if(SM.isInitialBuildOrderFinished==true)// && myPlayer.minerals()>350)
 		{
 			goOut = true;
 		}
 		
-		if(goOut==false)
+		if(MyBotModule.Broodwar.getFrameCount() <= 24*60*6.0)
 		{
-			if(SM.enemyMainBaseLocation==null 
+			/*if(SM.enemyMainBaseLocation==null 
 					|| SM.isInitialBuildOrderFinished==false 
 					|| (SM.isInitialBuildOrderFinished==true && myPlayer.minerals()<350))
 			{
-				ArrayList <Position> defenseSite = UnitControl_COMMON.defenseSite;
+			*/	ArrayList <Position> defenseSite = UnitControl_COMMON.defenseSite;
 				for(Unit unit : SM.myHydraliskList)
 				{				
 					Unit nextTarget = getNextTargetOf(UnitType.Zerg_Hydralisk, unit.getPosition());	
@@ -468,7 +468,7 @@ public class UnitControl_Hydralisk {
 						}				
 						else
 						{
-							commandUtil.move(unit, setFleePoint(averagePosition));
+							commandUtil.move(unit, SM.myMainBaseLocation.getPosition());
 							continue;
 						}
 						
@@ -496,7 +496,7 @@ public class UnitControl_Hydralisk {
 				}
 				
 				return;
-			}
+			//}
 		}
 		
 		//setStartGatherEndPoint();

@@ -429,7 +429,7 @@ public class OverloadManager {
 					waitOverloadList.add(overloadInfo);
 				}
 
-				System.out.println("overloadInfo.overLoad.getHitPoints() : " + overloadInfo.overLoad.getHitPoints());
+				//System.out.println("overloadInfo.overLoad.getHitPoints() : " + overloadInfo.overLoad.getHitPoints());
 				if (overloadInfo.overLoad.getHitPoints() < 50) {
 					if (overloadInfo.overLoad.unloadAll(overloadInfo.overLoad.getPosition(), false)) {
 						System.out.println("정상적으로 내렸다");

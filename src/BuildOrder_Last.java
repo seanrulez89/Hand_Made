@@ -27,8 +27,8 @@ public class BuildOrder_Last {
 	
 	
 	public void lastBuildOrder() {
-		// myPlayer.allUnitCount(UnitType.Zerg_Hatchery) < 3
-		if(myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)<4 || SM.isInitialBuildOrderFinished==false )
+		// myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)<4
+		if(myPlayer.allUnitCount(UnitType.Zerg_Hatchery) < 4 || SM.isInitialBuildOrderFinished==false )
 		{
 			return;
 		}
@@ -88,7 +88,7 @@ public class BuildOrder_Last {
 						&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0
 						&& myPlayer.completedUnitCount(UnitType.Zerg_Hive)>0)
 				{
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Carapace, true, chamber.getID());
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Carapace, false, chamber.getID());
 					return;
 				}
 				
@@ -107,7 +107,7 @@ public class BuildOrder_Last {
 						&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Melee_Attacks) == 0
 						&& myPlayer.completedUnitCount(UnitType.Zerg_Hive)>0)
 				{
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Melee_Attacks, true, chamber.getID());
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Melee_Attacks, false, chamber.getID());
 					return;
 				}
 
@@ -126,7 +126,7 @@ public class BuildOrder_Last {
 						&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Missile_Attacks) == 0
 						&& myPlayer.completedUnitCount(UnitType.Zerg_Hive)>0)
 				{
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Missile_Attacks, true, chamber.getID());
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Missile_Attacks, false, chamber.getID());
 					return;
 				}
 				
@@ -138,8 +138,9 @@ public class BuildOrder_Last {
 			
 		}
 		
-		//if(myPlayer.completedUnitCount(UnitType.Zerg_Spire) == 1)
-		if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) >= 1)
+		//if (myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) >= 1)
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Spire) >= 1)
+			
 		{
 
 			

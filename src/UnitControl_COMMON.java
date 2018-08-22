@@ -47,7 +47,7 @@ public class UnitControl_COMMON {
 
 		
 		
-		MyBotModule.Broodwar.drawCircleMap(StrategyManager.Instance().mySecondChokePoint.getCenter(), 12 * Config.TILE_SIZE, Color.Blue);
+		MyBotModule.Broodwar.drawCircleMap(StrategyManager.Instance().mySecondChokePoint.getCenter(), 6 * Config.TILE_SIZE, Color.Blue);
 		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(StrategyManager.Instance().mySecondChokePoint.getCenter(), 12 * Config.TILE_SIZE)) 
 		{
 			if (unit.getPlayer().equals(InformationManager.Instance().enemyPlayer)) 
@@ -242,7 +242,7 @@ public class UnitControl_COMMON {
 
 		
 		
-		defenseSite.add(StrategyManager.Instance().mySecondChokePoint.getPoint());
+		//defenseSite.add(StrategyManager.Instance().mySecondChokePoint.getPoint());
 		
 		
 		BaseLocation expansionLocation = BuildOrder_Expansion.expansion();

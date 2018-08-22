@@ -259,10 +259,14 @@ public class UnitControl_Zergling {
 			goOut = true;
 		}
 		
-		if (goOut == false) {
-			if (SM.enemyMainBaseLocation == null || SM.isInitialBuildOrderFinished == false
-					|| (SM.isInitialBuildOrderFinished == true && myPlayer.minerals() < 350)) {
-
+		if (MyBotModule.Broodwar.getFrameCount() <= 24*60*6.0) 
+		
+		{
+			/*if (SM.enemyMainBaseLocation == null || SM.isInitialBuildOrderFinished == false
+					|| (SM.isInitialBuildOrderFinished == true && myPlayer.minerals() < 350)) 
+			
+			{
+*/
 				/*
 				 * for(Unit unit : SM.myZerglingList) {
 				 * 
@@ -334,7 +338,7 @@ public class UnitControl_Zergling {
 				}
 
 				return;
-			}
+			//}
 		}
 		
 		
@@ -523,7 +527,7 @@ public class UnitControl_Zergling {
 				
 				if(nextTarget!=null) 
 				{
-					commandUtil.attackUnit(Zergling, nextTarget);
+					commandUtil.attackMove(Zergling, nextTarget.getPosition());
 				}
 				
 								

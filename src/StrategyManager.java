@@ -258,7 +258,7 @@ public class StrategyManager {
 			SeedPositionSpecified = BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified;
 
 			// 업그레이드 및 리서치 대상 설정
-			necessaryUpgradeType1 = UpgradeType.Metabolic_Boost;
+			necessaryUpgradeType1 = UpgradeType.Muscular_Augments;
 			necessaryUpgradeType2 = UpgradeType.Pneumatized_Carapace; //UpgradeType.Ventral_Sacs;
 			necessaryUpgradeType3 = UpgradeType.Zerg_Flyer_Attacks; // 공중공업
 			necessaryUpgradeType4 = UpgradeType.Zerg_Flyer_Carapace; // 공중방업
@@ -731,7 +731,7 @@ public class StrategyManager {
 			int optimalWorkerCount = 0;
 			for (BaseLocation baseLocation : InformationManager.Instance()
 					.getOccupiedBaseLocations(InformationManager.Instance().selfPlayer)) {
-				optimalWorkerCount += baseLocation.getMinerals().size() * 1.5;
+				optimalWorkerCount += baseLocation.getMinerals().size() * 2.0;
 				optimalWorkerCount += baseLocation.getGeysers().size() * 3;
 			}
 
@@ -1056,7 +1056,8 @@ public class StrategyManager {
 				}
 			}
 			else if(numberOfMyCombatUnitTrainingBuilding == 1 
-					|| numberOfMyCombatUnitTrainingBuilding == 2)
+					|| numberOfMyCombatUnitTrainingBuilding == 2
+					)
 			{
 				if(buildNUM == 0 && constNUM == 0)
 				{
@@ -1098,7 +1099,7 @@ public class StrategyManager {
 				}
 			}			
 			else if(numberOfMyCombatUnitTrainingBuilding == 4
-					|| numberOfMyCombatUnitTrainingBuilding == 5
+					|| numberOfMyCombatUnitTrainingBuilding == 6
 					
 					|| numberOfMyCombatUnitTrainingBuilding == 11
 					|| numberOfMyCombatUnitTrainingBuilding == 13)
@@ -1140,7 +1141,7 @@ public class StrategyManager {
 			*/
 			else
 			{
-				// 3, 6 
+				//6 
 				if(myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)>1)
 				{
 					if(availableMinerals>300 && buildNUM == 0 && constNUM == 0)
@@ -1317,6 +1318,11 @@ public class StrategyManager {
 					&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType1) == 0) {
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType1, false);
 			}
+			else if(myPlayer.getUpgradeLevel(necessaryUpgradeType1) == 1)
+			{
+				necessaryUpgradeType1 = UpgradeType.Metabolic_Boost;
+			}
+			
 		}
 
 		if (isTimeToStartUpgradeType2) {
@@ -1374,7 +1380,7 @@ public class StrategyManager {
 			if (myPlayer.getUpgradeLevel(necessaryUpgradeType4) < 2
 					&& myPlayer.isUpgrading(necessaryUpgradeType4) == false
 					&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType4) == 0) {
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType4, true);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType4, false);
 			}
 		}
 		
@@ -1383,7 +1389,7 @@ public class StrategyManager {
 					&& myPlayer.isUpgrading(necessaryUpgradeType4) == false
 					&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType4) == 0
 					&& myPlayer.completedUnitCount(UnitType.Zerg_Hive)>0) {
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType4, true);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType4, false);
 			}
 		}
 		

@@ -297,7 +297,7 @@ public class WorkerManager {
 
 		//////// 초반 긴급 방어 구축
 
-		if (MyBotModule.Broodwar.getFrameCount() < 24*60*6.5 && MyBotModule.Broodwar.getFrameCount() > 240) {
+		if (MyBotModule.Broodwar.getFrameCount() > 240) {
 			
 			List<BaseLocation> myBaseLocations = InformationManager.Instance()
 					.getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
@@ -348,8 +348,7 @@ public class WorkerManager {
 
 			}//30초에 한번 실행 :  기지 근처에 적이 있으면 저글링 4마리 생산 (경기 시간 10분까지만)
 
-			
-			
+			/*			
 			if(numberOfEarlyAttackUnit == 0)
 			{
 				for(int i = 0 ; i < deadDrone ; i++)
@@ -360,7 +359,7 @@ public class WorkerManager {
 					deadDrone--;
 				}
 			}
-			
+			*/
 			
 													
 			
@@ -432,7 +431,7 @@ public class WorkerManager {
 				if (myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) > 0
 						&& numberOfUnitType_Zerg_Sunken_Colony < 4) {
 
-					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) < 4) {
+					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) < 2) {
 						
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Sunken_Colony, true);
 						
