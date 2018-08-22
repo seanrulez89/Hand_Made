@@ -433,9 +433,9 @@ public class WorkerManager {
 						&& numberOfUnitType_Zerg_Sunken_Colony < 4) {
 
 					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) < 4) {
-						/*
+						
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Sunken_Colony, true);
-						*/
+						
 					}
 				}
 			}
