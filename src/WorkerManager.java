@@ -381,14 +381,14 @@ public class WorkerManager {
 				numberOfUnitType_Zerg_Sunken_Colony += myPlayer.allUnitCount(UnitType.Zerg_Sunken_Colony);
 				numberOfUnitType_Zerg_Sunken_Colony += BuildManager.Instance().buildQueue
 						.getItemCount(UnitType.Zerg_Sunken_Colony);
-/*
+
 				System.out.println("numberOfUnitType_Zerg_Creep_Colony : " +
 				numberOfUnitType_Zerg_Creep_Colony);
 				System.out.println("+++++");
 				System.out.println("numberOfUnitType_Zerg_Sunken_Colony : " +
 				numberOfUnitType_Zerg_Sunken_Colony);
 
-*/				
+				
 				for (Unit building : MyBotModule.Broodwar.self().getUnits()) 
 				{
 					if (building.getType().equals(UnitType.Zerg_Hatchery) && building.canCancelMorph()) 
