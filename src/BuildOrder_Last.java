@@ -88,7 +88,7 @@ public class BuildOrder_Last {
 						&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0
 						&& myPlayer.completedUnitCount(UnitType.Zerg_Hive)>0)
 				{
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Carapace, false, chamber.getID());
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Carapace, true, chamber.getID());
 					return;
 				}
 				

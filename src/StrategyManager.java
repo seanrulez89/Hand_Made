@@ -706,7 +706,7 @@ public class StrategyManager {
 			*/
 			
 			
-			if(workerCount>65)
+			if(workerCount>70)
 			{
 				return;
 			}
@@ -1438,7 +1438,7 @@ public class StrategyManager {
 		
 		UnitType nextUnitTypeToTrain = getNextCombatUnitTypeToTrain();
 
-		if (BuildManager.Instance().buildQueue.getItemCount(nextUnitTypeToTrain) < myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)*1) 
+		if (BuildManager.Instance().buildQueue.getItemCount(nextUnitTypeToTrain) < myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)*2) 
 		{
 
 			if(nextUnitTypeToTrain == UnitType.Zerg_Mutalisk)
@@ -1992,6 +1992,7 @@ public class StrategyManager {
 		}
 		if(unit.getType()==UnitType.Zerg_Overlord) {
 			OverloadManager.Instance().addOverload(unit);
+			myAllCombatUnitList.add(unit);
 		}
 	}
 	
@@ -2017,6 +2018,7 @@ public class StrategyManager {
 		
 		if(unit.getType()==UnitType.Zerg_Overlord) {
 			OverloadManager.Instance().addOverload(unit);
+			myAllCombatUnitList.add(unit);
 		}
 		
 	}

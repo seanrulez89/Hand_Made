@@ -71,7 +71,9 @@ public class OverloadManager {
 			.getMainBaseLocation(InformationManager.Instance().selfPlayer);
 	// 정찰할 지역 리스트를 넣어둔다.
 	private static List<Position> exploreAreaList = new ArrayList<Position>();
-
+		
+	// 모임장소
+	private static Position gatherPosition = null;
 	// 따라다닐 유닛 타입과 넘버
 	private Map<UnitType, Integer> withAttackUnitMap = new HashMap<UnitType, Integer>();
 
@@ -205,7 +207,7 @@ public class OverloadManager {
 			}
 
 			if (overloadInfo.status == overloadStatus.dropshipConcentrating
-					&& overloadInfo.overLoad.getDistance(new Position(63 * 32, 63 * 32)) > 64) {
+					&& overloadInfo.overLoad.getDistance(gatherPosition) > 64) {
 				return false;
 			}
 		}
@@ -326,6 +328,19 @@ public class OverloadManager {
 	}
 
 	public void onUpdate() {
+
+		
+		if(gatherPosition==null && StrategyManager.Instance().enemyMainBaseLocation!=null)
+		{
+			gatherPosition = new Position((UnitControl_COMMON.positionList.get(3).getX()+63*32)/2, (UnitControl_COMMON.positionList.get(3).getY()+63*32)/2);
+		}
+		
+		
+		
+		
+		
+		
+		
 		// 드랍십 관련 update
 		for (int i = 0; i < waitDropshipUnitList.size(); i++) {
 			WaitingLoadUnitAndOverload waitingLoadUnitAndOverload = waitDropshipUnitList.get(i);
@@ -420,7 +435,7 @@ public class OverloadManager {
 			} else if (overloadInfo.status == overloadStatus.dropshipWaitingForUnit) {
 				// 아직 미구현 --> 쓸 일 없음
 			} else if (overloadInfo.status == overloadStatus.dropshipConcentrating) {
-				commandUtil.move(overloadInfo.overLoad, new Position(63 * 32, 63 * 32));
+				commandUtil.move(overloadInfo.overLoad, gatherPosition);  //new Position(63 * 32, 63 * 32));
 			} else if (overloadInfo.status == overloadStatus.dropshipAttack) {
 				if (overloadInfo.overLoad.getLoadedUnits() == null
 						|| overloadInfo.overLoad.getLoadedUnits().size() == 0) {

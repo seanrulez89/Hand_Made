@@ -228,13 +228,13 @@ public class BuildOrder_Initial {
 
 
 		
-			
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery, 
+				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);		
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor, 
 				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery, 
-				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);	
+		
 
 
 		

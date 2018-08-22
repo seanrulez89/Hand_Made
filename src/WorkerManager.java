@@ -429,11 +429,11 @@ public class WorkerManager {
 				}//Mainbase는 너무 안쪽이고 1st choke point는 적절한데 가끔 언덕 아래로 배치되면 망테크;
 
 				if (myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) > 0
-						&& numberOfUnitType_Zerg_Sunken_Colony < 4) {
+						&& numberOfUnitType_Zerg_Sunken_Colony < 2) {
 
 					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) < 2) {
 						
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Sunken_Colony, true);
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Sunken_Colony, false);
 						
 					}
 				}
