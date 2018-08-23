@@ -498,7 +498,7 @@ public class StrategyManager {
 		}
 
 		// 30분이 경과했고 내 유닛이 80 이상이라면 
-		if (MyBotModule.Broodwar.getFrameCount() > 24*60*30 && myPlayer.supplyUsed() > 100 * 2) {
+		if (MyBotModule.Broodwar.getFrameCount() > 24*60*30 && myPlayer.supplyUsed() > 300) {
 			System.out.println("eli case 2");
 			return true;
 		}
@@ -1517,7 +1517,7 @@ public class StrategyManager {
 			if(myPlayer.completedUnitCount(UnitType.Zerg_Defiler_Mound)>0 &&  defilerNumber<2) {
 				nextUnitTypeToTrain = myDefiler;
 			}
-			else if (myZerglingList.size() < myHydraliskList.size()) 
+			else if (myZerglingList.size() < myHydraliskList.size()*1.5) 
 			{
 				nextUnitTypeToTrain = myZergling;
 			} 
@@ -1575,7 +1575,7 @@ public class StrategyManager {
 			{
 				nextUnitTypeToTrain = myHydralisk;
 			}			
-			else if (myZerglingList.size() < myHydraliskList.size()) 
+			else if (myZerglingList.size() < myHydraliskList.size()*1.5) 
 			{
 				nextUnitTypeToTrain = myZergling;
 			} 

@@ -46,8 +46,8 @@ public class BuildOrder_Last {
 		
 		if(spireNumber == 0) // myPlayer.hasResearched(TechType.Lurker_Aspect)==true &&
 		{
-			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spire,
-					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Spire,
+					BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
 			
 			if (chamberNumber <3) {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Evolution_Chamber,

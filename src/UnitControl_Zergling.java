@@ -341,6 +341,95 @@ public class UnitControl_Zergling {
 			//}
 		}
 		
+		/*
+		if (MyBotModule.Broodwar.getFrameCount() > 24*60*6.0 && MyBotModule.Broodwar.getFrameCount() < 24*60*6.05)
+		{
+			
+			for(Unit Zergling : SM.myZerglingList)
+			{
+				commandUtil.attackMove(Zergling, SM.enemyMainBaseLocation.getPosition());
+			}
+			return;
+			
+			
+			if (positionAssigned_01 == null || positionAssigned_02 == null
+					|| MyBotModule.Broodwar.getFrameCount() % 24 * 60 * 3 == 0) {
+				setPositionAssigned();
+			}
+
+			a: for (int i = 0; i < SM.myZerglingList.size(); i++) {
+				Unit Zergling = SM.myZerglingList.get(i);
+
+				if (i == 0 && Zergling != null && scoutZerglingFleePosition != null
+						&& positionAssigned_02 != null) {
+
+					int cnt = 0;
+					for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(Zergling.getPosition(),
+							Zergling.getType().sightRange())) {
+						if (enemy.getPlayer() == enemyPlayer)// && MyBotModule.Broodwar.getFrameCount() % 24 == 0)
+						{
+							// System.out.println("적군 유인");
+							if (Zergling.getDistance(scoutZerglingFleePosition) >= 32) {
+								willBeThere = PredictMovement(enemy, 24);
+							}
+
+							//commandUtil.move(Zergling, scoutZerglingFleePosition);
+							
+							commandUtil.move(Zergling, getScoutFleePositionFromEnemyRegionVertices(Zergling));
+							runrunrun = true;
+							cnt++;
+							continue a;
+						}
+					}
+
+					if (scoutZerglingFleePosition != null && Zergling.getDistance(scoutZerglingFleePosition) < 32) {
+						// System.out.println("적 리셋");
+						willBeThere = null;
+					}
+
+					if (willBeThere != null && Zergling.getDistance(willBeThere) < 32) {
+						// System.out.println("적 리셋");
+						willBeThere = null;
+					}
+
+					if (cnt == 0) {
+						runrunrun = false;
+
+					}
+
+					if (runrunrun == false) {
+						if (willBeThere != null) {
+							// System.out.println("예상적목표향해이동");
+							commandUtil.attackMove(Zergling, willBeThere);
+							continue;
+						} else {
+							// System.out.println("정찰위치로이동");
+							commandUtil.attackMove(Zergling, positionAssigned_02);
+							continue;
+						}
+
+					}
+
+				} else {
+					commandUtil.attackMove(Zergling, SM.enemyMainBaseLocation.getPosition());
+				}
+				
+
+			}
+			
+			
+			return;
+			
+			
+			
+		}
+		*/
+		
+		
+		
+		
+		
+		
 		
 			
 		if(positionAssigned_01 == null || positionAssigned_02 == null || MyBotModule.Broodwar.getFrameCount() % 24*60*3 == 0)
@@ -389,12 +478,7 @@ public class UnitControl_Zergling {
 			Unit Zergling = SM.myZerglingList.get(i);
 			
 			
-			if(i==1 && Zergling!=null && positionAssigned_01 != null)
-			{
-				//commandUtil.attackMove(Zergling, positionAssigned_01);
-				continue;
-			}
-			else if(i==0 && Zergling!=null && scoutZerglingFleePosition != null && positionAssigned_02!=null)
+			if(i==0 && Zergling!=null && scoutZerglingFleePosition != null && positionAssigned_02!=null)
 			{
 				
 				

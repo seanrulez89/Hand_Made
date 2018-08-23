@@ -67,8 +67,12 @@ public class OverloadManager {
 	private static List<OverloadInfo> withAttackUnitOverloadList = new ArrayList<OverloadInfo>();
 	private static List<OverloadInfo> dropshipOverloadList = new ArrayList<OverloadInfo>();
 	private static List<WaitingLoadUnitAndOverload> waitDropshipUnitList = new ArrayList<WaitingLoadUnitAndOverload>();
-	private static BaseLocation baseLocation = InformationManager.Instance()
-			.getMainBaseLocation(InformationManager.Instance().selfPlayer);
+/*	private static BaseLocation baseLocation = InformationManager.Instance()
+			.getMainBaseLocation(InformationManager.Instance().selfPlayer);*/
+	
+	private static Position baseLocation = BuildOrder_Initial.hatcheryPosition;
+	
+	
 	// 정찰할 지역 리스트를 넣어둔다.
 	private static List<Position> exploreAreaList = new ArrayList<Position>();
 		
@@ -308,9 +312,9 @@ public class OverloadManager {
 
 		// 2. 히드라 따라다니기
 		if (withAttackUnitMap.get(UnitType.Zerg_Hydralisk) != null) {
-			List<Unit> hydraliskList = StrategyManager.Instance().myHydraliskList;
-			if (hydraliskList != null && hydraliskList.size() != 0 && queue.size() != 0) {
-				queue = rebalanceWithAttackUnitOverload(2, hydraliskList, queue);
+			List<Unit> HydraliskList = StrategyManager.Instance().myHydraliskList;
+			if (HydraliskList != null && HydraliskList.size() !=0 && queue.size() != 0) {
+				queue = rebalanceWithAttackUnitOverload(2, HydraliskList, queue);
 			}
 		}
 
@@ -368,17 +372,23 @@ public class OverloadManager {
 		}
 
 		// 공격유닛따라다니기 관련 update
-		if (MyBotModule.Broodwar.getFrameCount() % 24 == 0 && withAttackUnitOverloadList.size() != 0) {
+		if (MyBotModule.Broodwar.getFrameCount() % 8 == 0 && withAttackUnitOverloadList.size() != 0) 
+		{
 			Unit underAttackHydralisk = null;
 			Unit underAttackMutallisk = null;
-			a: for (Unit hydra : StrategyManager.Instance().myHydraliskList) {
-				for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(hydra.getPosition(), 6 * Config.TILE_SIZE)) {
+			
+			
+			a: for (Unit Hydralisk : StrategyManager.Instance().myHydraliskList) { 
+				for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(Hydralisk.getPosition(), 6 * Config.TILE_SIZE)) {
 					if (enemy.getPlayer() == StrategyManager.Instance().enemyPlayer) {
-						underAttackHydralisk = hydra;
+						underAttackHydralisk = Hydralisk;
 						break a;
 					}
 				}
 			}
+			
+			
+			
 			a: for (Unit mutal : StrategyManager.Instance().myMutaliskList) {
 				for (Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(mutal.getPosition(), 6 * Config.TILE_SIZE)) {
 					if (enemy.getPlayer() == StrategyManager.Instance().enemyPlayer) {
@@ -390,7 +400,7 @@ public class OverloadManager {
 
 			for (OverloadInfo overloadInfo : withAttackUnitOverloadList) {
 				if (overloadInfo.followingAttackUnit.getType() == UnitType.Zerg_Hydralisk) {
-					if (underAttackHydralisk != null) {
+					if (underAttackHydralisk != null) {					
 						overloadInfo.followingAttackUnit = underAttackHydralisk;
 					} else if (overloadInfo.followingAttackUnit == null
 							|| overloadInfo.followingAttackUnit.exists() == false
@@ -405,7 +415,7 @@ public class OverloadManager {
 					} else if (overloadInfo.followingAttackUnit == null
 							|| overloadInfo.followingAttackUnit.exists() == false
 							|| overloadInfo.followingAttackUnit.getHitPoints() <= 0) {
-						if (StrategyManager.Instance().myHydraliskList.size() > 0) {
+						if (StrategyManager.Instance().myMutaliskList.size() > 0) {
 							overloadInfo.followingAttackUnit = StrategyManager.Instance().myMutaliskList.get(0);
 						}
 					}
@@ -413,25 +423,25 @@ public class OverloadManager {
 			}
 		}
 
-		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) {
+		if (MyBotModule.Broodwar.getFrameCount() % 8 != 0) {
 			return;
 		}
 
 		for (OverloadInfo overloadInfo : allOverloadList) {
 			if (overloadInfo.status == overloadStatus.withAttackUnit) {
 				if (overloadInfo.overLoad.isUnderAttack()) {
-					commandUtil.move(overloadInfo.overLoad, baseLocation.getPosition());
+					commandUtil.move(overloadInfo.overLoad, baseLocation); // baseLocation.getPosition()
 				} else {
 					commandUtil.move(overloadInfo.overLoad, overloadInfo.followingAttackUnit.getPosition());
 				}
 			} else if (overloadInfo.status == overloadStatus.scout) {
 				if (overloadInfo.overLoad.isUnderAttack()) {
-					commandUtil.move(overloadInfo.overLoad, baseLocation.getPosition());
+					commandUtil.move(overloadInfo.overLoad, baseLocation); // baseLocation.getPosition()
 				} else {
 					commandUtil.move(overloadInfo.overLoad, overloadInfo.exploreArea);
 				}
 			} else if (overloadInfo.status == overloadStatus.wait) {
-				commandUtil.move(overloadInfo.overLoad, baseLocation.getPosition());
+				commandUtil.move(overloadInfo.overLoad, baseLocation); // baseLocation.getPosition()
 			} else if (overloadInfo.status == overloadStatus.dropshipWaitingForUnit) {
 				// 아직 미구현 --> 쓸 일 없음
 			} else if (overloadInfo.status == overloadStatus.dropshipConcentrating) {
@@ -497,7 +507,7 @@ public class OverloadManager {
 		while (waitOverloadQueue.isEmpty() == false) {
 			OverloadInfo target = waitOverloadQueue.poll();
 			target.status = overloadStatus.wait;
-			target.exploreArea = baseLocation.getPosition();
+			target.exploreArea = baseLocation; // baseLocation.getPosition()
 			target.followingAttackUnit = null;
 			waitOverloadList.add(target);
 		}

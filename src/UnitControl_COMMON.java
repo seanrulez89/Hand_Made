@@ -46,16 +46,16 @@ public class UnitControl_COMMON {
 		}
 
 		
-		
+		/*
 		MyBotModule.Broodwar.drawCircleMap(StrategyManager.Instance().mySecondChokePoint.getCenter(), 6 * Config.TILE_SIZE, Color.Blue);
-		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(StrategyManager.Instance().mySecondChokePoint.getCenter(), 12 * Config.TILE_SIZE)) 
+		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(StrategyManager.Instance().mySecondChokePoint.getCenter(), 6 * Config.TILE_SIZE)) 
 		{
 			if (unit.getPlayer().equals(InformationManager.Instance().enemyPlayer)) 
 			{ 
 				defenseSite.add(unit.getPosition()); 
 			}			
 		}
-		
+		*/
 		
 
 		
@@ -70,6 +70,17 @@ public class UnitControl_COMMON {
 				}			
 			}
 		}
+		
+		/*
+		MyBotModule.Broodwar.drawCircleMap(StrategyManager.Instance().myFirstExpansionLocation.getPosition(), 30 * Config.TILE_SIZE, Color.Red);
+		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(StrategyManager.Instance().myFirstExpansionLocation.getPosition(), 30 * Config.TILE_SIZE)) 
+		{
+			if (unit.getPlayer().equals(InformationManager.Instance().enemyPlayer)) 
+			{ 
+				defenseSite.add(unit.getPosition());
+			}			
+		}
+		*/
 		
 		
 		
@@ -252,7 +263,7 @@ public class UnitControl_COMMON {
 			Position middlePosition = new Position ((expansionLocation.getX()+tempChokePoint.getX())/2,
 					(expansionLocation.getY()+tempChokePoint.getY())/2);
 		
-			defenseSite.add(middlePosition);
+			//defenseSite.add(middlePosition);
 			
 			
 			//defenseSite.add(bwta.BWTA.getNearestChokepoint(expansionLocation.getPosition()).getCenter());

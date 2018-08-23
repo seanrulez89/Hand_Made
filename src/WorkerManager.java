@@ -334,19 +334,7 @@ public class WorkerManager {
 				//System.out.println(MyBotModule.Broodwar.getFrameCount()/24+"초/ 플래그 초기화");
 			}
 			
-			if(numberOfEarlyAttackUnit >= 1 && defenceFlagforEarlyAttack == 0 && myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool)>0)
-			{
-				
-				
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-				
-				System.out.println("저글링 생산!");
-				defenceFlagforEarlyAttack = 1;
-
-			}//30초에 한번 실행 :  기지 근처에 적이 있으면 저글링 4마리 생산 (경기 시간 10분까지만)
+			//30초에 한번 실행 :  기지 근처에 적이 있으면 저글링 4마리 생산 (경기 시간 10분까지만)
 
 			/*			
 			if(numberOfEarlyAttackUnit == 0)
@@ -434,10 +422,34 @@ public class WorkerManager {
 					if (BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) < 2) {
 						
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Sunken_Colony, false);
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Sunken_Colony, false);
 						
 					}
 				}
 			}
+			
+			
+			
+			if(numberOfEarlyAttackUnit >= 1 && defenceFlagforEarlyAttack == 0 && myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool)>0)
+			{
+				
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) ==0 )
+				{
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
+							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
+							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+					
+					System.out.println("저글링 생산!");
+					defenceFlagforEarlyAttack = 1;
+				}
+				
+
+			}
+			
+			
+			
+			
 
 		}
 

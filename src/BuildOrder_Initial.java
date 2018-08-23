@@ -235,6 +235,11 @@ public class BuildOrder_Initial {
 				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 		
 		
+		if(InformationManager.Instance().enemyRace.equals(Race.Protoss))
+		{
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Spore_Colony, true);
+		}
+		
 
 
 		

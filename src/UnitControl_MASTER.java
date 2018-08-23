@@ -96,6 +96,43 @@ public class UnitControl_MASTER {
 		}
 		
 		
+		
+		if(StrategyManager.Instance().mySunkenColonyList.size()>0)
+		{
+			for(Unit sunken : StrategyManager.Instance().mySunkenColonyList)
+			{
+				int tempHP = 0;
+				int minHP = 10000 ;
+				Unit target = null;
+				for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(sunken.getPosition(), sunken.getType().groundWeapon().maxRange()))
+				{
+					if(enemy.getPlayer().equals(StrategyManager.Instance().enemyPlayer))
+					{
+						tempHP = enemy.getShields()+enemy.getHitPoints();
+						if(tempHP<minHP)
+						{
+							minHP = tempHP;
+							target = enemy;
+						}
+					}
+					
+					
+				}
+				
+				if(target!=null)
+				{
+					//private CommandUtil commandUtil = new CommandUtil();
+					//CommandUtil.this.attackUnit(sunken, target);
+					new CommandUtil().attackUnit(sunken, target);
+					System.out.println("target : " + target.getID() + " / HP : " + minHP);
+				}
+				
+			}
+			
+			
+		}
+		
+		
 	}
 	
 	

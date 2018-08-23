@@ -63,7 +63,7 @@ public class UnitControl_Lurker {
 									}
 									else
 									{
-										lurkerAttackLogic(unit, UnitControl_COMMON.movePosition);
+										lurkerAttackLogic(unit,SM.enemyMainBaseLocation.getPosition());
 									}
 									
 									

@@ -499,6 +499,21 @@ public class UnitControl_Hydralisk {
 			//}
 		}
 		
+		/*
+		if (MyBotModule.Broodwar.getFrameCount() > 24*60*6.0 && MyBotModule.Broodwar.getFrameCount() < 24*60*6.1)
+		{
+			for(Unit Hydralisk : SM.myHydraliskList)
+			{
+				commandUtil.attackMove(Hydralisk, SM.enemyMainBaseLocation.getPosition());
+			}
+			return;
+		}
+		*/
+		
+		
+		
+		
+		
 		//setStartGatherEndPoint();
 		
 		if(UnitControl_COMMON.moveIndex == UnitControl_COMMON.BASIC_MOVE_INDEX)
@@ -597,8 +612,17 @@ public class UnitControl_Hydralisk {
 				}
 				else
 				{
-					commandUtil.move(Hydralisk, setFleePoint(averagePosition));
-					continue;
+					if(SM.combatState == StrategyManager.CombatState.attackStarted)
+					{
+						commandUtil.move(Hydralisk, setFleePoint(averagePosition));
+						continue;
+					}
+					else
+					{
+						commandUtil.move(Hydralisk, SM.myMainBaseLocation.getPosition());
+						continue;
+					}
+					
 				}
 				
 				
@@ -699,7 +723,7 @@ public class UnitControl_Hydralisk {
 								}
 								else
 								{
-									commandUtil.attackMove(Hydralisk, movePosition);
+									commandUtil.attackMove(Hydralisk, SM.enemyMainBaseLocation.getPosition());
 									continue;
 								}
 								
