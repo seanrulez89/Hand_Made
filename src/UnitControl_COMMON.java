@@ -54,7 +54,7 @@ public class UnitControl_COMMON {
 		}
 
 		
-		/*
+		
 		MyBotModule.Broodwar.drawCircleMap(StrategyManager.Instance().mySecondChokePoint.getCenter(), 6 * Config.TILE_SIZE, Color.Blue);
 		for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(StrategyManager.Instance().mySecondChokePoint.getCenter(), 6 * Config.TILE_SIZE)) 
 		{
@@ -63,7 +63,7 @@ public class UnitControl_COMMON {
 				defenseSite.add(unit.getPosition()); 
 			}			
 		}
-		*/
+		
 		
 
 		

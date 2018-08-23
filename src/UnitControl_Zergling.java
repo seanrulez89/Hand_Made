@@ -341,7 +341,50 @@ public class UnitControl_Zergling {
 						}
 
 					} else {
-						commandUtil.attackMove(Zergling, SM.myFirstChokePoint.getCenter());
+						
+						
+						
+						//commandUtil.attackMove(Zergling, SM.myFirstChokePoint.getCenter());
+						
+						
+						Unit nextTarget = null;
+						nextTarget = getNextTargetOf(UnitType.Zerg_Zergling, Zergling.getPosition());
+						
+												
+						if (nextTarget != null) 
+						{
+							commandUtil.attackUnit(Zergling, nextTarget);
+							continue;
+						}
+						
+						
+						
+						
+						if (UnitControl_COMMON.defenseSite.isEmpty()==false && Zergling.isAttacking()==false)
+						{
+							Position toSearch = UnitControl_COMMON.getClosestDefenseSite(Zergling);
+							nextTarget = getNextTargetOf(UnitType.Zerg_Zergling, toSearch);
+							
+							if(nextTarget!=null) 
+							{
+								commandUtil.attackMove(Zergling, nextTarget.getPosition());
+							}
+							
+											
+						}		
+						else
+						{
+							commandUtil.attackMove(Zergling, SM.myFirstChokePoint.getCenter());
+						}
+						
+						
+						
+						
+						
+						
+						
+						
+						
 					}
 
 				}
