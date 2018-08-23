@@ -311,7 +311,7 @@ public class WorkerManager {
 			for (BaseLocation myBase : myBaseLocations) 
 			{
 
-				for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(myBase.getPosition(), 18 * Config.TILE_SIZE)) 
+				for (Unit unit : MyBotModule.Broodwar.getUnitsInRadius(myBase.getPosition(), 12 * Config.TILE_SIZE)) 
 				{
 			
 					if (unit.getPlayer() == StrategyManager.Instance().enemyPlayer
@@ -430,15 +430,17 @@ public class WorkerManager {
 			
 			
 			
-			if(numberOfEarlyAttackUnit >= 1 && defenceFlagforEarlyAttack == 0 && myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool)>0)
+			if(numberOfEarlyAttackUnit >= 1 && defenceFlagforEarlyAttack == 0 
+					&& myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool)>0
+					&& myPlayer.completedUnitCount(UnitType.Zerg_Zergling)<8)
 			{
 				
-				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) ==0 )
+				if(BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) == 0 )
 				{
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
-							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
-							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 					
 					System.out.println("저글링 생산!");
 					defenceFlagforEarlyAttack = 1;
