@@ -1,3 +1,11 @@
+/*
+KATA BOT
+BasicBot
+fastMutalBot
+ML_Q_Learning_Bot
+Bomb_Drop
+Squad_Sample
+*/
 
 import java.*;
 import java.io.BufferedReader;
@@ -346,21 +354,21 @@ public class StrategyManager {
 		if (combatState == CombatState.defenseMode) {
 
 			/// 아군 공격유닛 들에게 방어를 지시합니다
-			MyBotModule.Broodwar.drawTextScreen(100, y, "Defense Mode");
+			// MyBotModule.Broodwar.drawTextScreen(100, y, "Defense Mode");
 
 			commandMyCombatUnitToDefense();
 
 
 			/// 공격 모드로 전환할 때인지 여부를 판단합니다
 			if (isTimeToStartAttack()) {
-				MyBotModule.Broodwar.drawTextScreen(100, y, "Attack Mode" + attack_cnt);
+				//MyBotModule.Broodwar.drawTextScreen(100, y, "Attack Mode" + attack_cnt);
 				combatState = CombatState.attackStarted;
 			}
 			
 			
 			/// 적군을 Eliminate 시키는 모드로 전환할지 여부를 판단합니다
 			if (isTimeToStartElimination()) {
-				MyBotModule.Broodwar.drawTextScreen(100, y, "Eliminate Mode");
+				//MyBotModule.Broodwar.drawTextScreen(100, y, "Eliminate Mode");
 				combatState = CombatState.eliminateEnemy;
 			}
 			
@@ -372,19 +380,19 @@ public class StrategyManager {
 		else if (combatState == CombatState.attackStarted) {
 
 			/// 아군 공격유닛 들에게 공격을 지시합니다
-			MyBotModule.Broodwar.drawTextScreen(100, y, "Attack Mode" + attack_cnt);
+			//MyBotModule.Broodwar.drawTextScreen(100, y, "Attack Mode" + attack_cnt);
 			commandMyCombatUnitToAttack();
 
 			/// 방어 모드로 전환할 때인지 여부를 판단합니다
 			if (isTimeToStartDefense()) {
-				MyBotModule.Broodwar.drawTextScreen(100, y, "Defense Mode");
+				//MyBotModule.Broodwar.drawTextScreen(100, y, "Defense Mode");
 				combatState = CombatState.defenseMode;
 
 			}
 
 			/// 적군을 Eliminate 시키는 모드로 전환할지 여부를 판단합니다
 			if (isTimeToStartElimination()) {
-				MyBotModule.Broodwar.drawTextScreen(100, y, "Eliminate Mode");
+				//MyBotModule.Broodwar.drawTextScreen(100, y, "Eliminate Mode");
 				combatState = CombatState.eliminateEnemy;
 			}
 			
@@ -392,7 +400,7 @@ public class StrategyManager {
 		} else if (combatState == CombatState.eliminateEnemy) {
 
 			/// 적군을 Eliminate 시키도록 아군 공격 유닛들에게 지시합니다
-			MyBotModule.Broodwar.drawTextScreen(100, y, "Eliminate Mode");
+			//MyBotModule.Broodwar.drawTextScreen(100, y, "Eliminate Mode");
 			commandMyCombatUnitToEliminate();
 		}
 	}
@@ -404,7 +412,7 @@ public class StrategyManager {
 
 	boolean isTimeToStartAttack() {
 
-		MyBotModule.Broodwar.drawTextScreen(100, 240, "Wave Count : " + attack_cnt);
+		//MyBotModule.Broodwar.drawTextScreen(100, 240, "Wave Count : " + attack_cnt);
 			
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lurker) > 4 && myPlayer.getUpgradeLevel(UpgradeType.Ventral_Sacs)==1) {
 
@@ -442,7 +450,7 @@ public class StrategyManager {
 		
 		if(UnitControl_COMMON.defenseSite.isEmpty()==false)
 		{
-			System.out.println(111);
+			//System.out.println(111);
 			return true;
 		}
 		
@@ -455,7 +463,7 @@ public class StrategyManager {
 		
 		
 		if (myHydraliskList.size() < 13) {
-			System.out.println(333);
+			//System.out.println(333);
 			return true;
 		}
 		
@@ -493,13 +501,13 @@ public class StrategyManager {
 		}
 		
 		if (myUnitCountAroundEnemyMainBaseLocation > 24) {
-			System.out.println("eli case 1");
+			//System.out.println("eli case 1");
 			return true;
 		}
 
 		// 30분이 경과했고 내 유닛이 80 이상이라면 
 		if (MyBotModule.Broodwar.getFrameCount() > 24*60*30 && myPlayer.supplyUsed() > 300) {
-			System.out.println("eli case 2");
+			//System.out.println("eli case 2");
 			return true;
 		}
 
@@ -1052,7 +1060,7 @@ public class StrategyManager {
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 							BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, false);
 					
-					System.out.println(1);
+				//	System.out.println(1);
 				}
 			}
 			else if(numberOfMyCombatUnitTrainingBuilding == 1 
@@ -1066,7 +1074,7 @@ public class StrategyManager {
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 							BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, false);
 					
-					System.out.println(2);
+				//	System.out.println(2);
 				}
 			}
 			
@@ -1084,7 +1092,7 @@ public class StrategyManager {
 						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 								nextExpansion.getTilePosition(), true);
 						
-						System.out.println(3);
+					//	System.out.println(3);
 					}
 				}
 				else
@@ -1093,7 +1101,7 @@ public class StrategyManager {
 					{
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 								nextExpansion.getTilePosition(), true);
-						System.out.println(4);
+					//	System.out.println(4);
 					}
 					
 				}
@@ -1113,7 +1121,7 @@ public class StrategyManager {
 						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 								nextExpansion.getTilePosition(), true);
 						
-						System.out.println(5);
+					//	System.out.println(5);
 					}
 				}
 				else
@@ -1122,7 +1130,7 @@ public class StrategyManager {
 					{
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 								nextExpansion.getTilePosition(), true);
-						System.out.println(6);
+					//	System.out.println(6);
 					}
 					
 				}
@@ -1148,7 +1156,7 @@ public class StrategyManager {
 					{
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 								BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-						System.out.println(7);
+					//	System.out.println(7);
 					}
 				}
 				

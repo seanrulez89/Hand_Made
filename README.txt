@@ -1,6 +1,7 @@
 Steamhammer.txt - license for Steamhammer, 우리 봇은 Steamhammer을 참조했습니다.
 2017년 알고리즘 경진대회 참여봇 BULLBUG을 참조했습니다.
 2017년 알고리즘 경진대회 KATA BOT을 참조했습니다.
+2018년 알고리즘 경진대회 BasicBot을 참조했습니다.
 2018년 알고리즘 경진대회 fastMutalBot을 참조했습니다.
 2018년 알고리즘 경진대회 ML_Q_Learning_Bot을 참조했습니다.
 2018년 알고리즘 경진대회 Bomb_Drop을 참조했습니다.

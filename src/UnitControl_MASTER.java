@@ -1,4 +1,11 @@
-
+/*
+KATA BOT
+BasicBot
+fastMutalBot
+ML_Q_Learning_Bot
+Bomb_Drop
+Squad_Sample
+*/
 
 import java.util.*;
 
@@ -124,7 +131,7 @@ public class UnitControl_MASTER {
 					//private CommandUtil commandUtil = new CommandUtil();
 					//CommandUtil.this.attackUnit(sunken, target);
 					new CommandUtil().attackUnit(sunken, target);
-					System.out.println("target : " + target.getID() + " / HP : " + minHP);
+					//System.out.println("target : " + target.getID() + " / HP : " + minHP);
 				}
 				
 			}

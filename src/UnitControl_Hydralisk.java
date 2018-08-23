@@ -1,3 +1,11 @@
+/*
+KATA BOT
+BasicBot
+fastMutalBot
+ML_Q_Learning_Bot
+Bomb_Drop
+Squad_Sample
+*/
 
 import java.util.*;
 
@@ -280,7 +288,7 @@ public class UnitControl_Hydralisk {
 			{
 				Position tempPosition = new Position(averagePosition.getX()+4*Config.TILE_SIZE*i+16*i, averagePosition.getY()+4*Config.TILE_SIZE*j+16*j);
 				
-				MyBotModule.Broodwar.drawCircleMap(tempPosition, 3 * Config.TILE_SIZE, Color.Red);
+				//MyBotModule.Broodwar.drawCircleMap(tempPosition, 3 * Config.TILE_SIZE, Color.Red);
 
 				currentEnemy = 0;
 				for(Unit enemy : MyBotModule.Broodwar.getUnitsInRadius(tempPosition, 3 * Config.TILE_SIZE))				
@@ -771,7 +779,7 @@ public class UnitControl_Hydralisk {
 		{
 			Position destination = PredictMovement(target, 8);	// the number is how many frames to look ahead
 			//BWAPI::Broodwar->drawLineMap(attacker->getPosition(), destination, BWAPI::Colors::Blue);
-			MyBotModule.Broodwar.drawLineMap(attacker.getPosition(), destination, Color.Yellow);
+			//MyBotModule.Broodwar.drawLineMap(attacker.getPosition(), destination, Color.Yellow);
 			commandUtil.move(attacker, destination);
 			System.out.println("추격");
 		}

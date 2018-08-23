@@ -1,3 +1,11 @@
+/*
+KATA BOT
+BasicBot
+fastMutalBot
+ML_Q_Learning_Bot
+Bomb_Drop
+Squad_Sample
+*/
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -369,11 +377,9 @@ public class WorkerManager {
 				numberOfUnitType_Zerg_Sunken_Colony += BuildManager.Instance().buildQueue
 						.getItemCount(UnitType.Zerg_Sunken_Colony);
 
-				System.out.println("numberOfUnitType_Zerg_Creep_Colony : " +
-				numberOfUnitType_Zerg_Creep_Colony);
-				System.out.println("+++++");
-				System.out.println("numberOfUnitType_Zerg_Sunken_Colony : " +
-				numberOfUnitType_Zerg_Sunken_Colony);
+				//System.out.println("numberOfUnitType_Zerg_Creep_Colony : " + numberOfUnitType_Zerg_Creep_Colony);
+				//System.out.println("+++++");
+				//System.out.println("numberOfUnitType_Zerg_Sunken_Colony : " +numberOfUnitType_Zerg_Sunken_Colony);
 
 				
 				for (Unit building : MyBotModule.Broodwar.self().getUnits()) 
@@ -385,7 +391,7 @@ public class WorkerManager {
 							building.cancelMorph();// 이걸로 크립, 성큰콜로니 지을 미네랄을 확보한다
 							BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
 									BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
-							System.out.println("해처리 취소");
+							//System.out.println("해처리 취소");
 						}
 					}
 				}
@@ -442,7 +448,7 @@ public class WorkerManager {
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling,
 							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 					
-					System.out.println("저글링 생산!");
+					//System.out.println("저글링 생산!");
 					defenceFlagforEarlyAttack = 1;
 				}
 				

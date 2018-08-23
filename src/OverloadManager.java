@@ -220,7 +220,7 @@ public class OverloadManager {
 
 	public void goDropships() {
 		if (canDropshipsGoAttack() == false) {
-			System.out.println("아직 공격 불가입니다.");
+			//System.out.println("아직 공격 불가입니다.");
 			return;
 		}
 		for (OverloadInfo overloadInfo : dropshipOverloadList) {
@@ -287,14 +287,14 @@ public class OverloadManager {
 				} else if (overloadInfo.status == overloadStatus.dropshipAttack) {
 					dropshipOverloadList.remove(overloadInfo);
 				} else {
-					System.out.println("문제가있어요!!!removeOverload");
+					//System.out.println("문제가있어요!!!removeOverload");
 				}
 				allOverloadList.remove(overloadInfo);
 				rebalance();
 				return;
 			}
 		}
-		System.out.println("문제가있어요2!!removeOverload");
+		//System.out.println("문제가있어요2!!removeOverload");
 	}
 
 	public void rebalance() {
@@ -457,9 +457,9 @@ public class OverloadManager {
 				//System.out.println("overloadInfo.overLoad.getHitPoints() : " + overloadInfo.overLoad.getHitPoints());
 				if (overloadInfo.overLoad.getHitPoints() < 50) {
 					if (overloadInfo.overLoad.unloadAll(overloadInfo.overLoad.getPosition(), false)) {
-						System.out.println("정상적으로 내렸다");
+						//System.out.println("정상적으로 내렸다");
 					} else {
-						System.out.println("못내림..");
+						//System.out.println("못내림..");
 					}
 					continue;
 				}
@@ -477,9 +477,9 @@ public class OverloadManager {
 					if (overloadInfo.overLoad.getDistance(targetPosition.toPosition()) < 32) {
 						if (overloadInfo.overLoad.canUnload()) {
 							if (overloadInfo.overLoad.unloadAll(overloadInfo.overLoad.getPosition(), false)) {
-								System.out.println("정상적으로 내렸다");
+								//System.out.println("정상적으로 내렸다");
 							} else {
-								System.out.println("못내림..");
+								//System.out.println("못내림..");
 							}
 						}
 					} else {

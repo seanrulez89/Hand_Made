@@ -1,3 +1,12 @@
+/*
+KATA BOT
+BasicBot
+fastMutalBot
+ML_Q_Learning_Bot
+Bomb_Drop
+Squad_Sample
+*/
+
 
 import java.util.*;
 
